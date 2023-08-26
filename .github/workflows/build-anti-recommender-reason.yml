@@ -36,6 +36,9 @@ jobs:
       - name: Install all deps
         run: make install
 
+      - name: Install melange-json
+        run: opam pin add melange-json.dev git+https://github.com/melange-community/melange-json.git#main
+
       - name: Build basic template
         run: make build
 
@@ -44,4 +47,4 @@ jobs:
 
       - name: Run Node app
         run: |
-          node _build/default/src/node/src/Hello.js
+          node _build/default/src/node/src/Index.js
