@@ -1,0 +1,20 @@
+opam-version: "2.0"
+synopsis: "Anti-Recommender prototype"
+description: "An Anti-Recommender prototype in ReasonReact"
+maintainer: ["imlapps"]
+authors: ["imlapps"]
+license: "MIT"
+homepage: "https://github.com/imlapps/anti-recommender"
+bug-reports: "https://github.com/imlapps/anti-recommender/issues"
+depends: [
+  "ocaml" {>= "4.14.0" & < "5.0.0"}
+  "reason" {>= "3.8.1" & < "4.0.0"}
+  "dune" {>= "3.8"}
+  "melange" {>= "1.0.0"}
+  "reactjs-jsx-ppx" {>= "1.0.0"}
+  "reason-react" {>= "0.11.0"}
+  "ocaml-lsp-server" {dev}
+  "dot-merlin-reader" {dev}
+  "odoc" {with-doc}
+]
+dev-repo: "git+https://github.com/imlapps/anti-recommender.git"

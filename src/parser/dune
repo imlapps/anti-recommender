@@ -1,0 +1,6 @@
+(library
+ (name parser)
+ (libraries melange-json reason-react)
+ (preprocess
+  (pps reactjs-jsx-ppx))
+ (modes melange))

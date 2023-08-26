@@ -1,0 +1,6 @@
+(library
+ (name mui)
+ (libraries components reason-react)
+ (preprocess
+  (pps reactjs-jsx-ppx))
+ (modes melange))

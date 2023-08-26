@@ -1,0 +1,6 @@
+(library
+ (name components)
+ (libraries datatypes reason-react)
+ (preprocess
+  (pps reactjs-jsx-ppx))
+ (modes melange))
