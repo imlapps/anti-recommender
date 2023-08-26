@@ -1,0 +1,9 @@
+(melange.emit
+ (target output)
+ (alias react)
+ (libraries reason-react mui parser reader)
+ (preprocess
+  (pps reactjs-jsx-ppx))
+ (module_systems es6))
+
+; Note to Self: add node output command and change watch command in Makefile
