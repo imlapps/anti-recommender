@@ -51,7 +51,7 @@ type Msg
   = GotFile (Result Http.Error String) 
 
 
--- Read in Wikipedia Dump output
+-- Read Wikipedia JSONL file
 getFile: Cmd Msg
 getFile = Http.get
       { url = "http://localhost:8000/src/storage/mini-wikipedia.output.txt"
@@ -92,7 +92,7 @@ sublinkDecoder =
        (field "anchor" string)
        (field "link" string)
 
-
+-- UPDATE
 update : Msg -> Model -> (Model, Cmd Msg)
 update msg model =
   case msg of
@@ -111,9 +111,6 @@ subscriptions : Model -> Sub Msg
 subscriptions model =
   Sub.none
 
-
--- JSON DECODERS
-
 -- VIEW
 view : Model -> Html Msg
 view model =
@@ -129,7 +126,7 @@ view model =
       [ div [] [ printWikipediaTitle (Array.get 1 wikipediaRecordsArray) ]
       ]
 
-
+-- Add Wikipedia Title to HTML
 printWikipediaTitle : Maybe WikipediaRecord -> Html Msg
 printWikipediaTitle record =
         case record of 

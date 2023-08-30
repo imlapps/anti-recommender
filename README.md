@@ -1,5 +1,5 @@
 # anti-recommender
-Anti-recommender system
+Anti-recommender prototype in Elm
 
 ## Building Locally
 
