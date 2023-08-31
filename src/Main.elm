@@ -22,9 +22,17 @@ main = Browser.element
     , view = view
     }
 
-type LoadDataStatus = Failure | Loading | Success (Array WikipediaRecord)
+-- INIT
+init : () -> (Model, Cmd Msg)
+init _ =
+  ( {status = Loading , index = 0}
+  , getFile
+  )
+
+
 
 -- MODEL
+type LoadDataStatus = Failure | Loading | Success (Array WikipediaRecord)
 type alias Model =  {status: LoadDataStatus, index: Int}
 
 -- Type Aliases for the Wikipedia Record 
@@ -41,12 +49,6 @@ type alias Sublink = {
   anchor: String,
   link: String}
 
-
-init : () -> (Model, Cmd Msg)
-init _ =
-  ( {status = Loading , index = 0}
-  , getFile
-  )
 
 
 -- UPDATE
@@ -67,6 +69,7 @@ buildWikipediaRecordsList: String -> List (WikipediaRecord)
 buildWikipediaRecordsList fileText =
                           fileText |> split "\n"
                                    |> List.map(parseWikipediaJsonl)
+                                   |> List.filter(filterWikipediaRecords)
 
 -- Main function to parse JSONL
 parseWikipediaJsonl : String -> WikipediaRecord
@@ -74,6 +77,16 @@ parseWikipediaJsonl wikiString =
       let res = (decodeString wikipediaRecordDecoder wikiString ) in case res of
           Ok record -> record
           Err _ -> WikipediaRecord Nothing Nothing
+
+-- Filter out suitable WikipediaRecords
+-- A suitable WikipediaRecord is a record that has at least the abstract_info filled 
+filterWikipediaRecords : WikipediaRecord -> Bool
+filterWikipediaRecords wikiRecord = 
+                      case wikiRecord.abstract_info of 
+                          Nothing -> 
+                                  False
+                          Just _ ->
+                                  True
 
 -- WikipediaRecord Decoder
 wikipediaRecordDecoder : Decoder WikipediaRecord
@@ -137,7 +150,7 @@ view model =
         div [class "sidenav"] [ul [] 
         (printWikipediaSublinks (Array.get model.index wikipediaRecordsArray))],
         div [class "content"] [ 
-          h2 [] [printWikipediaTitle (Array.get model.index wikipediaRecordsArray)], 
+          h2 [] [printWikipediaTitle (Array.get model.index wikipediaRecordsArray)],
           div [] [
             p [] [printWikipediaUrl (Array.get model.index wikipediaRecordsArray)]
           ],
