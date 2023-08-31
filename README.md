@@ -6,7 +6,7 @@ Anti-recommender prototype in Elm
 Run the following commands:
 
 ```bash
-elm make src/Main.elm
+elm make src/Main.elm --output=elm.js
 elm reactor 
 ```
 
