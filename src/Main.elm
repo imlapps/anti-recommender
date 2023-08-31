@@ -25,7 +25,7 @@ main = Browser.element
 -- INIT
 init : () -> (Model, Cmd Msg)
 init _ =
-  ( {status = Loading , index = 0}
+  ( {status = Loading , index = 0, numberOfRecords = 0}
   , getFile
   )
 
@@ -33,7 +33,7 @@ init _ =
 
 -- MODEL
 type LoadDataStatus = Failure | Loading | Success (Array WikipediaRecord)
-type alias Model =  {status: LoadDataStatus, index: Int}
+type alias Model =  {status: LoadDataStatus, index: Int, numberOfRecords: Int}
 
 -- Type Aliases for the Wikipedia Record 
 type alias WikipediaRecord = {
@@ -114,14 +114,18 @@ update : Msg -> Model -> (Model, Cmd Msg)
 update msg model =
   case msg of
     Next ->
-       ({model | index = model.index + 1}, Cmd.none)
+       ({model | index = if model.index >= model.numberOfRecords - 1 then 0 
+                         else model.index + 1}, Cmd.none)
     Back ->
-       ({model | index = model.index - 1 }, Cmd.none)
+       ({model | index = if model.index <= 0  then model.numberOfRecords - 1 
+                         else model.index - 1}, Cmd.none)
     GotText result ->
       case result of
         Ok fileText ->
           let wikipediaRecordsArray = Array.fromList(buildWikipediaRecordsList(fileText)) in
-          ({model | status = Success wikipediaRecordsArray}, Cmd.none)
+          ({model | status = Success wikipediaRecordsArray, 
+                    numberOfRecords = Array.length wikipediaRecordsArray}, 
+          Cmd.none)
         Err _ ->
           ({model | status = Failure}, Cmd.none)
     
@@ -144,7 +148,6 @@ view model =
       text "Loading..."
 
     Success wikipediaRecordsArray ->
-
       div []
       [ 
         div [class "sidenav"] [ul [] 
