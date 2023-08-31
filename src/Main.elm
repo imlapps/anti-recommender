@@ -4,8 +4,12 @@ import Http
 import Browser
 import Array exposing (Array)
 import String exposing (split)
-import Html exposing (Html, text, div)
-import Json.Decode exposing (Decoder, at,map2, map3, list, field, string, decodeString)
+
+import Html exposing (..)
+import Html.Events exposing (..)
+import Html.Attributes exposing (..)
+
+import Json.Decode exposing (Decoder, at,map2, map3, field, string, decodeString)
 
 
 
@@ -21,8 +25,7 @@ main = Browser.element
 type LoadDataStatus = Failure | Loading | Success (Array WikipediaRecord)
 
 -- MODEL
-type alias Model =  {status: LoadDataStatus}
-
+type alias Model =  {status: LoadDataStatus, index: Int}
 
 -- Type Aliases for the Wikipedia Record 
 type alias WikipediaRecord = {
@@ -41,21 +44,22 @@ type alias Sublink = {
 
 init : () -> (Model, Cmd Msg)
 init _ =
-  ( {status = Loading}
+  ( {status = Loading , index = 0}
   , getFile
   )
 
 
 -- UPDATE
 type Msg
-  = GotFile (Result Http.Error String) 
-
+  = GotText (Result Http.Error String) 
+    | Next 
+    | Back
 
 -- Read Wikipedia JSONL file
 getFile: Cmd Msg
 getFile = Http.get
       { url = "http://localhost:8000/src/storage/mini-wikipedia.output.txt"
-      , expect = Http.expectString GotFile
+      , expect = Http.expectString GotText
       }
 
 -- Entry point to parse JSONL
@@ -66,8 +70,8 @@ buildWikipediaRecordsList fileText =
 
 -- Main function to parse JSONL
 parseWikipediaJsonl : String -> WikipediaRecord
-parseWikipediaJsonl wikipediaString =
-      let res = (decodeString wikipediaRecordDecoder wikipediaString) in case res of
+parseWikipediaJsonl wikiString =
+      let res = (decodeString wikipediaRecordDecoder wikiString ) in case res of
           Ok record -> record
           Err _ -> WikipediaRecord Nothing Nothing
 
@@ -75,7 +79,7 @@ parseWikipediaJsonl wikipediaString =
 wikipediaRecordDecoder : Decoder WikipediaRecord
 wikipediaRecordDecoder = map2 WikipediaRecord
                            (Json.Decode.nullable (at ["record","abstract_info"] abstractInfoDecoder))
-                           (Json.Decode.nullable (at ["record","sublinks"] (list sublinkDecoder)))
+                           (Json.Decode.nullable (at ["record","sublinks"] (Json.Decode.list sublinkDecoder)))
 
 -- AbstractInfo Decoder
 abstractInfoDecoder : Decoder AbstractInfo
@@ -96,7 +100,11 @@ sublinkDecoder =
 update : Msg -> Model -> (Model, Cmd Msg)
 update msg model =
   case msg of
-    GotFile result ->
+    Next ->
+       ({model | index = model.index + 1}, Cmd.none)
+    Back ->
+       ({model | index = model.index - 1 }, Cmd.none)
+    GotText result ->
       case result of
         Ok fileText ->
           let wikipediaRecordsArray = Array.fromList(buildWikipediaRecordsList(fileText)) in
@@ -111,6 +119,7 @@ subscriptions : Model -> Sub Msg
 subscriptions model =
   Sub.none
 
+
 -- VIEW
 view : Model -> Html Msg
 view model =
@@ -122,8 +131,24 @@ view model =
       text "Loading..."
 
     Success wikipediaRecordsArray ->
+
       div []
-      [ div [] [ printWikipediaTitle (Array.get 1 wikipediaRecordsArray) ]
+      [ 
+        div [class "sidenav"] [ul [] 
+        (printWikipediaSublinks (Array.get model.index wikipediaRecordsArray))],
+        div [class "content"] [ 
+          h2 [] [printWikipediaTitle (Array.get model.index wikipediaRecordsArray)], 
+          div [] [
+            p [] [printWikipediaUrl (Array.get model.index wikipediaRecordsArray)]
+          ],
+          div [] [
+            p [] [printWikipediaAbstract (Array.get model.index wikipediaRecordsArray)]
+          ],
+          div [] [
+              button [ onClick Back ] [ text "Back" ],
+              button [ onClick Next ] [ text "Next" ]
+          ]
+          ]
       ]
 
 -- Add Wikipedia Title to HTML
@@ -138,3 +163,48 @@ printWikipediaTitle record =
                 text("Nothing")
               Just abstract_info ->
                  text(abstract_info.title)
+
+-- Add Wikipedia Title to HTML
+printWikipediaUrl : Maybe WikipediaRecord -> Html Msg
+printWikipediaUrl record =
+        case record of 
+        Nothing ->
+          text ("Nothing")
+        Just wikiRecord ->
+            case wikiRecord.abstract_info of 
+              Nothing ->
+                text("Nothing")
+              Just abstract_info ->
+                 text(abstract_info.url)
+
+-- Add Wikipedia Abstract to HTML
+printWikipediaAbstract : Maybe WikipediaRecord -> Html Msg
+printWikipediaAbstract record =
+        case record of 
+        Nothing ->
+          text ("Nothing")
+        Just wikiRecord ->
+            case wikiRecord.abstract_info of 
+              Nothing ->
+                text("Nothing")
+              Just abstract_info ->
+                 text(abstract_info.abstract)
+
+-- Add Wikipedia Sublinks List to HTML
+printWikipediaSublinks: Maybe WikipediaRecord -> List(Html Msg)
+printWikipediaSublinks record =
+        case record of 
+          Nothing ->
+            [li [] [a [][text("Nothing")]]]
+          Just wikiRecord ->
+            case wikiRecord.sublinks of 
+              Nothing ->
+               [li [] [a [][text("Nothing")]]]
+              Just sublinks ->
+                (List.map toli sublinks)
+
+-- Add Sublink Item to List
+toli : Sublink -> Html msg
+toli sublink = 
+        li [] [a [href sublink.link] [ text (( sublink.anchor)) ]]
+        
