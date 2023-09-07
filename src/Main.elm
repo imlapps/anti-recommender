@@ -150,7 +150,7 @@ view model =
     Success wikipediaRecordsArray ->
       div []
       [ 
-        div [class "sidenav"] [ul [] 
+        div [class "sidenav"] [ul [style "list-style" "none"] 
         (printWikipediaSublinks (Array.get model.index wikipediaRecordsArray))],
         div [class "content"] [ 
           h2 [] [printWikipediaTitle (Array.get model.index wikipediaRecordsArray)],
@@ -161,8 +161,28 @@ view model =
             p [] [printWikipediaAbstract (Array.get model.index wikipediaRecordsArray)]
           ],
           div [] [
-              button [ onClick Back ] [ text "Back" ],
-              button [ onClick Next ] [ text "Next" ]
+              button [style "background-color" "DodgerBlue",
+                      style "border" "none",
+                      style "color" "white",
+                      style "padding" "12px 16px",
+                      style "font-size" "16px",
+                      style "cursor" "pointer", 
+              onClick Back ] [ 
+                
+                i [class "fa-solid fa-chevron-left"][]
+                
+                 ],
+              button [style "background-color" "DodgerBlue",
+                      style "border" "none",
+                      style "color" "white",
+                      style "padding" "12px 16px",
+                      style "font-size" "16px",
+                      style "cursor" "pointer", 
+              onClick Next ] [ 
+                  
+                  i [class "fa-solid fa-chevron-right"][] 
+                  
+              ]
           ]
           ]
       ]
