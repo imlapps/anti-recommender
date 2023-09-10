@@ -3,13 +3,14 @@ module Main exposing (..)
 import Http
 import Browser
 import Array exposing (Array)
-import String exposing (split)
 
 import Html exposing (..)
 import Html.Events exposing (..)
 import Html.Attributes exposing (..)
 
-import Json.Decode exposing (Decoder, at,map2, map3, field, string, decodeString)
+import Parser exposing (..)
+import WikipediaTypes exposing (..)
+
 
 
 
@@ -35,21 +36,6 @@ init _ =
 type LoadDataStatus = Failure | Loading | Success (Array WikipediaRecord)
 type alias Model =  {status: LoadDataStatus, index: Int, numberOfRecords: Int}
 
--- Type Aliases for the Wikipedia Record 
-type alias WikipediaRecord = {
-  abstract_info : Maybe AbstractInfo,
-  sublinks : Maybe (List Sublink)}  
-
-type alias AbstractInfo = {
-  title: String,
-  url: String,
-  abstract: String} 
-
-type alias Sublink = {
-  anchor: String,
-  link: String}
-
-
 
 -- UPDATE
 type Msg
@@ -64,50 +50,7 @@ getFile = Http.get
       , expect = Http.expectString GotText
       }
 
--- Entry point to parse JSONL
-buildWikipediaRecordsList: String -> List (WikipediaRecord)
-buildWikipediaRecordsList fileText =
-                          fileText |> split "\n"
-                                   |> List.map(parseWikipediaJsonl)
-                                   |> List.filter(filterWikipediaRecords)
 
--- Main function to parse JSONL
-parseWikipediaJsonl : String -> WikipediaRecord
-parseWikipediaJsonl wikiString =
-      let res = (decodeString wikipediaRecordDecoder wikiString ) in case res of
-          Ok record -> record
-          Err _ -> WikipediaRecord Nothing Nothing
-
--- Filter out suitable WikipediaRecords
--- A suitable WikipediaRecord is a record that has at least the abstract_info filled 
-filterWikipediaRecords : WikipediaRecord -> Bool
-filterWikipediaRecords wikiRecord = 
-                      case wikiRecord.abstract_info of 
-                          Nothing -> 
-                                  False
-                          Just _ ->
-                                  True
-
--- WikipediaRecord Decoder
-wikipediaRecordDecoder : Decoder WikipediaRecord
-wikipediaRecordDecoder = map2 WikipediaRecord
-                           (Json.Decode.nullable (at ["record","abstract_info"] abstractInfoDecoder))
-                           (Json.Decode.nullable (at ["record","sublinks"] (Json.Decode.list sublinkDecoder)))
-
--- AbstractInfo Decoder
-abstractInfoDecoder : Decoder AbstractInfo
-abstractInfoDecoder = 
-        map3 AbstractInfo
-                  (field "title" string)
-                  (field "url" string)
-                  (field "abstract" string)
-
--- Sublink Decoder
-sublinkDecoder : Decoder Sublink 
-sublinkDecoder = 
-    map2 Sublink 
-       (field "anchor" string)
-       (field "link" string)
 
 -- UPDATE
 update : Msg -> Model -> (Model, Cmd Msg)
@@ -222,6 +165,7 @@ view model =
           ]
       ]]
 
+        
 -- Add Wikipedia Title to HTML
 getWikipediaTitle : Maybe WikipediaRecord -> Html Msg
 getWikipediaTitle record =
@@ -278,4 +222,3 @@ getWikipediaSublinks record =
 getSublinkItem : Sublink -> Html msg
 getSublinkItem sublink = 
         a [href sublink.link] [ li [][ text (( sublink.anchor)) ]]
-        
