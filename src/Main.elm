@@ -148,48 +148,83 @@ view model =
       text "Loading..."
 
     Success wikipediaRecordsArray ->
-      div []
+      div[][    
+
+        -- Burger Menu     
+        -- nav[][
+        --   div [ id "menuToggle"] [
+        --       input [type_ "checkbox"][],
+        --       span [][],
+        --       span [][],
+        --       span [][],
+        --       ul [id "menu"] 
+        -- (getWikipediaSublinks (Array.get model.index wikipediaRecordsArray))
+        --   ]
+        -- ],
+
+      div [style "display" "flex",
+           style "column-gap" "465px"]
       [ 
-        div [class "sidenav"] [ul [style "list-style" "none"] 
-        (printWikipediaSublinks (Array.get model.index wikipediaRecordsArray))],
-        div [class "content"] [ 
-          h2 [] [printWikipediaTitle (Array.get model.index wikipediaRecordsArray)],
-          div [] [
-            p [] [printWikipediaUrl (Array.get model.index wikipediaRecordsArray)]
-          ],
-          div [] [
-            p [] [printWikipediaAbstract (Array.get model.index wikipediaRecordsArray)]
-          ],
-          div [] [
-              button [style "background-color" "DodgerBlue",
-                      style "border" "none",
-                      style "color" "white",
-                      style "padding" "12px 16px",
-                      style "font-size" "16px",
-                      style "cursor" "pointer", 
-              onClick Back ] [ 
-                
+        -- Back Button
+        div[
+            style "margin-top" "300px",
+            style "margin-left" "50px"]
+        [              
+          button [onClick Back,
+                  style "background-color" "DodgerBlue",
+                  style "border" "none",
+                  style "color" "white",
+                  style "padding" "12px 16px",
+                  style "font-size" "16px",
+                  style "cursor" "pointer"
+                  ] 
+                [ 
                 i [class "fa-solid fa-chevron-left"][]
+                ]
+        ],
+        -- Main Content
+        div [
+             style "width" "500px",
+             style "height" "500px",
+             style "margin-top" "200px"
+            ] [ 
+              div[][
                 
-                 ],
-              button [style "background-color" "DodgerBlue",
+                a[
+                  href (getWikipediaUrl (Array.get model.index wikipediaRecordsArray)),
+                  style "color" "whitesmoke",
+                  style "text-decoration" "none"
+                ][
+                  
+                  h1 [] [getWikipediaTitle (Array.get model.index wikipediaRecordsArray)]]
+              ],
+              div[][p [] [getWikipediaAbstract (Array.get model.index wikipediaRecordsArray)]]
+        
+
+          ],
+
+        -- Next Button
+        div [
+            style "margin-top" "300px",
+            style "margin-right" "50px"] [
+
+              button [onClick Next, 
+                      style "background-color" "DodgerBlue",
                       style "border" "none",
                       style "color" "white",
                       style "padding" "12px 16px",
                       style "font-size" "16px",
-                      style "cursor" "pointer", 
-              onClick Next ] [ 
+                      style "cursor" "pointer" 
+                     ] [ 
                   
                   i [class "fa-solid fa-chevron-right"][] 
-                  
               ]
           ]
-          ]
-      ]
+      ]]
 
 -- Add Wikipedia Title to HTML
-printWikipediaTitle : Maybe WikipediaRecord -> Html Msg
-printWikipediaTitle record =
+getWikipediaTitle : Maybe WikipediaRecord -> Html Msg
+getWikipediaTitle record =
         case record of 
         Nothing ->
           text ("Nothing")
@@ -201,21 +236,21 @@ printWikipediaTitle record =
                  text(abstract_info.title)
 
 -- Add Wikipedia Title to HTML
-printWikipediaUrl : Maybe WikipediaRecord -> Html Msg
-printWikipediaUrl record =
+getWikipediaUrl : Maybe WikipediaRecord -> String
+getWikipediaUrl record =
         case record of 
         Nothing ->
-          text ("Nothing")
+          "Nothing"
         Just wikiRecord ->
             case wikiRecord.abstract_info of 
               Nothing ->
-                text("Nothing")
+                "Nothing"
               Just abstract_info ->
-                 text(abstract_info.url)
+                 abstract_info.url
 
 -- Add Wikipedia Abstract to HTML
-printWikipediaAbstract : Maybe WikipediaRecord -> Html Msg
-printWikipediaAbstract record =
+getWikipediaAbstract : Maybe WikipediaRecord -> Html Msg
+getWikipediaAbstract record =
         case record of 
         Nothing ->
           text ("Nothing")
@@ -227,8 +262,8 @@ printWikipediaAbstract record =
                  text(abstract_info.abstract)
 
 -- Add Wikipedia Sublinks List to HTML
-printWikipediaSublinks: Maybe WikipediaRecord -> List(Html Msg)
-printWikipediaSublinks record =
+getWikipediaSublinks: Maybe WikipediaRecord -> List(Html Msg)
+getWikipediaSublinks record =
         case record of 
           Nothing ->
             [li [] [a [][text("Nothing")]]]
@@ -237,10 +272,10 @@ printWikipediaSublinks record =
               Nothing ->
                [li [] [a [][text("Nothing")]]]
               Just sublinks ->
-                (List.map toli sublinks)
+                (List.map getSublinkItem sublinks)
 
 -- Add Sublink Item to List
-toli : Sublink -> Html msg
-toli sublink = 
-        li [] [a [href sublink.link] [ text (( sublink.anchor)) ]]
+getSublinkItem : Sublink -> Html msg
+getSublinkItem sublink = 
+        a [href sublink.link] [ li [][ text (( sublink.anchor)) ]]
         
