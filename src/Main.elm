@@ -12,8 +12,6 @@ import Parser exposing (..)
 import WikipediaTypes exposing (..)
 
 
-
-
 -- MAIN
 main : Program () Model Msg
 main = Browser.element

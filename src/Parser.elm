@@ -2,7 +2,7 @@ module Parser exposing (parseWikipediaJsonl, buildWikipediaRecordsList)
 
 import String exposing (split)
 import WikipediaTypes exposing (..)
-import Json.Decode exposing (Decoder, at,map2, map3, field, string, decodeString)
+import Json.Decode exposing (Decoder, at,map2, map4, field, string, decodeString)
 
 -- Main function to parse JSONL
 parseWikipediaJsonl : String -> WikipediaRecord
@@ -38,10 +38,11 @@ wikipediaRecordDecoder = map2 WikipediaRecord
 -- AbstractInfo Decoder
 abstractInfoDecoder : Decoder AbstractInfo
 abstractInfoDecoder = 
-        map3 AbstractInfo
+        map4 AbstractInfo
                   (field "title" string)
                   (field "url" string)
                   (field "abstract" string)
+                  (field "image" string)
 
 -- Sublink Decoder
 sublinkDecoder : Decoder Sublink 

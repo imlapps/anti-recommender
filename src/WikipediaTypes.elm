@@ -8,7 +8,8 @@ type alias WikipediaRecord = {
 type alias AbstractInfo = {
   title: String,
   url: String,
-  abstract: String} 
+  abstract: String,
+  image: String} 
 
 type alias Sublink = {
   anchor: String,
