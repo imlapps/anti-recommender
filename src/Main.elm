@@ -228,7 +228,7 @@ getWikipediaAbstract record =
               Nothing ->
                 text("Nothing")
               Just abstract_info ->
-                 if ((List.length (split " " abstract_info.abstract)) >= 15) then
+                 if ((List.length (split " " abstract_info.abstract)) >= 10) then
                  text(abstract_info.abstract) else text(" ")
 
 -- Add Wikipedia Image to HTML
