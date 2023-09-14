@@ -117,37 +117,58 @@ view model =
         div [
              style "width" "500px",
              style "height" "500px",
-             style "margin-top" "30px"
+             style "margin-top" "100px"
             ] [ 
               div[style "display" "flex",
                   style "justify-content" "center"][
+
+                  
+           img[src (getWikipediaImageUrl (Array.get model.index wikipediaRecordsArray)),
+                    width 300,
+                    height 300][]],
+
+          div[style "display" "flex", style "justify-content" "center"]
+          [
                   a[
                   href (getWikipediaUrl (Array.get model.index wikipediaRecordsArray)),
                   target "_blank",
                   style "color" "#222",
                   style "text-decoration" "none"
                 ][
-                  h1 [] [getWikipediaTitle (Array.get model.index wikipediaRecordsArray)]]],
-                 div[style "display" "flex",
-                 style "justify-content" "center"][
-                
-                img[src (getWikipediaImageUrl (Array.get model.index wikipediaRecordsArray)),
-                    width 300,
-                    height 300][]],
+                  
+            h1 [] [getWikipediaTitle (Array.get model.index wikipediaRecordsArray)]
+            ]
+          ],
 
-              div[style "display" "flex"
+            div[style "display" "flex"
               ][p [] [getWikipediaAbstract (Array.get model.index wikipediaRecordsArray)]],
               
-              div[class "wrapper"][                                  
+              div[style "display" "flex",
+                  style "flex-direction" "row",
+                  style "justify-content" "space-between"][
+
+              -- Contents List
+              div[style "width" "180px"][                                  
                 input[type_ "checkbox", id  "wikipedia-items"][],
-                label[for "wikipedia-items", class "first"][i [class "fa-solid fa-bars",
-                                                               style "padding-right" "10px"][], 
-                                                            text("Contents"),
+                label[for "wikipedia-items", class "first"][
+                  i [class "fa-solid fa-bars", style "padding-right" "10px"][], 
+                  text("Contents"),
+                  i [class "fa-solid fa-chevron-down", style "padding-left" "45px"][]],
+                ul [] (getWikipediaSublinks (Array.get model.index wikipediaRecordsArray))
+              ], 
+              
+              -- Categories List
+              div[style "width" "200px"][                                  
+                input[type_ "checkbox", id  "wikipedia-categories"][],
+                label[for "wikipedia-categories"][i [class "fa-solid fa-bars",
+                                                               style "padding-right" "8px"][], 
+                                                            text("Categories"),
                                                             i [class "fa-solid fa-chevron-down",
                                                                style "padding-left" "45px"][]],
-                ul [] (getWikipediaSublinks (Array.get model.index wikipediaRecordsArray))
-              ]
-              , div[style "height" "20px"][]  
+                ul [] (getWikipediaCategories (Array.get model.index wikipediaRecordsArray))
+              ]], 
+              
+              div[style "height" "20px"][]  
           ],
 
         -- Next Button
@@ -207,7 +228,7 @@ getWikipediaAbstract record =
               Nothing ->
                 text("Nothing")
               Just abstract_info ->
-                 if ((List.length (split " " abstract_info.abstract)) >= 20) then
+                 if ((List.length (split " " abstract_info.abstract)) >= 15) then
                  text(abstract_info.abstract) else text(" ")
 
 -- Add Wikipedia Image to HTML
@@ -240,3 +261,22 @@ getWikipediaSublinks record =
 getSublinkItem : Sublink -> Html msg
 getSublinkItem sublink = 
         a [href sublink.link, target "_blank"] [ li [][ text (( sublink.anchor)) ]]
+
+
+-- Add Wikipedia Category List to HTML
+getWikipediaCategories: Maybe WikipediaRecord -> List(Html Msg)
+getWikipediaCategories record =
+        case record of 
+          Nothing ->
+            [li [] [a [][text("Nothing")]]]
+          Just wikiRecord ->
+            case wikiRecord.catgeories of 
+              Nothing ->
+               [li [] [a [][text("Nothing")]]]
+              Just categories ->
+                (List.map getCategoryItem categories)
+
+-- Add Category Item to List
+getCategoryItem : Category -> Html msg
+getCategoryItem category = 
+        a [href ("https://en.wikipedia.org/" ++ category.link), target "_blank"] [ li [][ text ((category.text)) ]]

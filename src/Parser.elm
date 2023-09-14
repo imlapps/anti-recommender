@@ -2,14 +2,14 @@ module Parser exposing (parseWikipediaJsonl, buildWikipediaRecordsList)
 
 import String exposing (split)
 import WikipediaTypes exposing (..)
-import Json.Decode exposing (Decoder, at,map2, map4, field, string, decodeString)
+import Json.Decode exposing (Decoder, at,map2, map3, map4, field, string, decodeString)
 
 -- Main function to parse JSONL
 parseWikipediaJsonl : String -> WikipediaRecord
 parseWikipediaJsonl wikiString =
       let res = (decodeString wikipediaRecordDecoder wikiString ) in case res of
           Ok record -> record
-          Err _ -> WikipediaRecord Nothing Nothing
+          Err _ -> WikipediaRecord Nothing Nothing Nothing
 
 
 -- Entry point to parse JSONL
@@ -31,9 +31,10 @@ filterWikipediaRecords wikiRecord =
 
 -- WikipediaRecord Decoder
 wikipediaRecordDecoder : Decoder WikipediaRecord
-wikipediaRecordDecoder = map2 WikipediaRecord
+wikipediaRecordDecoder = map3 WikipediaRecord
                            (Json.Decode.nullable (at ["record","abstract_info"] abstractInfoDecoder))
                            (Json.Decode.nullable (at ["record","sublinks"] (Json.Decode.list sublinkDecoder)))
+                           (Json.Decode.nullable (at ["record","categories"] (Json.Decode.list categoryDecoder)))
 
 -- AbstractInfo Decoder
 abstractInfoDecoder : Decoder AbstractInfo
@@ -50,3 +51,10 @@ sublinkDecoder =
     map2 Sublink 
        (field "anchor" string)
        (field "link" string)
+
+-- Category Decoder
+categoryDecoder : Decoder Category
+categoryDecoder = 
+        map2 Category
+        (field "text" string)
+        (field "link" string)
