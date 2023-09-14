@@ -91,7 +91,7 @@ view model =
 
     Success wikipediaRecordsArray ->
       div[][    
-        div[class "header"][h1[][text("NerdSwipe")]],
+        -- div[class "header"][h1[][text("NerdSwipe")]],
 
       div [style "display" "flex",
            style "column-gap" "465px"]
