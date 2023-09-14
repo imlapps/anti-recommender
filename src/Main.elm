@@ -10,6 +10,7 @@ import Html.Attributes exposing (..)
 
 import Parser exposing (..)
 import WikipediaTypes exposing (..)
+import String exposing (split)
 
 
 -- MAIN
@@ -90,18 +91,7 @@ view model =
 
     Success wikipediaRecordsArray ->
       div[][    
-
-        -- Burger Menu     
-        -- nav[][
-        --   div [ id "menuToggle"] [
-        --       input [type_ "checkbox"][],
-        --       span [][],
-        --       span [][],
-        --       span [][],
-        --       ul [id "menu"] 
-        -- (getWikipediaSublinks (Array.get model.index wikipediaRecordsArray))
-        --   ]
-        -- ],
+        div[class "header"][h1[][text("NerdSwipe")]],
 
       div [style "display" "flex",
            style "column-gap" "465px"]
@@ -127,21 +117,37 @@ view model =
         div [
              style "width" "500px",
              style "height" "500px",
-             style "margin-top" "200px"
+             style "margin-top" "30px"
             ] [ 
-              div[][
-                
-                a[
+              div[style "display" "flex",
+                  style "justify-content" "center"][
+                  a[
                   href (getWikipediaUrl (Array.get model.index wikipediaRecordsArray)),
-                  style "color" "whitesmoke",
+                  target "_blank",
+                  style "color" "#222",
                   style "text-decoration" "none"
                 ][
-                  
-                  h1 [] [getWikipediaTitle (Array.get model.index wikipediaRecordsArray)]]
-              ],
-              div[][p [] [getWikipediaAbstract (Array.get model.index wikipediaRecordsArray)]]
-        
+                  h1 [] [getWikipediaTitle (Array.get model.index wikipediaRecordsArray)]]],
+                 div[style "display" "flex",
+                 style "justify-content" "center"][
+                
+                img[src (getWikipediaImageUrl (Array.get model.index wikipediaRecordsArray)),
+                    width 300,
+                    height 300][]],
 
+              div[style "display" "flex"
+              ][p [] [getWikipediaAbstract (Array.get model.index wikipediaRecordsArray)]],
+              
+              div[class "wrapper"][                                  
+                input[type_ "checkbox", id  "wikipedia-items"][],
+                label[for "wikipedia-items", class "first"][i [class "fa-solid fa-bars",
+                                                               style "padding-right" "10px"][], 
+                                                            text("Contents"),
+                                                            i [class "fa-solid fa-chevron-down",
+                                                               style "padding-left" "45px"][]],
+                ul [] (getWikipediaSublinks (Array.get model.index wikipediaRecordsArray))
+              ]
+              , div[style "height" "20px"][]  
           ],
 
         -- Next Button
@@ -157,11 +163,11 @@ view model =
                       style "font-size" "16px",
                       style "cursor" "pointer" 
                      ] [ 
-                  
                   i [class "fa-solid fa-chevron-right"][] 
               ]
           ]
-      ]]
+
+      ] ]
 
         
 -- Add Wikipedia Title to HTML
@@ -177,7 +183,7 @@ getWikipediaTitle record =
               Just abstract_info ->
                  text(abstract_info.title)
 
--- Add Wikipedia Title to HTML
+-- Add Wikipedia URL to HTML
 getWikipediaUrl : Maybe WikipediaRecord -> String
 getWikipediaUrl record =
         case record of 
@@ -201,7 +207,21 @@ getWikipediaAbstract record =
               Nothing ->
                 text("Nothing")
               Just abstract_info ->
-                 text(abstract_info.abstract)
+                 if ((List.length (split " " abstract_info.abstract)) >= 20) then
+                 text(abstract_info.abstract) else text(" ")
+
+-- Add Wikipedia Image to HTML
+getWikipediaImageUrl : Maybe WikipediaRecord -> String 
+getWikipediaImageUrl record = 
+        case record of 
+        Nothing ->
+          ""
+        Just wikiRecord ->
+            case wikiRecord.abstract_info of 
+              Nothing ->
+                ""
+              Just abstract_info ->
+                 abstract_info.image
 
 -- Add Wikipedia Sublinks List to HTML
 getWikipediaSublinks: Maybe WikipediaRecord -> List(Html Msg)
@@ -219,4 +239,4 @@ getWikipediaSublinks record =
 -- Add Sublink Item to List
 getSublinkItem : Sublink -> Html msg
 getSublinkItem sublink = 
-        a [href sublink.link] [ li [][ text (( sublink.anchor)) ]]
+        a [href sublink.link, target "_blank"] [ li [][ text (( sublink.anchor)) ]]
