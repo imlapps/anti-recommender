@@ -109,30 +109,32 @@ view model =
         div [
               class "wikipedia-content"
             ] [ 
-              div[class "wikipedia-image"][
 
-                  
+        -- Wikipedia Image  
+        div[class "wikipedia-image"][
            img[src (getWikipediaImageUrl (Array.get model.index wikipediaRecordsArray)),
                     width 300,
                     height 300][]],
 
           div[class "main-wikipedia-content"]
           [
+              -- Wikipedia Title
               a[
-                  href (getWikipediaUrl (Array.get model.index wikipediaRecordsArray)),
-                  target "_blank",
-                  class "wikipedia-url"
-                ][
-                  
-            div[class "wikipedia-title"][h2 [] [
-                getWikipediaTitle (Array.get model.index wikipediaRecordsArray)]]
+                href (getWikipediaUrl (Array.get model.index wikipediaRecordsArray)),
+                target "_blank",
+                class "wikipedia-url"
+              ][
+                
+              div[class "wikipedia-title"][
+                h2 [] [
+                getWikipediaTitle (Array.get model.index wikipediaRecordsArray)
+                ]]
             ], 
             
-            p [] [getWikipediaAbstract (Array.get model.index wikipediaRecordsArray)]
+            -- Wikipedia Abstract
+            p [class "wikipedia-abstract"] [getWikipediaAbstract (Array.get model.index wikipediaRecordsArray)]
           ],
 
-
-              
               div[class "extra-details"][
 
               -- Contents List
@@ -159,7 +161,7 @@ view model =
                 ul [] (getWikipediaCategories (Array.get model.index wikipediaRecordsArray))
               ]], 
               
-              div[style "height" "20px"][]  
+              div[class "footer"][]  
           ],
 
         -- Next Button
