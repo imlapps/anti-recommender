@@ -45,7 +45,7 @@ type Msg
 -- Read Wikipedia JSONL file
 getFile: Cmd Msg
 getFile = Http.get
-      { url = "http://localhost:8000/src/storage/mini-wikipedia.output.txt"
+      { url = "/src/storage/mini-wikipedia.output.txt"
       , expect = Http.expectString GotText
       }
 
@@ -91,23 +91,15 @@ view model =
 
     Success wikipediaRecordsArray ->
       div[][    
-        -- div[class "header"][h1[][text("NerdSwipe")]],
+      div[class "header"][h1[][text("NerdSwipe")]],
 
-      div [style "display" "flex",
-           style "column-gap" "465px"]
+      div [class "main"]
       [ 
         -- Back Button
-        div[
-            style "margin-top" "300px",
-            style "margin-left" "50px"]
+        div[class "previous-button-container"]
         [              
           button [onClick Back,
-                  style "background-color" "DodgerBlue",
-                  style "border" "none",
-                  style "color" "white",
-                  style "padding" "12px 16px",
-                  style "font-size" "16px",
-                  style "cursor" "pointer"
+                  class "button"
                   ] 
                 [ 
                 i [class "fa-solid fa-chevron-left"][]
@@ -115,56 +107,55 @@ view model =
         ],
         -- Main Content
         div [
-             style "width" "500px",
-             style "height" "500px",
-             style "margin-top" "100px"
+              class "wikipedia-content"
             ] [ 
-              div[style "display" "flex",
-                  style "justify-content" "center"][
+              div[class "wikipedia-image"][
 
                   
            img[src (getWikipediaImageUrl (Array.get model.index wikipediaRecordsArray)),
                     width 300,
                     height 300][]],
 
-          div[style "display" "flex", style "justify-content" "center"]
+          div[class "main-wikipedia-content"]
           [
-                  a[
+              a[
                   href (getWikipediaUrl (Array.get model.index wikipediaRecordsArray)),
                   target "_blank",
-                  style "color" "#222",
-                  style "text-decoration" "none"
+                  class "wikipedia-url"
                 ][
                   
-            h1 [] [getWikipediaTitle (Array.get model.index wikipediaRecordsArray)]
-            ]
+            div[class "wikipedia-title"][h2 [] [
+                getWikipediaTitle (Array.get model.index wikipediaRecordsArray)]]
+            ], 
+            
+            p [] [getWikipediaAbstract (Array.get model.index wikipediaRecordsArray)]
           ],
 
-            div[style "display" "flex"
-              ][p [] [getWikipediaAbstract (Array.get model.index wikipediaRecordsArray)]],
+
               
-              div[style "display" "flex",
-                  style "flex-direction" "row",
-                  style "justify-content" "space-between"][
+              div[class "extra-details"][
 
               -- Contents List
-              div[style "width" "180px"][                                  
+              div[class "categories"][                                  
                 input[type_ "checkbox", id  "wikipedia-items"][],
-                label[for "wikipedia-items", class "first"][
-                  i [class "fa-solid fa-bars", style "padding-right" "10px"][], 
+                label[for "wikipedia-items"][
+                  i [class "fa-solid fa-bars",
+                     class "bars-icon-contents"][], 
                   text("Contents"),
-                  i [class "fa-solid fa-chevron-down", style "padding-left" "45px"][]],
+                  i [class "fa-solid fa-chevron-down", 
+                     class "chevron-icon-contents"][]],
                 ul [] (getWikipediaSublinks (Array.get model.index wikipediaRecordsArray))
               ], 
               
               -- Categories List
-              div[style "width" "200px"][                                  
+              div[class "categories"][                                  
                 input[type_ "checkbox", id  "wikipedia-categories"][],
-                label[for "wikipedia-categories"][i [class "fa-solid fa-bars",
-                                                               style "padding-right" "8px"][], 
-                                                            text("Categories"),
-                                                            i [class "fa-solid fa-chevron-down",
-                                                               style "padding-left" "45px"][]],
+                label[for "wikipedia-categories"][
+                      i [class "fa-solid fa-bars",
+                         class "bars-icon-categories"][], 
+                        text("Categories"),
+                      i [class "fa-solid fa-chevron-down", 
+                         class "chevron-icon-categories"][]],
                 ul [] (getWikipediaCategories (Array.get model.index wikipediaRecordsArray))
               ]], 
               
@@ -172,17 +163,10 @@ view model =
           ],
 
         -- Next Button
-        div [
-            style "margin-top" "300px",
-            style "margin-right" "50px"] [
+        div [class "next-button-container"] [
 
               button [onClick Next, 
-                      style "background-color" "DodgerBlue",
-                      style "border" "none",
-                      style "color" "white",
-                      style "padding" "12px 16px",
-                      style "font-size" "16px",
-                      style "cursor" "pointer" 
+                      class "button"
                      ] [ 
                   i [class "fa-solid fa-chevron-right"][] 
               ]
@@ -270,7 +254,7 @@ getWikipediaCategories record =
           Nothing ->
             [li [] [a [][text("Nothing")]]]
           Just wikiRecord ->
-            case wikiRecord.catgeories of 
+            case wikiRecord.categories of 
               Nothing ->
                [li [] [a [][text("Nothing")]]]
               Just categories ->

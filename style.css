@@ -1,18 +1,95 @@
+ 
+ * {
+  box-sizing: border-box;
+ }
+
  body
  {
    margin: 0;
    padding: 0;
-   
-   /* make it look decent enough */
-   /* background: #232323; */
-   /* color: #cdcdcd; */
    font-family: sans-serif;
  }
- 
-hr.solid {
-  border-top: 1px solid #ed0505; 
-}
 
+ .main {
+   display: flex;
+  justify-content: space-between;
+ }
+
+ .wikipedia-content {
+     width: 500px;
+     height: 500px;
+     margin-top: 50px;
+ }
+
+ .main-wikipedia-content {
+  display: flex;
+  flex-direction: column;
+ }
+
+ .wikipedia-url {
+  color: #222;
+  text-decoration: none;
+ }
+
+.wikipedia-title {
+  display: flex;
+  justify-content: center;
+ }
+
+ .wikipedia-image {
+  display: flex;
+  justify-content: center;
+ }
+
+ .button {
+  background-color: DodgerBlue;
+  border: none;
+  color: white;
+  padding: 12px 16px;
+  font-size: 16px;
+  cursor: pointer;
+ }
+
+ .extra-details {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+ }
+ .contents {
+  width: 180px;
+ }
+
+ .bars-icon-contents{
+  padding-right: 10px;
+ }
+
+ .chevron-icon-contents {
+  padding-left: 45px;
+ }
+
+ .categories{
+  width: 200px;
+ }
+
+ .bars-icon-categories{
+  padding-right: 8px;
+ }
+
+ .chevron-icon-categories {
+  padding-left: 45px;
+ }
+
+ .previous-button-container {
+  margin-top: 300px;
+  margin-left: 50px;
+ }
+
+ .next-button-container {
+  margin-top: 300px;
+  margin-right: 50px;
+ }
+
+ /* Header */
 .header {
   padding-left: 30px;
   text-align: left;
@@ -21,6 +98,7 @@ hr.solid {
 }
 
 
+/* Burger Menu */
 ul{
   list-style-type: none;
   margin: 0;
@@ -53,8 +131,6 @@ ul li{
   color: #232323;
 }
 
-
-/* Change the link color on hover */
 li:hover {
   background-color: royalblue;
   color: white;

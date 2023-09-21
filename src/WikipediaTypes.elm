@@ -4,7 +4,7 @@ module WikipediaTypes exposing (..)
 type alias WikipediaRecord = {
   abstract_info : Maybe AbstractInfo,
   sublinks : Maybe (List Sublink),
-  catgeories: Maybe (List Category)}  
+  categories: Maybe (List Category)}  
 
 type alias AbstractInfo = {
   title: String,
