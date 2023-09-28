@@ -90,22 +90,34 @@ view model =
       text "Loading..."
 
     Success wikipediaRecordsArray ->
-      div[][    
+      div[][
+             
       div[class "header"][h1[][text("NerdSwipe")]],
-
+      
       div [class "main"]
       [ 
-        -- Back Button
-        div[class "previous-button-container"]
-        [              
-          button [onClick Back,
-                  class "button"
-                  ] 
-                [ 
+        div[class "gallery"][
+          div[class "container_column"][
+
+          -- Back Button
+         div[class "previous-button-container"][
+            button [onClick Back, class "button"] 
+                [   
                 i [class "fa-solid fa-chevron-left"][]
                 ]
+         ],
+      
+        -- Previous Content
+        div [class "previous-wikipedia-content"] [ 
+
+        -- Wikipedia Image  
+        div[class "wikipedia-image"][
+           img[src (getWikipediaImageUrl (Array.get (model.index - 1) wikipediaRecordsArray)),
+                    width 400,
+                    height 400][]]    
+          ]
         ],
-        -- Main Content
+           -- Main Content
         div [
               class "wikipedia-content"
             ] [ 
@@ -113,45 +125,75 @@ view model =
         -- Wikipedia Image  
         div[class "wikipedia-image"][
            img[src (getWikipediaImageUrl (Array.get model.index wikipediaRecordsArray)),
-                    width 300,
-                    height 300][]],
+                    width 500,
+                    height 500][]]
+            ],
+       
+        div[class "container_column"][
+        
+        -- Next Button
+        div [class "next-button-container"] [
 
-          div[class "main-wikipedia-content"]
-          [
+            button [onClick Next, class "button"
+                    ] [ 
+                   i [class "fa-solid fa-chevron-right"][] 
+                      ]
+          ],
+
+        -- Next Content
+        div [
+              class "next-wikipedia-content"
+            ] [ 
+
+        -- Wikipedia Image  
+        div[class "wikipedia-image"][
+           img[src (getWikipediaImageUrl (Array.get (model.index + 1) wikipediaRecordsArray)),
+                    width 400,
+                    height 400][]]
+          ]]
+        ],
+
+      -- Additional Content
+      div[class "additional-content"][
+            div[][],
+            div[class "descriptive-content "][
+
               -- Wikipedia Title
               a[
                 href (getWikipediaUrl (Array.get model.index wikipediaRecordsArray)),
                 target "_blank",
                 class "wikipedia-url"
               ][
-                
               div[class "wikipedia-title"][
-                h2 [] [
+                h1 [] [
                 getWikipediaTitle (Array.get model.index wikipediaRecordsArray)
                 ]]
-            ], 
-            
+            ],
+              
             -- Wikipedia Abstract
-            p [class "wikipedia-abstract"] [getWikipediaAbstract (Array.get model.index wikipediaRecordsArray)]
-          ],
-
-              div[class "extra-details"][
-
-              -- Contents List
-              div[class "categories"][                                  
+            div[class "wikipedia-abstract"][
+                p[] [getWikipediaAbstract (Array.get model.index wikipediaRecordsArray)]
+              ],
+            
+            div[class "wiki-content-category"][
+                -- Contents List
+                div[class "contents"][                                  
                 input[type_ "checkbox", id  "wikipedia-items"][],
+                
                 label[for "wikipedia-items"][
                   i [class "fa-solid fa-bars",
                      class "bars-icon-contents"][], 
                   text("Contents"),
                   i [class "fa-solid fa-chevron-down", 
                      class "chevron-icon-contents"][]],
-                ul [] (getWikipediaSublinks (Array.get model.index wikipediaRecordsArray))
+                   
+              ul [] (getWikipediaSublinks (Array.get model.index wikipediaRecordsArray))
               ], 
               
               -- Categories List
               div[class "categories"][                                  
                 input[type_ "checkbox", id  "wikipedia-categories"][],
+                
                 label[for "wikipedia-categories"][
                       i [class "fa-solid fa-bars",
                          class "bars-icon-categories"][], 
@@ -159,23 +201,14 @@ view model =
                       i [class "fa-solid fa-chevron-down", 
                          class "chevron-icon-categories"][]],
                 ul [] (getWikipediaCategories (Array.get model.index wikipediaRecordsArray))
-              ]], 
-              
-              div[class "footer"][]  
-          ],
-
-        -- Next Button
-        div [class "next-button-container"] [
-
-              button [onClick Next, 
-                      class "button"
-                     ] [ 
-                  i [class "fa-solid fa-chevron-right"][] 
               ]
+                  ]
+                      ]                   
+      ]
           ]
-
-      ] ]
-
+               ]
+      
+      
         
 -- Add Wikipedia Title to HTML
 getWikipediaTitle : Maybe WikipediaRecord -> Html Msg
