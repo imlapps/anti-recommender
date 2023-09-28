@@ -97,7 +97,7 @@ view model =
       div [class "main"]
       [ 
         div[class "gallery"][
-          div[class "container_column"][
+          div[class "alt-wikipedia-container"][
 
           -- Back Button
          div[class "previous-button-container"][
@@ -135,7 +135,7 @@ view model =
             ]
         ],
        
-        div[class "container_column"][
+        div[class "alt-wikipedia-container"][
         
         -- Next Button
         div [class "next-button-container"] [

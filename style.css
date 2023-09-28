@@ -26,7 +26,7 @@
   /* background-color: #28282B; */
  }
 
-.container_column{
+.alt-wikipedia-container{
   display: flex;
   align-items: center;
 }
@@ -48,7 +48,7 @@
 }
 .next-wikipedia-content {
    opacity: 0.2;
-   padding-right: 30px;
+   padding-right: 50px;
 }
 
 .gallery {
@@ -57,7 +57,6 @@
   justify-content: space-between;
   border-bottom: thin solid black;
   background-color: rgb(29, 26, 26);
-  
 }
 
 .wikipedia-content {
@@ -92,7 +91,6 @@
   font-size: 1.125rem;
   color: whitesmoke;
   width: 34rem;
-
  }
 
 .button {
@@ -108,7 +106,7 @@
  
 .additional-content {
   display: flex;
-  column-gap: 545px;
+  column-gap: 525px;
 }
 .descriptive-content {
     display: flex;
@@ -170,7 +168,7 @@ label{
 }
 
 label:hover{
-  background: #C332CD;
+  background: deeppink;
   color: white;
 }
 
@@ -219,7 +217,7 @@ input[type="checkbox"]:checked + label{
   border-bottom: 0.063rem solid #fff;
 }
 
-@media screen and (max-width: 900px) {
+@media (max-width: 900px) {
   .previous-wikipedia-content, .next-wikipedia-content {
     display: none;
   }
