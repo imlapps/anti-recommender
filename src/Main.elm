@@ -122,12 +122,18 @@ view model =
               class "wikipedia-content"
             ] [ 
 
-        -- Wikipedia Image  
-        div[class "wikipedia-image"][
+            -- Wikipedia Image  
+        a[
+            href (getWikipediaUrl (Array.get model.index wikipediaRecordsArray)),
+            target "_blank",
+            class "wikipedia-url"
+        ][
+                  div[class "wikipedia-image"][
            img[src (getWikipediaImageUrl (Array.get model.index wikipediaRecordsArray)),
                     width 500,
                     height 500][]]
-            ],
+            ]
+        ],
        
         div[class "container_column"][
         
@@ -146,10 +152,13 @@ view model =
             ] [ 
 
         -- Wikipedia Image  
+
         div[class "wikipedia-image"][
            img[src (getWikipediaImageUrl (Array.get (model.index + 1) wikipediaRecordsArray)),
                     width 400,
                     height 400][]]
+        
+
           ]]
         ],
 
