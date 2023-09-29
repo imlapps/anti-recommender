@@ -33,22 +33,22 @@
 
 .previous-button-container{
   z-index: 1;
-  transform: translate(150px, 0px);
+  transform: translate(9.4rem, 0rem);
 }
 
 .previous-wikipedia-content {
     opacity: 0.2;
-    padding-right: 50px;
+    padding-right: 3.13rem;
 }
 
 .next-button-container{
    z-index: 1;
-   transform: translate(250px, 0px);
+   transform: translate(15.6rem, 0rem);
 
 }
 .next-wikipedia-content {
    opacity: 0.2;
-   padding-right: 50px;
+   padding-right: 3rem;
 }
 
 .gallery {
@@ -82,9 +82,10 @@
   display: flex;
   align-self: center;
   justify-content: center;
-  border: 0.5px solid;
-  border-color: #e7e7e7;
-  border-radius: 5px;
+  background-color: whitesmoke;
+  border: 0.03rem solid;
+  border-color: #222222;
+  border-radius: 0.3rem;
  }
 
 .wikipedia-abstract {
@@ -95,9 +96,9 @@
 
 .button {
   background-color: #ff6cc9;
-  border: 0.5px solid;
-  border-color: #e7e7e7;
-  border-radius: 5px;
+  border: 0.03rem solid;
+  border-color: black;
+  border-radius: 0.3rem;
   color: whitesmoke;
   padding: 0.75rem 1rem;
   font-size: 3rem;
@@ -106,7 +107,7 @@
  
 .additional-content {
   display: flex;
-  column-gap: 525px;
+  justify-content: center;
 }
 .descriptive-content {
     display: flex;
@@ -214,7 +215,7 @@ input[type="checkbox"]:checked ~ ul{
 
 input[type="checkbox"]:checked + label{
   background: #ff6cc9;
-  border-bottom: 0.063rem solid #fff;
+  border-bottom: 0.06rem solid #fff;
 }
 
 @media (max-width: 900px) {
@@ -222,10 +223,6 @@ input[type="checkbox"]:checked + label{
     display: none;
   }
   .previous-button-container, .next-button-container{
-   transform: translate(0px, 0px);
+   transform: translate(0rem, 0rem);
  }
- .additional-content{
-  column-gap: 50px;
- }
-
 } 
