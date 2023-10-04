@@ -37,6 +37,8 @@
 }
 
 .previous-wikipedia-content {
+    display: flex;
+    flex-direction: row;
     opacity: 0.2;
     padding-right: 3.13rem;
 }
@@ -47,8 +49,10 @@
 
 }
 .next-wikipedia-content {
-   opacity: 0.2;
-   padding-right: 3rem;
+  display: flex;
+  flex-direction: row;
+  opacity: 0.2;
+  padding-right: 3rem;
 }
 
 .gallery {

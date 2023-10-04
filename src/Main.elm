@@ -114,8 +114,13 @@ view model =
         div[class "wikipedia-image"][
            img[src (getWikipediaImageUrl (Array.get (model.index - 1) wikipediaRecordsArray)),
                     width 400,
-                    height 400][]]    
+                    height 400][]],
+                                  div[class "wikipedia-title"][
+                h1 [] [
+                getWikipediaTitle (Array.get (model.index - 1) wikipediaRecordsArray)
+                ]]    
           ]
+
         ],
            -- Main Content
         div [
@@ -156,7 +161,11 @@ view model =
         div[class "wikipedia-image"][
            img[src (getWikipediaImageUrl (Array.get (model.index + 1) wikipediaRecordsArray)),
                     width 400,
-                    height 400][]]
+                    height 400][]],
+                                  div[class "wikipedia-title"][
+                h1 [] [
+                getWikipediaTitle (Array.get (model.index + 1) wikipediaRecordsArray)
+                ]]    
         
 
           ]]
@@ -185,20 +194,7 @@ view model =
               ],
             
             div[class "wiki-content-category"][
-                -- Contents List
-                div[class "contents"][                                  
-                input[type_ "checkbox", id  "wikipedia-items"][],
-                
-                label[for "wikipedia-items"][
-                  i [class "fa-solid fa-bars",
-                     class "bars-icon-contents"][], 
-                  text("Contents"),
-                  i [class "fa-solid fa-chevron-down", 
-                     class "chevron-icon-contents"][]],
-                   
-              ul [] (getWikipediaSublinks (Array.get model.index wikipediaRecordsArray))
-              ], 
-              
+
               -- Categories List
               div[class "categories"][                                  
                 input[type_ "checkbox", id  "wikipedia-categories"][],
