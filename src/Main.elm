@@ -329,9 +329,49 @@ view model =
           Tw.justify_evenly,
           Tw.bg_color Tw.custom_black_2
         ]
-      ][
-        div[][p[][text("Abstract")]],
-        div[][p[][text("Categories")]],
+      ][       div[][
+          div[
+            css [
+              Tw.flex, 
+              Tw.justify_center, 
+              Tw.text_color Tw.pink_400, 
+              Tw.font_serif
+          ]
+          ][
+            h1[][text("Categories")]
+          ],
+          div[
+            css [
+                Tw.flex_row,
+                Tw.justify_evenly
+          ]
+          ][
+              ul [] (getWikipediaCategories (Array.get model.index wikipediaRecordsArray))
+          ]
+     ],
+        div[][          
+          
+          div[
+            css [
+              Tw.flex, 
+              Tw.justify_center, 
+              Tw.text_color Tw.pink_400, 
+              Tw.font_serif
+          ]
+          ][
+            h1[][text("Abstract")]
+          ],
+          
+                    div[
+            css [
+              Tw.flex, 
+              Tw.justify_center, 
+              Tw.text_color Tw.pink_400, 
+              Tw.font_serif
+          ]
+          ][
+            h1[][text("Table of Contents")]
+          ]],
         div[][
           div[css [
               Tw.flex, 
@@ -445,7 +485,11 @@ getWikipediaCategories record =
 -- Add Category Item to List
 getCategoryItem : Category -> Html msg
 getCategoryItem category = 
-        a [href ("https://en.wikipedia.org/" ++ category.link), target "_blank"] [ li [][ text ((category.text)) ]]
+
+          a [href ("https://en.wikipedia.org/" ++ category.link), target "_blank"] 
+          [ li [
+
+          ][ div[][text ((category.text))]]]
 
 -- Add Random List Item to HTML
 getRandomItem : Maybe WikipediaRecord -> Html Msg
