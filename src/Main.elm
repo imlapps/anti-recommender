@@ -4,14 +4,22 @@ import Http
 import Browser
 import Array exposing (Array)
 
-import Html exposing (..)
-import Html.Events exposing (..)
-import Html.Attributes exposing (..)
+-- import Html exposing (..)
+-- import Html.Events exposing (..)
+-- import Html.Attributes exposing (..)
+import Html.Styled exposing (..)
+import Html.Styled.Attributes exposing (..)
+import Html.Styled.Events exposing (onClick)
 
 import Parser exposing (..)
 import WikipediaTypes exposing (..)
 import String exposing (split)
 
+import Css
+import Css.Global
+import Tailwind.Breakpoints as Breakpoints
+import Tailwind.Utilities as Tw
+import Tailwind.Theme as Tw
 
 -- MAIN
 main : Program () Model Msg
@@ -19,7 +27,7 @@ main = Browser.element
     { init = init
     , update = update
     , subscriptions = subscriptions
-    , view = view
+    , view = view >> toUnstyled
     }
 
 -- INIT
@@ -90,128 +98,228 @@ view model =
       text "Loading..."
 
     Success wikipediaRecordsArray ->
-      div[][
-             
-      div[class "header"][h1[][text("NerdSwipe")]],
-      
-      div [class "main"]
-      [ 
-        div[class "gallery"][
-          div[class "alt-wikipedia-container"][
 
-          -- Back Button
-         div[class "previous-button-container"][
-            button [onClick Back, class "button"] 
+      div[][
+
+      -- header  
+      div[css[Tw.flex, 
+              Tw.pl_8, 
+              Tw.text_left, 
+              Tw.text_color Tw.custom_pink,
+              Tw.border_b_8,
+              Tw.border_color Tw.black,
+              Tw.bg_color Tw.gray_400,
+              Tw.bg_radial_gradient
+             ]]
+             [h1[][text("NerdSwipe")]],
+      -- main container
+      div [css[Tw.flex, 
+            Tw.flex_col, 
+            Tw.justify_between]]
+      [ 
+      
+      -- gallery container
+      div[css [Tw.flex, 
+             Tw.flex_row, 
+             Tw.justify_between, 
+             Tw.bg_color Tw.custom_black_2,
+             Tw.border_b_8,
+             Tw.border_color Tw.black,
+             Tw.pr_4,
+             Tw.pl_4]][
+          
+        -- previous wikipedia container
+          div[
+            css[Tw.flex, 
+                Tw.items_center,
+                Tw.justify_center]][
+
+          -- previous button
+         div[css [Tw.z_10,
+                  Tw.absolute, 
+                  Tw.transform,
+                  Tw.translate_x_36,Tw.translate_y_0]][
+            button [onClick Back,
+                    css[
+                    Tw.bg_color Tw.custom_pink,
+                    Tw.border,
+                    Tw.text_color Tw.zinc_100,
+                    Tw.border_color Tw.black, 
+                    Tw.rounded,
+                    Tw.text_5xl, Tw.cursor_pointer,
+                    Tw.px_4, Tw.py_3
+            ] 
+                    ] 
                 [   
                 i [class "fa-solid fa-chevron-left"][]
                 ]
          ],
       
-        -- Previous Content
-        div [class "previous-wikipedia-content"] [ 
+        -- previous content
+        div [
+          css [ 
+                Tw.opacity_20
+            ]
+        ] [ 
 
-        -- Wikipedia Image  
-        div[class "wikipedia-image"][
+        -- wikipedia image (Previous)
+        div[
+          css[ 
+            Tw.flex, 
+            Tw.self_center,
+            Tw.justify_center, 
+            Tw.border,
+            Tw.border_color Tw.gray_900, 
+            Tw.rounded,
+            Tw.text_color Tw.zinc_100
+            ]
+        ][
            img[src (getWikipediaImageUrl (Array.get (model.index - 1) wikipediaRecordsArray)),
                     width 400,
                     height 400][]],
-                                  div[class "wikipedia-title"][
-                h1 [] [
+          
+          -- wikipedia title (previous)
+           div[
+            css[ 
+              Tw.flex, 
+              Tw.justify_center, 
+              Tw.text_color Tw.pink_400, 
+              Tw.font_serif
+              ]
+            ][
+             h2 [] [
                 getWikipediaTitle (Array.get (model.index - 1) wikipediaRecordsArray)
-                ]]    
+                ]
+              ]
           ]
-
         ],
-           -- Main Content
+           -- main content
         div [
-              class "wikipedia-content"
+            css [
+            Tw.mb_4, 
+            Tw.mt_4
+            ]
             ] [ 
 
-            -- Wikipedia Image  
+        -- wikipedia image  (Main)
         a[
             href (getWikipediaUrl (Array.get model.index wikipediaRecordsArray)),
             target "_blank",
-            class "wikipedia-url"
+            css [
+                  Tw.no_underline,
+                  Tw.text_color Tw.gray_900
+            ]
         ][
-                  div[class "wikipedia-image"][
+        div[
+          css[ 
+            Tw.flex, 
+            Tw.self_center,
+            Tw.justify_center, 
+            Tw.border,
+            Tw.border_color Tw.gray_900, 
+            Tw.rounded,
+            Tw.text_color Tw.zinc_100
+            ]
+        ][
            img[src (getWikipediaImageUrl (Array.get model.index wikipediaRecordsArray)),
                     width 500,
                     height 500][]]
-            ]
+            ],
+
+          -- wikipedia title (Main)
+         div[
+            css[ 
+              Tw.flex, 
+              Tw.justify_center, 
+              Tw.text_color Tw.pink_400, 
+              Tw.font_serif
+              ]
+            ][
+             h1 [] [
+                getWikipediaTitle (Array.get (model.index) wikipediaRecordsArray)
+                ]
+              ]
+            -- Abstract
+            --  div[
+            --   css[ 
+            --   Tw.text_lg, 
+            --   Tw.text_color Tw.gray_200, 
+            --   Tw.w_64
+            -- ]][
+            --     p[] [getWikipediaAbstract (Array.get model.index wikipediaRecordsArray)]
+            --   ]
         ],
-       
-        div[class "alt-wikipedia-container"][
-        
-        -- Next Button
-        div [class "next-button-container"] [
+                 
+        -- next wikipedia container
+        div[css[Tw.flex, 
+                Tw.items_center,
+                Tw.justify_center]][
 
-            button [onClick Next, class "button"
-                    ] [ 
-                   i [class "fa-solid fa-chevron-right"][] 
-                      ]
-          ],
-
-        -- Next Content
+          -- next button
+         div[css [Tw.z_10,
+                  Tw.absolute, 
+                  Tw.transform,
+                  Tw.translate_x_64,Tw.translate_y_0]][
+            button [onClick Next,
+                    css[
+                    Tw.bg_color Tw.pink_400,
+                    Tw.border,
+                    Tw.text_color Tw.zinc_100,
+                    Tw.border_color Tw.black, 
+                    Tw.rounded,
+                    Tw.text_5xl, Tw.cursor_pointer,
+                    Tw.px_4, Tw.py_3
+            ] 
+                    ] 
+                [   
+                i [class "fa-solid fa-chevron-right"][]
+                ]
+         ],
+      
+        -- next content
         div [
-              class "next-wikipedia-content"
-            ] [ 
+          css [ 
+                Tw.opacity_20
+            ]
+        ] [ 
 
-        -- Wikipedia Image  
-
-        div[class "wikipedia-image"][
+        -- wikipedia image (next)
+        div[
+          css[ 
+            Tw.flex, 
+            Tw.self_center,
+            Tw.justify_center, 
+            Tw.border,
+            Tw.border_color Tw.gray_900, 
+            Tw.rounded,
+            Tw.text_color Tw.zinc_100
+            ]
+        ][
            img[src (getWikipediaImageUrl (Array.get (model.index + 1) wikipediaRecordsArray)),
                     width 400,
                     height 400][]],
-                                  div[class "wikipedia-title"][
-                h1 [] [
-                getWikipediaTitle (Array.get (model.index + 1) wikipediaRecordsArray)
-                ]]    
-        
-
-          ]]
-        ],
-
-      -- Additional Content
-      div[class "additional-content"][
-            div[][],
-            div[class "descriptive-content "][
-
-              -- Wikipedia Title
-              a[
-                href (getWikipediaUrl (Array.get model.index wikipediaRecordsArray)),
-                target "_blank",
-                class "wikipedia-url"
-              ][
-              div[class "wikipedia-title"][
-                h1 [] [
-                getWikipediaTitle (Array.get model.index wikipediaRecordsArray)
-                ]]
-            ],
-              
-            -- Wikipedia Abstract
-            div[class "wikipedia-abstract"][
-                p[] [getWikipediaAbstract (Array.get model.index wikipediaRecordsArray)]
-              ],
             
-            div[class "wiki-content-category"][
-
-              -- Categories List
-              div[class "categories"][                                  
-                input[type_ "checkbox", id  "wikipedia-categories"][],
-                
-                label[for "wikipedia-categories"][
-                      i [class "fa-solid fa-bars",
-                         class "bars-icon-categories"][], 
-                        text("Categories"),
-                      i [class "fa-solid fa-chevron-down", 
-                         class "chevron-icon-categories"][]],
-                ul [] (getWikipediaCategories (Array.get model.index wikipediaRecordsArray))
+           -- wikipedia title (next)
+           div[
+            css[ 
+              Tw.flex, 
+              Tw.justify_center, 
+              Tw.text_color Tw.pink_400, 
+              Tw.font_serif
               ]
-                  ]
-                      ]                   
-      ]
+            ][
+             h2 [] [
+                getWikipediaTitle (Array.get (model.index + 1) wikipediaRecordsArray)
+                ]
+              ]
+            ]
           ]
-               ]
+        ]
+      ]
+    ]
+
+      
+
       
       
         
@@ -224,9 +332,9 @@ getWikipediaTitle record =
         Just wikiRecord ->
             case wikiRecord.abstract_info of 
               Nothing ->
-                text("Nothing")
+                text ("Nothing")
               Just abstract_info ->
-                 text(abstract_info.title)
+                 text (abstract_info.title)
 
 -- Add Wikipedia URL to HTML
 getWikipediaUrl : Maybe WikipediaRecord -> String
