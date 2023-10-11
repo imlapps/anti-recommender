@@ -2,6 +2,7 @@ module Main exposing (..)
 
 import Http
 import Browser
+import Random
 import Array exposing (Array)
 
 -- import Html exposing (..)
@@ -33,7 +34,7 @@ main = Browser.element
 -- INIT
 init : () -> (Model, Cmd Msg)
 init _ =
-  ( {status = Loading , index = 0, numberOfRecords = 0}
+  ( {status = Loading , index = 0, randomIndex = 0, numberOfRecords = 0}
   , getFile
   )
 
@@ -41,7 +42,7 @@ init _ =
 
 -- MODEL
 type LoadDataStatus = Failure | Loading | Success (Array WikipediaRecord)
-type alias Model =  {status: LoadDataStatus, index: Int, numberOfRecords: Int}
+type alias Model =  {status: LoadDataStatus, index: Int, randomIndex: Int, numberOfRecords: Int}
 
 
 -- UPDATE
@@ -49,6 +50,7 @@ type Msg
   = GotText (Result Http.Error String) 
     | Next 
     | Back
+    | RandomNumber Int
 
 -- Read Wikipedia JSONL file
 getFile: Cmd Msg
@@ -65,10 +67,13 @@ update msg model =
   case msg of
     Next ->
        ({model | index = if model.index >= model.numberOfRecords - 1 then 0 
-                         else model.index + 1}, Cmd.none)
+                         else model.index + 1}, 
+                 Random.generate RandomNumber (Random.int 0 (model.numberOfRecords - 4)))
     Back ->
        ({model | index = if model.index <= 0  then model.numberOfRecords - 1 
                          else model.index - 1}, Cmd.none)
+    RandomNumber randomNumber->
+       ({model | randomIndex = randomNumber}, Cmd.none)
     GotText result ->
       case result of
         Ok fileText ->
@@ -115,14 +120,15 @@ view model =
       -- main container
       div [css[Tw.flex, 
             Tw.flex_col, 
-            Tw.justify_between]]
+            Tw.justify_between,
+            Tw.bg_color Tw.custom_black_2]]
       [ 
       
       -- gallery container
       div[css [Tw.flex, 
              Tw.flex_row, 
              Tw.justify_between, 
-             Tw.bg_color Tw.custom_black_2,
+             Tw.bg_color Tw.black,
              Tw.border_b_8,
              Tw.border_color Tw.black,
              Tw.pr_4,
@@ -315,14 +321,42 @@ view model =
             ]
           ]
         ]
+      ],
+      div[
+        css[
+          Tw.flex,
+          Tw.flex_row,
+          Tw.justify_evenly,
+          Tw.bg_color Tw.custom_black_2
+        ]
+      ][
+        div[][p[][text("Abstract")]],
+        div[][p[][text("Categories")]],
+        div[][
+          div[css [
+              Tw.flex, 
+              Tw.justify_center, 
+              Tw.text_color Tw.pink_400, 
+              Tw.font_serif
+          ]][
+            h1[][text("Explore")]
+          ],
+          div[
+            css [
+              Tw.flex_col,
+              Tw.justify_evenly
+            ]
+          ][
+         (getRandomItem (Array.get model.randomIndex wikipediaRecordsArray)),
+         (getRandomItem (Array.get (model.randomIndex - 1) wikipediaRecordsArray)),
+         (getRandomItem (Array.get (model.randomIndex + 1) wikipediaRecordsArray))
+          ]
+
+        ]
       ]
-    ]
-
       
-
-      
-      
-        
+      ]
+   
 -- Add Wikipedia Title to HTML
 getWikipediaTitle : Maybe WikipediaRecord -> Html Msg
 getWikipediaTitle record =
@@ -412,3 +446,53 @@ getWikipediaCategories record =
 getCategoryItem : Category -> Html msg
 getCategoryItem category = 
         a [href ("https://en.wikipedia.org/" ++ category.link), target "_blank"] [ li [][ text ((category.text)) ]]
+
+-- Add Random List Item to HTML
+getRandomItem : Maybe WikipediaRecord -> Html Msg
+getRandomItem record =
+        div[css[
+            Tw.pr_6,
+            Tw.pl_4,
+            Tw.py_2,
+            Tw.mb_4,
+            Tw.border,
+            Tw.border_color Tw.gray_900, 
+            Tw.rounded_lg,
+            Tw.bg_color Tw.black]][a[
+            href (getWikipediaUrl record),
+            target "_blank",
+            css [
+                  Tw.no_underline,
+                  Tw.text_color Tw.gray_900
+            ]
+        ][
+          div[
+            css[      
+                Tw.flex,
+                Tw.flex_row,
+                Tw.justify_start
+            ]][
+        div[
+          css[ 
+            Tw.border,
+            Tw.border_color Tw.gray_900, 
+            Tw.rounded,
+            Tw.text_color Tw.zinc_100,
+            Tw.pr_5
+            ]
+        ][
+           img[src (getWikipediaImageUrl record),
+                    width 100,
+                    height 100][]],
+                   div[
+            css[ 
+              Tw.text_color Tw.pink_400, 
+              Tw.font_serif
+              ]
+            ][
+             h2 [] [
+                getWikipediaTitle record
+                ]
+              ]
+                    ] 
+          ]]
