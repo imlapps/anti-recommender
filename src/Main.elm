@@ -68,10 +68,11 @@ update msg model =
     Next ->
        ({model | index = if model.index >= model.numberOfRecords - 1 then 0 
                          else model.index + 1}, 
-                 Random.generate RandomNumber (Random.int 0 (model.numberOfRecords - 4)))
+                 Random.generate RandomNumber (Random.int 2 (model.numberOfRecords - 2)))
     Back ->
        ({model | index = if model.index <= 0  then model.numberOfRecords - 1 
-                         else model.index - 1}, Cmd.none)
+                         else model.index - 1}, 
+                 Random.generate RandomNumber (Random.int 2 (model.numberOfRecords - 2)))
     RandomNumber randomNumber->
        ({model | randomIndex = randomNumber}, Cmd.none)
     GotText result ->
@@ -329,13 +330,60 @@ view model =
           Tw.justify_evenly,
           Tw.bg_color Tw.custom_black_2
         ]
-      ][       div[][
+      ][       
+        div[][          
+          
           div[
             css [
               Tw.flex, 
               Tw.justify_center, 
               Tw.text_color Tw.pink_400, 
               Tw.font_serif
+          ]
+          ][
+            h1[][text("Abstract")]
+          ],
+                      div[css[
+                        Tw.text_lg, 
+                        Tw.text_color Tw.gray_200,
+                        Tw.w_80
+                      ]][
+                p[] [getWikipediaAbstract (Array.get model.index wikipediaRecordsArray)]
+              ],
+          div[
+            css [
+              Tw.flex, 
+              Tw.justify_center, 
+              Tw.text_color Tw.pink_400, 
+              Tw.font_serif
+          ]
+          ][
+            h1[][text("Table of Contents")]
+          ],
+          div[
+            css [
+                Tw.flex_row,
+                Tw.justify_evenly
+          ]
+          ][
+              ul [] (getWikipediaSublinks (Array.get model.index wikipediaRecordsArray))
+          ]],        div[][
+       
+         div[
+          css [
+            Tw.flex,
+            Tw.justify_center
+          ]
+         ][
+          ratings
+         ],
+        div[
+            css [
+              Tw.flex, 
+              Tw.justify_center, 
+              Tw.text_color Tw.pink_400, 
+              Tw.font_serif,
+              Tw.mt_8
           ]
           ][
             h1[][text("Categories")]
@@ -349,29 +397,6 @@ view model =
               ul [] (getWikipediaCategories (Array.get model.index wikipediaRecordsArray))
           ]
      ],
-        div[][          
-          
-          div[
-            css [
-              Tw.flex, 
-              Tw.justify_center, 
-              Tw.text_color Tw.pink_400, 
-              Tw.font_serif
-          ]
-          ][
-            h1[][text("Abstract")]
-          ],
-          
-                    div[
-            css [
-              Tw.flex, 
-              Tw.justify_center, 
-              Tw.text_color Tw.pink_400, 
-              Tw.font_serif
-          ]
-          ][
-            h1[][text("Table of Contents")]
-          ]],
         div[][
           div[css [
               Tw.flex, 
@@ -389,7 +414,9 @@ view model =
           ][
          (getRandomItem (Array.get model.randomIndex wikipediaRecordsArray)),
          (getRandomItem (Array.get (model.randomIndex - 1) wikipediaRecordsArray)),
-         (getRandomItem (Array.get (model.randomIndex + 1) wikipediaRecordsArray))
+         (getRandomItem (Array.get (model.randomIndex + 1) wikipediaRecordsArray)),
+         (getRandomItem (Array.get (model.randomIndex - 2) wikipediaRecordsArray)),
+         (getRandomItem (Array.get (model.randomIndex + 2) wikipediaRecordsArray))
           ]
 
         ]
@@ -489,7 +516,7 @@ getCategoryItem category =
           a [href ("https://en.wikipedia.org/" ++ category.link), target "_blank"] 
           [ li [
 
-          ][ div[][text ((category.text))]]]
+          ][ text ((category.text))]]
 
 -- Add Random List Item to HTML
 getRandomItem : Maybe WikipediaRecord -> Html Msg
@@ -540,3 +567,70 @@ getRandomItem record =
               ]
                     ] 
           ]]
+
+ratings : Html(msg)
+ratings =     div
+        [ class "rate"
+        ]
+        [ input
+            [ type_ "radio"
+            , id "star5"
+            , name "rate"
+            , value "5"
+            ]
+            []
+        , label
+            [ for "star5"
+            , title "text"
+            ]
+            [ text "5 stars" ]
+        , input
+            [ type_ "radio"
+            , id "star4"
+            , name "rate"
+            , value "4"
+            ]
+            []
+        , label
+            [ for "star4"
+            , title "text"
+            ]
+            [ text "4 stars" ]
+        , input
+            [ type_ "radio"
+            , id "star3"
+            , name "rate"
+            , value "3"
+            ]
+            []
+        , label
+            [ for "star3"
+            , title "text"
+            ]
+            [ text "3 stars" ]
+        , input
+            [ type_ "radio"
+            , id "star2"
+            , name "rate"
+            , value "2"
+            ]
+            []
+        , label
+            [ for "star2"
+            , title "text"
+            ]
+            [ text "2 stars" ]
+        , input
+            [ type_ "radio"
+            , id "star1"
+            , name "rate"
+            , value "1"
+            ]
+            []
+        , label
+            [ for "star1"
+            , title "text"
+            ]
+            [ text "1 star" ]
+        ]
+    
