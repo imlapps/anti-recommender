@@ -178,7 +178,7 @@ view model =
             Tw.text_color Tw.zinc_100
             ]
         ][
-           img[src (getWikipediaImageUrl (Array.get (model.currentWikipediaIndex - 1) wikipediaRecordsArray)),
+           img[src (extractWikipediaImageURLFromWikipediaRecord (Array.get (model.currentWikipediaIndex - 1) wikipediaRecordsArray)),
                     width 400,
                     height 400,
                 css[
@@ -199,7 +199,7 @@ view model =
             ][
              h2 [
               css[ Tw.py_2 ]] [
-                getWikipediaTitle (Array.get (model.currentWikipediaIndex - 1) wikipediaRecordsArray)
+                extractWikipediaTitleFromWikipediaRecord (Array.get (model.currentWikipediaIndex - 1) wikipediaRecordsArray)
                 ]
               ]
           ]
@@ -214,7 +214,7 @@ view model =
 
           -- wikipedia image  (Main)
           a[
-            href (getWikipediaUrl (Array.get model.currentWikipediaIndex wikipediaRecordsArray)),
+            href (extractWikipediaURLFromWikipediaRecord (Array.get model.currentWikipediaIndex wikipediaRecordsArray)),
             target "_blank",
             css [
                   Tw.no_underline,
@@ -229,7 +229,7 @@ view model =
               Tw.text_color Tw.zinc_100
             ]
           ][
-           img[src (getWikipediaImageUrl (Array.get model.currentWikipediaIndex wikipediaRecordsArray)),
+           img[src (extractWikipediaImageURLFromWikipediaRecord (Array.get model.currentWikipediaIndex wikipediaRecordsArray)),
                     width 500,
                     height 500,
             css[
@@ -251,7 +251,7 @@ view model =
             ][
              h1 [
               css[Tw.py_2]] [
-                getWikipediaTitle (Array.get (model.currentWikipediaIndex) wikipediaRecordsArray)
+                extractWikipediaTitleFromWikipediaRecord (Array.get (model.currentWikipediaIndex) wikipediaRecordsArray)
                 ]
               ]
         ],
@@ -301,7 +301,7 @@ view model =
             Tw.text_color Tw.zinc_100
             ]
         ][
-           img[src (getWikipediaImageUrl (Array.get (model.currentWikipediaIndex + 1) wikipediaRecordsArray)),
+           img[src (extractWikipediaImageURLFromWikipediaRecord (Array.get (model.currentWikipediaIndex + 1) wikipediaRecordsArray)),
                     width 400,
                     height 400,
            css[
@@ -322,7 +322,7 @@ view model =
             ][
              h2 [
               css[ Tw.py_2 ]] [
-                getWikipediaTitle (Array.get (model.currentWikipediaIndex + 1) wikipediaRecordsArray)
+                extractWikipediaTitleFromWikipediaRecord (Array.get (model.currentWikipediaIndex + 1) wikipediaRecordsArray)
                 ]
               ]
             ]
@@ -368,7 +368,7 @@ view model =
                   Tw.justify_center,
                   Tw.text_color Tw.gray_200
               ]][
-                p[] [getWikipediaAbstract (Array.get model.currentWikipediaIndex wikipediaRecordsArray)]
+                p[] [extractWikipediaAbstractFromWikipediaRecord (Array.get model.currentWikipediaIndex wikipediaRecordsArray)]
               ],
           div[
             css [ 
@@ -392,7 +392,7 @@ view model =
                  Tw.justify_evenly]
             ]
           ][
-              ul [] (getWikipediaSublinks (Array.get model.currentWikipediaIndex wikipediaRecordsArray))
+              ul [] (extractWikipediaSublinksFromWikipediaRecord (Array.get model.currentWikipediaIndex wikipediaRecordsArray))
           ]], 
 
         -- Ratings and Categories View       
@@ -444,7 +444,7 @@ view model =
           ]
           ][
             div[][
-                ul [] (getWikipediaCategories (Array.get model.currentWikipediaIndex wikipediaRecordsArray))
+                ul [] (extractWikipediaCategoriesFromWikipediaRecord (Array.get model.currentWikipediaIndex wikipediaRecordsArray))
             ]
           ]
          ]
@@ -478,11 +478,11 @@ view model =
               Tw.justify_evenly
             ]
           ][
-         (getRandomItem (Array.get model.randomWikipediaIndex wikipediaRecordsArray)),
-         (getRandomItem (Array.get (model.randomWikipediaIndex - 1) wikipediaRecordsArray)),
-         (getRandomItem (Array.get (model.randomWikipediaIndex + 1) wikipediaRecordsArray)),
-         (getRandomItem (Array.get (model.randomWikipediaIndex - 2) wikipediaRecordsArray)),
-         (getRandomItem (Array.get (model.randomWikipediaIndex + 2) wikipediaRecordsArray))
+         (createRandomItemElement (Array.get model.randomWikipediaIndex wikipediaRecordsArray)),
+         (createRandomItemElement (Array.get (model.randomWikipediaIndex - 1) wikipediaRecordsArray)),
+         (createRandomItemElement (Array.get (model.randomWikipediaIndex + 1) wikipediaRecordsArray)),
+         (createRandomItemElement (Array.get (model.randomWikipediaIndex - 2) wikipediaRecordsArray)),
+         (createRandomItemElement (Array.get (model.randomWikipediaIndex + 2) wikipediaRecordsArray))
           ]
         ]
       ],
@@ -500,9 +500,9 @@ view model =
       ]
       ]
    
--- Add Wikipedia Title to HTML
-getWikipediaTitle : Maybe WikipediaRecord -> Html Msg
-getWikipediaTitle record =
+-- extract Wikipedia Title from Wikipedia Record
+extractWikipediaTitleFromWikipediaRecord : Maybe WikipediaRecord -> Html Msg
+extractWikipediaTitleFromWikipediaRecord record =
         case record of 
         Nothing ->
           text ("Nothing")
@@ -513,22 +513,22 @@ getWikipediaTitle record =
               Just abstract_info ->
                  text (abstract_info.title)
 
--- Add Wikipedia URL to HTML
-getWikipediaUrl : Maybe WikipediaRecord -> String
-getWikipediaUrl record =
+-- extract Wikipedia URL from Wikipedia Record
+extractWikipediaURLFromWikipediaRecord : Maybe WikipediaRecord -> String
+extractWikipediaURLFromWikipediaRecord record =
         case record of 
-        Nothing ->
-          "Nothing"
-        Just wikiRecord ->
+          Nothing ->
+            "Nothing"
+          Just wikiRecord ->
             case wikiRecord.abstract_info of 
               Nothing ->
                 "Nothing"
               Just abstract_info ->
                  abstract_info.url
 
--- Add Wikipedia Abstract to HTML
-getWikipediaAbstract : Maybe WikipediaRecord -> Html Msg
-getWikipediaAbstract record =
+-- extract Wikipedia Abstract from Wikipedia Record
+extractWikipediaAbstractFromWikipediaRecord : Maybe WikipediaRecord -> Html Msg
+extractWikipediaAbstractFromWikipediaRecord record =
         case record of 
         Nothing ->
           text ("Nothing")
@@ -540,9 +540,9 @@ getWikipediaAbstract record =
                  if ((List.length (split " " abstract_info.abstract)) >= 10) then
                  text(abstract_info.abstract) else text(" ")
 
--- Add Wikipedia Image to HTML
-getWikipediaImageUrl : Maybe WikipediaRecord -> String 
-getWikipediaImageUrl record = 
+-- extract Wikipedia Image URL from Wikipedia Record
+extractWikipediaImageURLFromWikipediaRecord : Maybe WikipediaRecord -> String 
+extractWikipediaImageURLFromWikipediaRecord record = 
         case record of 
         Nothing ->
           ""
@@ -553,9 +553,9 @@ getWikipediaImageUrl record =
               Just abstract_info ->
                  abstract_info.image
 
--- Add Wikipedia Sublinks List to HTML
-getWikipediaSublinks: Maybe WikipediaRecord -> List(Html Msg)
-getWikipediaSublinks record =
+-- extract Wikipedia Sublinks List from Wikipedia Record
+extractWikipediaSublinksFromWikipediaRecord: Maybe WikipediaRecord -> List(Html Msg)
+extractWikipediaSublinksFromWikipediaRecord record =
         case record of 
           Nothing ->
             [li [] [a [][text("Nothing")]]]
@@ -564,17 +564,17 @@ getWikipediaSublinks record =
               Nothing ->
                [li [] [a [][text("Nothing")]]]
               Just sublinks ->
-                (List.map getSublinkItem sublinks)
+                (List.map createSublinkItemElement sublinks)
 
--- Add Sublink Item to List
-getSublinkItem : Sublink -> Html msg
-getSublinkItem sublink = 
+-- extract Sublink Item from Sublink List and create HTML element
+createSublinkItemElement : Sublink -> Html msg
+createSublinkItemElement sublink = 
         a [href sublink.link, target "_blank",
                               css [
                   Tw.no_underline,
                   Tw.text_color Tw.gray_900
             ]] [ li [
-          css[ 
+        css[ 
               Tw.block,
               Tw.text_xl
             , Tw.bg_color Tw.black
@@ -590,13 +590,12 @@ getSublinkItem sublink =
                 [ Tw.mr_0
                 ]
           ]
-    
         ][ text (( sublink.anchor)) ]]
 
 
--- Add Wikipedia Category List to HTML
-getWikipediaCategories: Maybe WikipediaRecord -> List(Html Msg)
-getWikipediaCategories record =
+-- extract Wikipedia Category List from Wikipedia Record
+extractWikipediaCategoriesFromWikipediaRecord: Maybe WikipediaRecord -> List(Html Msg)
+extractWikipediaCategoriesFromWikipediaRecord record =
         case record of 
           Nothing ->
             [li [] [a [][text("Nothing")]]]
@@ -605,11 +604,11 @@ getWikipediaCategories record =
               Nothing ->
                [li [] [a [][text("Nothing")]]]
               Just categories ->
-                (List.map getCategoryItem categories)
+                (List.map createCategoryItemElement categories)
 
--- Add Category Item to List
-getCategoryItem : Category -> Html msg
-getCategoryItem category = 
+-- extract Category Item from Category List and create HTML element
+createCategoryItemElement : Category -> Html msg
+createCategoryItemElement category = 
 
           a [href ("https://en.wikipedia.org/" ++ category.link), target "_blank",
                       css [
@@ -635,9 +634,9 @@ getCategoryItem category =
           ]
           ][ text ((category.text))]]
 
--- Add Random List Item to HTML
-getRandomItem : Maybe WikipediaRecord -> Html Msg
-getRandomItem record =
+-- Create HTML Element for random items
+createRandomItemElement : Maybe WikipediaRecord -> Html Msg
+createRandomItemElement record =
         div[
           css[
             Tw.pr_6,
@@ -652,7 +651,7 @@ getRandomItem record =
             ]
         ][
           a[
-            href (getWikipediaUrl record),
+            href (extractWikipediaURLFromWikipediaRecord record),
             target "_blank",
             css [
                   Tw.no_underline,
@@ -674,7 +673,7 @@ getRandomItem record =
             Tw.pr_5
             ]
         ][
-           img[src (getWikipediaImageUrl record),
+           img[src (extractWikipediaImageURLFromWikipediaRecord record),
                width 100,
                height 100,
                css [Tw.bg_color Tw.white]][]],
@@ -685,7 +684,7 @@ getRandomItem record =
               Css.hover [Tw.text_color Tw.white ]
               ]
             ][
-          h2 [] [getWikipediaTitle record]
+          h2 [] [extractWikipediaTitleFromWikipediaRecord record]
           ]
         ] 
   ]]
