@@ -61,34 +61,4 @@ ul li{
   color: #ff6cc9;
 }
 
-li:hover {
-  background-color: #ff6cc9;
-  color: white;
-}
-
-a {
-  text-decoration: none;
-}
-input[type="checkbox"]{
-  position: absolute;
-  left: -624.938rem;
-}
-
-input[type="checkbox"] ~ ul{
-  height: 0;
-  transform: scaleY(0);
-}
-
-input[type="checkbox"]:checked ~ ul{
-  height: 200px;
-  overflow-y: scroll;
-  transform-origin: top;
-  transition: transform .2s ease-out;
-  transform: scaleY(1); 
-}
-
-input[type="checkbox"]:checked + label{
-  background: #ff6cc9;
-  border-bottom: 0.06rem solid #fff;
-}
 

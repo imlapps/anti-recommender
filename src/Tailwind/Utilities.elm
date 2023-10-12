@@ -275,7 +275,7 @@ accent_auto =
 
 accent_custom_black_1 : Css.Style
 accent_custom_black_1 =
-    Css.property "accent-color" "#1D1A1A"
+    Css.property "accent-color" "#1B1B1D"
 
 
 accent_custom_black_2 : Css.Style
@@ -1389,7 +1389,7 @@ bg_custom_black_1 : Css.Style
 bg_custom_black_1 =
     Css.batch
         [ Css.property "--tw-bg-opacity" "1"
-        , Css.property "background-color" "rgb(29 26 26 / var(--tw-bg-opacity))"
+        , Css.property "background-color" "rgb(27 27 29 / var(--tw-bg-opacity))"
         ]
 
 
@@ -1752,7 +1752,7 @@ border_b_custom_black_1 : Css.Style
 border_b_custom_black_1 =
     Css.batch
         [ Css.property "--tw-border-opacity" "1"
-        , Css.property "border-bottom-color" "rgb(29 26 26 / var(--tw-border-opacity))"
+        , Css.property "border-bottom-color" "rgb(27 27 29 / var(--tw-border-opacity))"
         ]
 
 
@@ -1773,7 +1773,7 @@ border_custom_black_1 : Css.Style
 border_custom_black_1 =
     Css.batch
         [ Css.property "--tw-border-opacity" "1"
-        , Css.property "border-color" "rgb(29 26 26 / var(--tw-border-opacity))"
+        , Css.property "border-color" "rgb(27 27 29 / var(--tw-border-opacity))"
         ]
 
 
@@ -1829,7 +1829,7 @@ border_e_custom_black_1 : Css.Style
 border_e_custom_black_1 =
     Css.batch
         [ Css.property "--tw-border-opacity" "1"
-        , Css.property "border-inline-end-color" "rgb(29 26 26 / var(--tw-border-opacity))"
+        , Css.property "border-inline-end-color" "rgb(27 27 29 / var(--tw-border-opacity))"
         ]
 
 
@@ -1875,7 +1875,7 @@ border_l_custom_black_1 : Css.Style
 border_l_custom_black_1 =
     Css.batch
         [ Css.property "--tw-border-opacity" "1"
-        , Css.property "border-left-color" "rgb(29 26 26 / var(--tw-border-opacity))"
+        , Css.property "border-left-color" "rgb(27 27 29 / var(--tw-border-opacity))"
         ]
 
 
@@ -1996,7 +1996,7 @@ border_r_custom_black_1 : Css.Style
 border_r_custom_black_1 =
     Css.batch
         [ Css.property "--tw-border-opacity" "1"
-        , Css.property "border-right-color" "rgb(29 26 26 / var(--tw-border-opacity))"
+        , Css.property "border-right-color" "rgb(27 27 29 / var(--tw-border-opacity))"
         ]
 
 
@@ -2037,7 +2037,7 @@ border_s_custom_black_1 : Css.Style
 border_s_custom_black_1 =
     Css.batch
         [ Css.property "--tw-border-opacity" "1"
-        , Css.property "border-inline-start-color" "rgb(29 26 26 / var(--tw-border-opacity))"
+        , Css.property "border-inline-start-color" "rgb(27 27 29 / var(--tw-border-opacity))"
         ]
 
 
@@ -2963,7 +2963,7 @@ border_t_custom_black_1 : Css.Style
 border_t_custom_black_1 =
     Css.batch
         [ Css.property "--tw-border-opacity" "1"
-        , Css.property "border-top-color" "rgb(29 26 26 / var(--tw-border-opacity))"
+        , Css.property "border-top-color" "rgb(27 27 29 / var(--tw-border-opacity))"
         ]
 
 
@@ -3019,8 +3019,8 @@ border_x_custom_black_1 : Css.Style
 border_x_custom_black_1 =
     Css.batch
         [ Css.property "--tw-border-opacity" "1"
-        , Css.property "border-left-color" "rgb(29 26 26 / var(--tw-border-opacity))"
-        , Css.property "border-right-color" "rgb(29 26 26 / var(--tw-border-opacity))"
+        , Css.property "border-left-color" "rgb(27 27 29 / var(--tw-border-opacity))"
+        , Css.property "border-right-color" "rgb(27 27 29 / var(--tw-border-opacity))"
         ]
 
 
@@ -3077,8 +3077,8 @@ border_y_custom_black_1 : Css.Style
 border_y_custom_black_1 =
     Css.batch
         [ Css.property "--tw-border-opacity" "1"
-        , Css.property "border-top-color" "rgb(29 26 26 / var(--tw-border-opacity))"
-        , Css.property "border-bottom-color" "rgb(29 26 26 / var(--tw-border-opacity))"
+        , Css.property "border-top-color" "rgb(27 27 29 / var(--tw-border-opacity))"
+        , Css.property "border-bottom-color" "rgb(27 27 29 / var(--tw-border-opacity))"
         ]
 
 
@@ -3554,7 +3554,7 @@ caption_top =
 
 caret_custom_black_1 : Css.Style
 caret_custom_black_1 =
-    Css.property "caret-color" "#1D1A1A"
+    Css.property "caret-color" "#1B1B1D"
 
 
 caret_custom_black_2 : Css.Style
@@ -4280,7 +4280,7 @@ decoration_clone =
 
 decoration_custom_black_1 : Css.Style
 decoration_custom_black_1 =
-    Css.property "text-decoration-color" "#1D1A1A"
+    Css.property "text-decoration-color" "#1B1B1D"
 
 
 decoration_custom_black_2 : Css.Style
@@ -4381,7 +4381,7 @@ divide_custom_black_1 =
     Css.Global.children
         [ Css.Global.selector ":not([hidden]) ~ :not([hidden])"
             [ Css.property "--tw-divide-opacity" "1"
-            , Css.property "border-color" "rgb(29 26 26 / var(--tw-divide-opacity))"
+            , Css.property "border-color" "rgb(27 27 29 / var(--tw-divide-opacity))"
             ]
         ]
 
@@ -5042,7 +5042,7 @@ end_px =
 
 fill_custom_black_1 : Css.Style
 fill_custom_black_1 =
-    Css.property "fill" "#1D1A1A"
+    Css.property "fill" "#1B1B1D"
 
 
 fill_custom_black_2 : Css.Style
@@ -5338,8 +5338,8 @@ from_95pct =
 from_custom_black_1 : Css.Style
 from_custom_black_1 =
     Css.batch
-        [ Css.property "--tw-gradient-from" "#1D1A1A var(--tw-gradient-from-position)"
-        , Css.property "--tw-gradient-to" "rgb(29 26 26 / 0) var(--tw-gradient-to-position)"
+        [ Css.property "--tw-gradient-from" "#1B1B1D var(--tw-gradient-from-position)"
+        , Css.property "--tw-gradient-to" "rgb(27 27 29 / 0) var(--tw-gradient-to-position)"
         , Css.property "--tw-gradient-stops" "var(--tw-gradient-from), var(--tw-gradient-to)"
         ]
 
@@ -18685,7 +18685,7 @@ outline_8 =
 
 outline_custom_black_1 : Css.Style
 outline_custom_black_1 =
-    Css.property "outline-color" "#1D1A1A"
+    Css.property "outline-color" "#1B1B1D"
 
 
 outline_custom_black_2 : Css.Style
@@ -19665,7 +19665,7 @@ placeholder_custom_black_1 : Css.Style
 placeholder_custom_black_1 =
     Css.pseudoElement "placeholder"
         [ Css.property "--tw-placeholder-opacity" "1"
-        , Css.property "color" "rgb(29 26 26 / var(--tw-placeholder-opacity))"
+        , Css.property "color" "rgb(27 27 29 / var(--tw-placeholder-opacity))"
         ]
 
 
@@ -21183,7 +21183,7 @@ ring_custom_black_1 : Css.Style
 ring_custom_black_1 =
     Css.batch
         [ Css.property "--tw-ring-opacity" "1"
-        , Css.property "--tw-ring-color" "rgb(29 26 26 / var(--tw-ring-opacity))"
+        , Css.property "--tw-ring-color" "rgb(27 27 29 / var(--tw-ring-opacity))"
         ]
 
 
@@ -21227,7 +21227,7 @@ ring_offset_8 =
 
 ring_offset_custom_black_1 : Css.Style
 ring_offset_custom_black_1 =
-    Css.property "--tw-ring-offset-color" "#1D1A1A"
+    Css.property "--tw-ring-offset-color" "#1B1B1D"
 
 
 ring_offset_custom_black_2 : Css.Style
@@ -26296,7 +26296,7 @@ shadow_2xl =
 shadow_custom_black_1 : Css.Style
 shadow_custom_black_1 =
     Css.batch
-        [ Css.property "--tw-shadow-color" "#1D1A1A"
+        [ Css.property "--tw-shadow-color" "#1B1B1D"
         , Css.property "--tw-shadow" "var(--tw-shadow-colored)"
         ]
 
@@ -27590,7 +27590,7 @@ stroke_2 =
 
 stroke_custom_black_1 : Css.Style
 stroke_custom_black_1 =
-    Css.property "stroke" "#1D1A1A"
+    Css.property "stroke" "#1B1B1D"
 
 
 stroke_custom_black_2 : Css.Style
@@ -27760,7 +27760,7 @@ text_custom_black_1 : Css.Style
 text_custom_black_1 =
     Css.batch
         [ Css.property "--tw-text-opacity" "1"
-        , Css.property "color" "rgb(29 26 26 / var(--tw-text-opacity))"
+        , Css.property "color" "rgb(27 27 29 / var(--tw-text-opacity))"
         ]
 
 
@@ -28016,7 +28016,7 @@ to_95pct =
 
 to_custom_black_1 : Css.Style
 to_custom_black_1 =
-    Css.property "--tw-gradient-to" "#1D1A1A var(--tw-gradient-to-position)"
+    Css.property "--tw-gradient-to" "#1B1B1D var(--tw-gradient-to-position)"
 
 
 to_custom_black_2 : Css.Style
@@ -29248,8 +29248,8 @@ via_95pct =
 via_custom_black_1 : Css.Style
 via_custom_black_1 =
     Css.batch
-        [ Css.property "--tw-gradient-to" "rgb(29 26 26 / 0)  var(--tw-gradient-to-position)"
-        , Css.property "--tw-gradient-stops" "var(--tw-gradient-from), #1D1A1A var(--tw-gradient-via-position), var(--tw-gradient-to)"
+        [ Css.property "--tw-gradient-to" "rgb(27 27 29 / 0)  var(--tw-gradient-to-position)"
+        , Css.property "--tw-gradient-stops" "var(--tw-gradient-from), #1B1B1D var(--tw-gradient-via-position), var(--tw-gradient-to)"
         ]
 
 

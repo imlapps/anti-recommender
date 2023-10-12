@@ -1832,7 +1832,7 @@ custom_gray =
 
 custom_black_1 : Color
 custom_black_1 =
-    Tw.Color "rgb" "29" "26" "26" Tw.ViaVariable
+    Tw.Color "rgb" "27" "27" "29" Tw.ViaVariable
 
 
 custom_black_2 : Color

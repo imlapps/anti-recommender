@@ -114,15 +114,18 @@ view model =
               Tw.text_color Tw.custom_pink,
               Tw.border_b_8,
               Tw.border_color Tw.black,
-              Tw.bg_color Tw.gray_400,
-              Tw.bg_radial_gradient
+              Tw.bg_radial_gradient,
+
+              Tw.py_4,
+              Tw.font_serif
              ]]
              [h1[][text("NerdSwipe")]],
+             
       -- main container
-      div [css[Tw.flex, 
+      div [css[
+            Tw.flex, 
             Tw.flex_col, 
-            Tw.justify_between,
-            Tw.bg_color Tw.custom_black_2]]
+            Tw.justify_between]]
       [ 
       
       -- gallery container
@@ -178,6 +181,7 @@ view model =
             Tw.self_center,
             Tw.justify_center, 
             Tw.border,
+
             Tw.border_color Tw.gray_900, 
             Tw.rounded,
             Tw.text_color Tw.zinc_100
@@ -185,7 +189,13 @@ view model =
         ][
            img[src (getWikipediaImageUrl (Array.get (model.index - 1) wikipediaRecordsArray)),
                     width 400,
-                    height 400][]],
+                    height 400,
+                css[
+            Tw.bg_color Tw.white,
+            Tw.border,
+            Tw.border_color Tw.gray_900, 
+            Tw.rounded
+                ]][]],
           
           -- wikipedia title (previous)
            div[
@@ -196,7 +206,9 @@ view model =
               Tw.font_serif
               ]
             ][
-             h2 [] [
+             h2 [css[
+              Tw.py_2
+             ]] [
                 getWikipediaTitle (Array.get (model.index - 1) wikipediaRecordsArray)
                 ]
               ]
@@ -224,15 +236,19 @@ view model =
             Tw.flex, 
             Tw.self_center,
             Tw.justify_center, 
-            Tw.border,
-            Tw.border_color Tw.gray_900, 
-            Tw.rounded,
+
             Tw.text_color Tw.zinc_100
             ]
         ][
            img[src (getWikipediaImageUrl (Array.get model.index wikipediaRecordsArray)),
                     width 500,
-                    height 500][]]
+                    height 500,
+        css[
+            Tw.bg_color Tw.white,
+            Tw.border_8,
+            Tw.border_color Tw.gray_900, 
+            Tw.rounded
+                ]][]]
             ],
 
           -- wikipedia title (Main)
@@ -244,7 +260,9 @@ view model =
               Tw.font_serif
               ]
             ][
-             h1 [] [
+             h1 [css[
+              Tw.py_2
+             ]] [
                 getWikipediaTitle (Array.get (model.index) wikipediaRecordsArray)
                 ]
               ]
@@ -291,15 +309,19 @@ view model =
             Tw.flex, 
             Tw.self_center,
             Tw.justify_center, 
-            Tw.border,
-            Tw.border_color Tw.gray_900, 
-            Tw.rounded,
+
             Tw.text_color Tw.zinc_100
             ]
         ][
            img[src (getWikipediaImageUrl (Array.get (model.index + 1) wikipediaRecordsArray)),
                     width 400,
-                    height 400][]],
+                    height 400,
+                                    css[
+            Tw.bg_color Tw.white,
+                        Tw.border,
+            Tw.border_color Tw.gray_900, 
+            Tw.rounded
+                ]][]],
             
            -- wikipedia title (next)
            div[
@@ -310,7 +332,9 @@ view model =
               Tw.font_serif
               ]
             ][
-             h2 [] [
+             h2 [css[
+              Tw.py_2
+             ]] [
                 getWikipediaTitle (Array.get (model.index + 1) wikipediaRecordsArray)
                 ]
               ]
@@ -323,9 +347,10 @@ view model =
           Tw.flex,
           Tw.flex_col,
           Tw.justify_center,
-          Tw.bg_color Tw.custom_black_2,
+          Tw.bg_color Tw.neutral_950,
           Breakpoints.lg[
-          Tw.flex_row
+          Tw.flex_row,
+          Tw.pt_4
           ]
         ]
       ][       
@@ -335,7 +360,8 @@ view model =
           css[
 
             Breakpoints.lg[
-            Tw.basis_1over4
+            Tw.basis_1over4,
+            Tw.pl_12
             ]
 
           ]
@@ -349,7 +375,11 @@ view model =
               Tw.font_serif
           ]
           ][
-            h1[][text("Abstract")]
+            h1[
+              css[
+              Tw.py_2
+            ]
+            ][text("Abstract")]
           ],
           div[css[
                   Tw.text_lg, 
@@ -370,7 +400,11 @@ view model =
               Tw.font_serif]
             ]
           ][
-            h1[][text("Table of Contents")]
+            h1[
+              css[
+              Tw.py_2
+            ]
+            ][text("Table of Contents")]
           ],
           div[
            css [ Tw.hidden,
@@ -394,11 +428,9 @@ view model =
             Tw.basis_1over2,
             Tw.flex_col
             ]
-
           ]
           ][
-       
-         div[
+        div[
           css[
             Tw.flex,
             Tw.justify_center,
@@ -407,26 +439,40 @@ view model =
          ][
           ratings
          ],
-         div[][
+         div[
+
+         ][
             div[
           
             css [
-              
               Tw.flex, 
               Tw.justify_center, 
               Tw.text_color Tw.pink_400, 
               Tw.font_serif,
               Tw.mt_8
+
           ]
           ][
-            h1[][text("Categories")]
+            h1[
+              css[
+              Tw.py_2
+            ]
+            ][text("Categories")]
           ],
           div[
             css [
- 
+              Tw.flex,
+              Tw.justify_center
           ]
           ][
-              ul [] (getWikipediaCategories (Array.get model.index wikipediaRecordsArray))
+
+            div[
+            ][
+            ul [] (getWikipediaCategories (Array.get model.index wikipediaRecordsArray))
+            ]
+
+            
+  
           ]
          ]
 
@@ -435,9 +481,12 @@ view model =
         -- Explore View
         div[
           css [ Tw.hidden,
-                Breakpoints.lg[
-                Tw.block,
-               Tw.basis_1over4]
+            
+            
+            Breakpoints.lg[
+               Tw.block,
+               Tw.basis_1over4,
+               Tw.pr_12]
             ]
         ][
           div[css [
@@ -446,7 +495,9 @@ view model =
               Tw.text_color Tw.pink_400, 
               Tw.font_serif
           ]][
-            h1[][text("Explore")]
+            h1[css[
+              Tw.py_2
+            ]][text("Explore")]
           ],
           div[
             css [
@@ -535,7 +586,29 @@ getWikipediaSublinks record =
 -- Add Sublink Item to List
 getSublinkItem : Sublink -> Html msg
 getSublinkItem sublink = 
-        a [href sublink.link, target "_blank"] [ li [][ text (( sublink.anchor)) ]]
+        a [href sublink.link, target "_blank",
+                              css [
+                  Tw.no_underline,
+                  Tw.text_color Tw.gray_900
+            ]] [ li [
+          css[ 
+              Tw.block,
+              Tw.text_xl
+            , Tw.bg_color Tw.black
+            , Tw.text_color Tw.pink_400
+            , Tw.rounded
+            , Tw.px_2
+            , Tw.py_4
+            , Tw.my_0_dot_5
+            , Tw.font_serif
+            , Css.hover [ Tw.bg_color Tw.pink_400, Tw.text_color Tw.white ],
+            Tw.mr_1
+            , Css.lastChild
+                [ Tw.mr_0
+                ]
+          ]
+    
+        ][ text (( sublink.anchor)) ]]
 
 
 -- Add Wikipedia Category List to HTML
@@ -555,9 +628,28 @@ getWikipediaCategories record =
 getCategoryItem : Category -> Html msg
 getCategoryItem category = 
 
-          a [href ("https://en.wikipedia.org/" ++ category.link), target "_blank"] 
+          a [href ("https://en.wikipedia.org/" ++ category.link), target "_blank",
+                      css [
+                  Tw.no_underline,
+                  Tw.text_color Tw.gray_900
+            ]] 
           [ li [
-
+          css[ 
+              Tw.block,
+              Tw.text_xl
+            , Tw.font_serif
+            , Tw.bg_color Tw.black
+            , Tw.text_color Tw.pink_400
+            , Tw.rounded
+            , Tw.px_2
+            , Tw.py_4
+            , Tw.my_0_dot_5
+            , Css.hover [ Tw.bg_color Tw.pink_400, Tw.text_color Tw.white ],
+            Tw.mr_1
+            , Css.lastChild
+                [ Tw.mr_0
+                ]
+          ]
           ][ text ((category.text))]]
 
 -- Add Random List Item to HTML
