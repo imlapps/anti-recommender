@@ -34,7 +34,7 @@ main = Browser.element
 -- INIT
 init : () -> (Model, Cmd Msg)
 init _ =
-  ( {status = Loading , index = 0, randomIndex = 0, numberOfRecords = 0}
+  ( {status = Loading , index = 0, randomIndex = 13, numberOfRecords = 0}
   , getFile
   )
 
@@ -164,14 +164,16 @@ view model =
       
         -- previous content
         div [
-          css [ 
-                Tw.opacity_20
+          css [ Tw.hidden,
+                Breakpoints.lg[
+                Tw.block,
+                Tw.opacity_20]
             ]
         ] [ 
 
         -- wikipedia image (Previous)
         div[
-          css[ 
+          css[
             Tw.flex, 
             Tw.self_center,
             Tw.justify_center, 
@@ -246,15 +248,6 @@ view model =
                 getWikipediaTitle (Array.get (model.index) wikipediaRecordsArray)
                 ]
               ]
-            -- Abstract
-            --  div[
-            --   css[ 
-            --   Tw.text_lg, 
-            --   Tw.text_color Tw.gray_200, 
-            --   Tw.w_64
-            -- ]][
-            --     p[] [getWikipediaAbstract (Array.get model.index wikipediaRecordsArray)]
-            --   ]
         ],
                  
         -- next wikipedia container
@@ -285,8 +278,10 @@ view model =
       
         -- next content
         div [
-          css [ 
-                Tw.opacity_20
+          css [ Tw.hidden,
+                Breakpoints.lg[
+                Tw.block,
+                Tw.opacity_20]
             ]
         ] [ 
 
@@ -326,12 +321,25 @@ view model =
       div[
         css[
           Tw.flex,
-          Tw.flex_row,
-          Tw.justify_evenly,
-          Tw.bg_color Tw.custom_black_2
+          Tw.flex_col,
+          Tw.justify_center,
+          Tw.bg_color Tw.custom_black_2,
+          Breakpoints.lg[
+          Tw.flex_row
+          ]
         ]
       ][       
-        div[][          
+
+        -- Abstract and Table of Contents
+        div[
+          css[
+
+            Breakpoints.lg[
+            Tw.basis_1over4
+            ]
+
+          ]
+        ][          
           
           div[
             css [
@@ -343,42 +351,67 @@ view model =
           ][
             h1[][text("Abstract")]
           ],
-                      div[css[
-                        Tw.text_lg, 
-                        Tw.text_color Tw.gray_200,
-                        Tw.w_80
-                      ]][
+          div[css[
+                  Tw.text_lg, 
+                  Tw.flex,
+                  Tw.justify_center,
+                  Tw.text_color Tw.gray_200
+                 
+            ]][
                 p[] [getWikipediaAbstract (Array.get model.index wikipediaRecordsArray)]
               ],
           div[
-            css [
+            css [ 
+              Tw.hidden,
+              Breakpoints.lg[
               Tw.flex, 
               Tw.justify_center, 
               Tw.text_color Tw.pink_400, 
-              Tw.font_serif
-          ]
+              Tw.font_serif]
+            ]
           ][
             h1[][text("Table of Contents")]
           ],
           div[
-            css [
+           css [ Tw.hidden,
+                Breakpoints.lg[
+                Tw.block,
                 Tw.flex_row,
-                Tw.justify_evenly
-          ]
+                Tw.justify_evenly]
+            ]
+
           ][
               ul [] (getWikipediaSublinks (Array.get model.index wikipediaRecordsArray))
-          ]],        div[][
+          ]], 
+
+        -- Ratings and Categories View       
+        div[
+          css[
+            Tw.flex,
+            Tw.flex_col_reverse,
+
+            Breakpoints.lg[
+            Tw.basis_1over2,
+            Tw.flex_col
+            ]
+
+          ]
+          ][
        
          div[
-          css [
+          css[
             Tw.flex,
-            Tw.justify_center
+            Tw.justify_center,
+            Tw.pb_5
           ]
          ][
           ratings
          ],
-        div[
+         div[][
+            div[
+          
             css [
+              
               Tw.flex, 
               Tw.justify_center, 
               Tw.text_color Tw.pink_400, 
@@ -390,14 +423,23 @@ view model =
           ],
           div[
             css [
-                Tw.flex_row,
-                Tw.justify_evenly
+ 
           ]
           ][
               ul [] (getWikipediaCategories (Array.get model.index wikipediaRecordsArray))
           ]
+         ]
+
      ],
-        div[][
+
+        -- Explore View
+        div[
+          css [ Tw.hidden,
+                Breakpoints.lg[
+                Tw.block,
+               Tw.basis_1over4]
+            ]
+        ][
           div[css [
               Tw.flex, 
               Tw.justify_center, 

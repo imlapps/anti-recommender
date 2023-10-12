@@ -1,7 +1,8 @@
-*{
+* {
   margin: 0;
   padding: 0;
 }
+
 .rate {
   float: left;
   height: 50px;
@@ -91,11 +92,3 @@ input[type="checkbox"]:checked + label{
   border-bottom: 0.06rem solid #fff;
 }
 
-@media (max-width: 900px) {
-  .previous-wikipedia-content, .next-wikipedia-content {
-    display: none;
-  }
-  .previous-button-container, .next-button-container{
-   transform: translate(0rem, 0rem);
- }
-} 
