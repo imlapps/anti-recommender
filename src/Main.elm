@@ -102,26 +102,34 @@ update msg model =
             Cmd.none
           )
 
+-- Function to generate a random number 
+-- between 2 and the number of wikipedia records
 randomNumberGenerator : Model -> Cmd Msg
 randomNumberGenerator model = 
                  Random.generate RandomNumber (Random.int 2 (model.numberOfWikipediaRecords - 2))
 
--- Lens
+-- Lenses
+
+-- Lens for the model's currentWikipediaIndex field
 modelCurrentWikipediaIndexLens : Lens Model Int
 modelCurrentWikipediaIndexLens = 
      Lens .currentWikipediaIndex (\b a -> { a | currentWikipediaIndex = b})
 
+-- Lens for the model's randomWikipediaIndex field
 modelRandomWikipediaIndexLens : Lens Model Int
 modelRandomWikipediaIndexLens = 
      Lens .randomWikipediaIndex (\b a -> { a | randomWikipediaIndex = b})
 
+-- Lens for the model's numberOfWikipediaRecords field
 modelNumberOfWikipediaRecordsLens : Lens Model Int
 modelNumberOfWikipediaRecordsLens = 
      Lens .numberOfWikipediaRecords (\b a -> { a | numberOfWikipediaRecords = b})
 
+-- Lens for the model's loadDataStatus field
 modelLoadDataStatusLens : Lens Model LoadDataStatus
 modelLoadDataStatusLens =
      Lens .loadDataStatus (\b a -> { a | loadDataStatus = b})
+
 
 -- SUBSCRIPTIONS
 subscriptions : Model -> Sub Msg
@@ -494,8 +502,8 @@ view model =
 
       -- Explore View
       div[
-          css [ Tw.hidden, 
-
+          css [ 
+          Tw.hidden, 
           Breakpoints.lg
             [
                Tw.block,
@@ -514,6 +522,8 @@ view model =
           h1[
             css[Tw.py_2]][text("Explore")]
           ],
+
+          -- Generate 5 random Wikipedia Articles
           div[
             css [
               Tw.flex_col,
@@ -528,6 +538,7 @@ view model =
           ]
         ]
       ],
+
       -- footer
       div[
         css
@@ -731,8 +742,9 @@ createRandomItemElement record =
         ] 
   ]]
 
+-- HTML Element for a 5-Star rating scale
 ratings : Html(msg)
-ratings =     div
+ratings =  div
         [ class "rate"
         ]
         [ input
