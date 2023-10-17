@@ -213,7 +213,7 @@ view model =
               
                Breakpoints.lg[
                     Tw.block,
-                    Tw.opacity_20]
+                    Tw.opacity_40]
             ]] [ 
 
         -- wikipedia image (Previous)
@@ -338,7 +338,7 @@ view model =
           css [ Tw.hidden,
                 Breakpoints.lg[
                 Tw.block,
-                Tw.opacity_20]
+                Tw.opacity_40]
             ]
         ] [ 
 
