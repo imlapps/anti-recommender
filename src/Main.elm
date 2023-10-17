@@ -51,7 +51,7 @@ init _ =
 type Msg
   = GotText (Result Http.Error String) 
     | Next 
-    | Back
+    | Previous
     | RandomNumber Int
 
 -- Read Wikipedia JSONL file
@@ -74,7 +74,7 @@ update msg model =
         else modelCurrentWikipediaIndexLens.set (model.currentWikipediaIndex + 1) model, 
         randomNumberGenerator model
       )
-    Back ->
+    Previous ->
        (
         if model.currentWikipediaIndex <= 0  
         then modelCurrentWikipediaIndexLens.set (model.numberOfWikipediaRecords - 1) model
@@ -194,7 +194,7 @@ view model =
                   Tw.transform,
                   Tw.translate_x_36,Tw.translate_y_0]][
 
-            button [onClick Back,
+            button [onClick Previous,
                     css[
                     Tw.bg_color Tw.custom_pink,
                     Tw.border,
