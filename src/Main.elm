@@ -77,7 +77,7 @@ update msg model =
     Back ->
        (
         if model.currentWikipediaIndex <= 0  
-        then modelCurrentWikipediaIndexLens.set model.numberOfWikipediaRecords model
+        then modelCurrentWikipediaIndexLens.set (model.numberOfWikipediaRecords - 1) model
         else modelCurrentWikipediaIndexLens.set (model.currentWikipediaIndex - 1) model, 
         randomNumberGenerator model
       ) 
@@ -391,7 +391,7 @@ view model =
           ]
         ]
       ][       
-        -- Abstract and Table of Contents
+        -- Abstract
         div[
           css [
           Breakpoints.lg[
@@ -419,31 +419,7 @@ view model =
                   Tw.text_color Tw.gray_200
               ]][
                 p[] [extractWikipediaAbstractFromWikipediaRecord (Array.get model.currentWikipediaIndex wikipediaRecordsArray)]
-              ],
-          div[
-            css [ 
-              Tw.hidden,
-              Breakpoints.lg[
-              Tw.flex, 
-              Tw.justify_center, 
-              Tw.text_color Tw.pink_400, 
-              Tw.font_serif]
-            ]
-          ][
-            h1[
-              css[ Tw.py_2 ]
-              ][text("Table of Contents")]
-          ],
-          div[
-           css [ Tw.hidden,
-                 Breakpoints.lg[
-                 Tw.block,
-                 Tw.flex_row,
-                 Tw.justify_evenly]
-            ]
-          ][
-              ul [] (extractWikipediaSublinksFromWikipediaRecord (Array.get model.currentWikipediaIndex wikipediaRecordsArray))
-          ]], 
+              ]], 
 
         -- Ratings and Categories View       
         div[
@@ -499,7 +475,6 @@ view model =
           ]
          ]
      ],
-
       -- Explore View
       div[
           css [ 
