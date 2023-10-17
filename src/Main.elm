@@ -5,6 +5,9 @@ import Browser
 import Random
 import Array exposing (Array)
 
+import Monocle.Optional exposing (Optional)
+import Monocle.Lens exposing (Lens)
+
 import Html.Styled exposing (..)
 import Html.Styled.Attributes exposing (..)
 import Html.Styled.Events exposing (onClick)
@@ -21,7 +24,12 @@ import Tailwind.Theme as Tw
 
 -- MODEL
 type LoadDataStatus = Failure | Loading | Success (Array WikipediaRecord)
-type alias Model =  {loadDataStatus: LoadDataStatus, currentWikipediaIndex: Int, randomWikipediaIndex: Int, numberOfWikipediaRecords: Int}
+type alias Model =  
+                  {  loadDataStatus: LoadDataStatus
+                   , currentWikipediaIndex: Int
+                   , randomWikipediaIndex: Int
+                   , numberOfWikipediaRecords: Int
+                  }
 
 -- MAIN
 main : Program () Model Msg
@@ -60,26 +68,60 @@ update : Msg -> Model -> (Model, Cmd Msg)
 update msg model =
   case msg of
     Next ->
-       ({model | currentWikipediaIndex = if model.currentWikipediaIndex >= model.numberOfWikipediaRecords - 1 then 0 
-                         else model.currentWikipediaIndex + 1}, 
-                 Random.generate RandomNumber (Random.int 2 (model.numberOfWikipediaRecords - 2)))
+       (
+        if model.currentWikipediaIndex >= model.numberOfWikipediaRecords - 1 
+        then modelCurrentWikipediaIndexLens.set 0 model
+        else modelCurrentWikipediaIndexLens.set (model.currentWikipediaIndex + 1) model, 
+        randomNumberGenerator model
+      )
     Back ->
-       ({model | currentWikipediaIndex = if model.currentWikipediaIndex <= 0  then model.numberOfWikipediaRecords - 1 
-                         else model.currentWikipediaIndex - 1}, 
-                 Random.generate RandomNumber (Random.int 2 (model.numberOfWikipediaRecords - 2)))
+       (
+        if model.currentWikipediaIndex <= 0  
+        then modelCurrentWikipediaIndexLens.set model.numberOfWikipediaRecords model
+        else modelCurrentWikipediaIndexLens.set (model.currentWikipediaIndex - 1) model, 
+        randomNumberGenerator model
+      ) 
     RandomNumber randomNumber->
-       ({model | randomWikipediaIndex = randomNumber}, Cmd.none)
+       (
+        modelRandomWikipediaIndexLens.set randomNumber model, 
+        Cmd.none
+       )
+
     GotText result ->
       case result of
         Ok fileText ->
           let wikipediaRecordsArray = Array.fromList(buildWikipediaRecordsList(fileText)) in
-          ({model | loadDataStatus = Success wikipediaRecordsArray, 
-                    numberOfWikipediaRecords = Array.length wikipediaRecordsArray}, 
-          Cmd.none)
+          (model 
+                 |> modelLoadDataStatusLens.set (Success wikipediaRecordsArray)
+                 |> modelNumberOfWikipediaRecordsLens.set (Array.length wikipediaRecordsArray),
+            Cmd.none
+          )
         Err _ ->
-          ({model | loadDataStatus = Failure}, Cmd.none)
-    
+          (
+            modelLoadDataStatusLens.set Failure model, 
+            Cmd.none
+          )
 
+randomNumberGenerator : Model -> Cmd Msg
+randomNumberGenerator model = 
+                 Random.generate RandomNumber (Random.int 2 (model.numberOfWikipediaRecords - 2))
+
+-- Lens
+modelCurrentWikipediaIndexLens : Lens Model Int
+modelCurrentWikipediaIndexLens = 
+     Lens .currentWikipediaIndex (\b a -> { a | currentWikipediaIndex = b})
+
+modelRandomWikipediaIndexLens : Lens Model Int
+modelRandomWikipediaIndexLens = 
+     Lens .randomWikipediaIndex (\b a -> { a | randomWikipediaIndex = b})
+
+modelNumberOfWikipediaRecordsLens : Lens Model Int
+modelNumberOfWikipediaRecordsLens = 
+     Lens .numberOfWikipediaRecords (\b a -> { a | numberOfWikipediaRecords = b})
+
+modelLoadDataStatusLens : Lens Model LoadDataStatus
+modelLoadDataStatusLens =
+     Lens .loadDataStatus (\b a -> { a | loadDataStatus = b})
 
 -- SUBSCRIPTIONS
 subscriptions : Model -> Sub Msg
