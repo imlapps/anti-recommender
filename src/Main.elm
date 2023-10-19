@@ -399,8 +399,12 @@ view model =
             Tw.pl_12
             ]
           ]
-        ][          
+        ][         
           div[
+            css [
+              Tw.pb_4
+          ]][
+             div[
             css [
               Tw.flex, 
               Tw.justify_center, 
@@ -409,17 +413,51 @@ view model =
             ]
           ][
             h1[
-              css[ Tw.py_2 ]
+              css[ Tw.py_2,
+                   Tw.pb_4]
             ][text("Abstract")]
           ],
           div[css [
-                  Tw.text_lg, 
+                  Tw.text_2xl, 
                   Tw.flex,
                   Tw.justify_center,
+                  Tw.self_center,
                   Tw.text_color Tw.gray_200
               ]][
                 p[] [extractWikipediaAbstractFromWikipediaRecord (Array.get model.currentWikipediaIndex wikipediaRecordsArray)]
-              ]], 
+              ]
+          ] ,
+         
+              
+              -- External Links
+          div[
+            css [ 
+              Tw.hidden,
+              Breakpoints.lg[
+              Tw.flex, 
+              Tw.justify_center, 
+              Tw.text_color Tw.pink_400, 
+              Tw.font_serif,
+              Tw.py_4]
+            ]
+          ][
+            h1[][text("External Links")]
+          ],
+          div[
+           css [ Tw.hidden,
+
+                Breakpoints.lg[
+                Tw.block,
+                Tw.flex_row,
+                Tw.justify_center,
+                Tw.border_4,
+                Tw.border_color Tw.black]
+            ]
+
+          ][
+              ul [] (extractExternalWikipediaLinksFromWikipediaRecord (Array.get model.currentWikipediaIndex wikipediaRecordsArray))
+          ]
+              ], 
 
         -- Ratings and Categories View       
         div[
@@ -460,7 +498,7 @@ view model =
             ]
           ][
             h1[
-              css[Tw.py_2]
+              css[Tw.py_4]
             ][text("Categories")]
           ],
           div[
@@ -565,8 +603,8 @@ extractWikipediaAbstractFromWikipediaRecord record =
               Nothing ->
                 text("Nothing")
               Just abstract_info ->
-                 if ((List.length (split " " abstract_info.abstract)) >= 10) then
-                 text(abstract_info.abstract) else text(" ")
+                 if ((List.length (split " " abstract_info.abstract)) >= 20) then
+                 text(abstract_info.abstract) else text("Not Available")
 
 -- extract Wikipedia Image URL from Wikipedia Record
 extractWikipediaImageURLFromWikipediaRecord : Maybe WikipediaRecord -> String 
@@ -620,6 +658,45 @@ createSublinkItemElement sublink =
           ]
         ][ text (( sublink.anchor)) ]]
 
+
+-- extract external Wikipedia Links List from Wikipedia Record
+extractExternalWikipediaLinksFromWikipediaRecord: Maybe WikipediaRecord -> List(Html Msg)
+extractExternalWikipediaLinksFromWikipediaRecord record =
+        case record of 
+          Nothing ->
+            [li [] [a [][text("Nothing")]]]
+          Just wikiRecord ->
+            case wikiRecord.external_links of 
+              Nothing ->
+               [li [] [a [][text("Nothing")]]]
+              Just external_links ->
+                (List.map createExternalLinkItemElement external_links)
+
+-- extract ExternalLink Item from Sublink List and create HTML element
+createExternalLinkItemElement : ExternalLink -> Html msg
+createExternalLinkItemElement externallink = 
+        a [href externallink.link, target "_blank",
+                              css [
+                  Tw.no_underline,
+                  Tw.text_color Tw.gray_900
+            ]] [ li [
+        css[ 
+              Tw.block,
+              Tw.text_xl
+            , Tw.bg_color Tw.black
+            , Tw.text_color Tw.pink_400
+            , Tw.rounded
+            , Tw.px_2
+            , Tw.py_4
+            , Tw.my_0_dot_5
+            , Tw.font_serif
+            , Css.hover [ Tw.bg_color Tw.pink_400, Tw.text_color Tw.white ],
+            Tw.mr_1
+            , Css.lastChild
+                [ Tw.mr_0
+                ]
+          ]
+        ][ text (( externallink.title)) ]]
 
 -- extract Wikipedia Category List from Wikipedia Record
 extractWikipediaCategoriesFromWikipediaRecord: Maybe WikipediaRecord -> List(Html Msg)
