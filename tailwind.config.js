@@ -13,6 +13,13 @@ module.exports = {
         "radial-gradient":
           "radial-gradient(circle at 10% 20%, rgb(10, 10, 10) 0%, rgb(34,34,34) 90.2%)",
       },
+      height: {
+        112: "28rem",
+        120: "30rem",
+        128: "32rem",
+        144: "36rem",
+        160: "40rem",
+      },
     },
   },
   variants: [],

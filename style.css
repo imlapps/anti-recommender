@@ -40,3 +40,26 @@
 .rate > input:checked + label:hover, .rate > input:checked + label:hover ~ label, .rate > input:checked ~ label:hover, .rate > input:checked ~ label:hover ~ label, .rate > label:hover ~ input:checked ~ label {
 	color: #c59b08;
 }
+
+/* Scrollbar styling */
+
+/* width */
+.scrollbar::-webkit-scrollbar {
+    width: 0.25rem;
+	background: transparent;
+}
+ 
+/* Track */
+.scrollbar::-webkit-scrollbar-track {
+    
+	background: #000000
+}
+ 
+/* Handle */
+.scrollbar::-webkit-scrollbar-thumb {
+    background: #FF6CC9;
+	height: 3rem;
+    border-radius: 0.25rem;
+}
+ 
+

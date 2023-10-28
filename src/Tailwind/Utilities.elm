@@ -6059,9 +6059,24 @@ h_11 =
     Css.property "height" "2.75rem"
 
 
+h_112 : Css.Style
+h_112 =
+    Css.property "height" "28rem"
+
+
 h_12 : Css.Style
 h_12 =
     Css.property "height" "3rem"
+
+
+h_120 : Css.Style
+h_120 =
+    Css.property "height" "30rem"
+
+
+h_128 : Css.Style
+h_128 =
+    Css.property "height" "32rem"
 
 
 h_14 : Css.Style
@@ -6069,9 +6084,19 @@ h_14 =
     Css.property "height" "3.5rem"
 
 
+h_144 : Css.Style
+h_144 =
+    Css.property "height" "36rem"
+
+
 h_16 : Css.Style
 h_16 =
     Css.property "height" "4rem"
+
+
+h_160 : Css.Style
+h_160 =
+    Css.property "height" "40rem"
 
 
 h_1_dot_5 : Css.Style

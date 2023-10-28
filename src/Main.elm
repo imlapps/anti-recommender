@@ -442,12 +442,16 @@ view model =
             ]
           ][
             h1[][text("External Links")]
-          ],
+          ]
+          ,
           div[
-           css [ Tw.hidden,
-
+            class "scrollbar",
+            css [ 
+              Tw.hidden,
                 Breakpoints.lg[
-                Tw.block,
+                Tw.block,   
+                Tw.overflow_y_auto,
+                Tw.h_144,
                 Tw.flex_row,
                 Tw.justify_center,
                 Tw.border_4,
@@ -501,16 +505,26 @@ view model =
               css[Tw.py_4]
             ][text("Categories")]
           ],
-          div[
+        div[
+          css[
+          Tw.flex,
+          Tw.justify_center
+        ]
+      ][
+            div[
+          class "scrollbar",
             css [
-              Tw.flex,
-              Tw.justify_center
+
+
+              Tw.overflow_y_auto,        
+              Tw.h_144
           ]
           ][
-            div[][
+      
                 ul [] (extractWikipediaCategoriesFromWikipediaRecord (Array.get model.currentWikipediaIndex wikipediaRecordsArray))
-            ]
+         
           ]
+        ]
          ]
      ],
       -- Explore View
