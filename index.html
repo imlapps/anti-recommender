@@ -16,8 +16,17 @@
   </body>
 
   <script type="text/javascript">
-    var app = Elm.Main.init({
-      node: document.getElementById("myapp"),
-    });
+    const readFile = async () => {
+      const res = await fetch("./src/storage/mini-wikipedia.output.txt");
+      const response = await res.text();
+      return response;
+    };
+
+    (async () => {
+      var app = Elm.Main.init({
+        node: document.getElementById("myapp"),
+        flags: await readFile(),
+      });
+    })();
   </script>
 </html>

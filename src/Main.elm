@@ -25,14 +25,15 @@ import Tailwind.Theme as Tw
 -- MODEL
 type LoadDataStatus = Failure | Loading | Success (Array WikipediaRecord)
 type alias Model =  
-                  {  loadDataStatus: LoadDataStatus
+                  {  
+                    loadDataStatus: LoadDataStatus
                    , currentWikipediaIndex: Int
                    , randomWikipediaIndex: Int
                    , numberOfWikipediaRecords: Int
                   }
 
 -- MAIN
-main : Program () Model Msg
+main : Program String Model Msg
 main = Browser.element
     { init = init
     , update = update
@@ -41,25 +42,29 @@ main = Browser.element
     }
 
 -- INIT
-init : () -> (Model, Cmd Msg)
-init _ =
-  ( {loadDataStatus = Loading , currentWikipediaIndex = 0, randomWikipediaIndex = 13, numberOfWikipediaRecords = 0}
-  , getFile
-  )
+init : String -> (Model, Cmd Msg)
+init flags = (
+  let wikipediaRecordsArray = Array.fromList(buildWikipediaRecordsList(flags)) in
+           {loadDataStatus = (Success wikipediaRecordsArray), 
+             currentWikipediaIndex = 0, 
+             randomWikipediaIndex = 13, 
+             numberOfWikipediaRecords = (Array.length wikipediaRecordsArray)},
+  Cmd.none)
+
 
 -- UPDATE
 type Msg
-  = GotText (Result Http.Error String) 
+  = GotText (Result String String) 
     | Next 
     | Previous
     | RandomNumber Int
 
--- Read Wikipedia JSONL file
-getFile: Cmd Msg
-getFile = Http.get
-      { url = "/src/storage/mini-wikipedia.output.txt"
-      , expect = Http.expectString GotText
-      }
+-- -- Read Wikipedia JSONL file
+-- getFile: Cmd Msg
+-- getFile = Http.get
+--       { url = "/src/storage/mini-wikipedia.output.txt"
+--       , expect = Http.expectString GotText
+--       }
 
 
 
@@ -427,8 +432,6 @@ view model =
                 p[] [extractWikipediaAbstractFromWikipediaRecord (Array.get model.currentWikipediaIndex wikipediaRecordsArray)]
               ]
           ] ,
-         
-              
               -- External Links
           div[
             css [ 
@@ -514,15 +517,11 @@ view model =
             div[
           class "scrollbar",
             css [
-
-
               Tw.overflow_y_auto,        
               Tw.h_144
           ]
           ][
-      
                 ul [] (extractWikipediaCategoriesFromWikipediaRecord (Array.get model.currentWikipediaIndex wikipediaRecordsArray))
-         
           ]
         ]
          ]
@@ -547,7 +546,7 @@ view model =
               Tw.font_serif
             ]][
           h1[
-            css[Tw.py_2]][text("Explore")]
+            css[Tw.pt_2, Tw.pb_4]][text("Explore")]
           ],
 
           -- Generate 5 random Wikipedia Articles
