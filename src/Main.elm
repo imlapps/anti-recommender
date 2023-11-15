@@ -1,11 +1,11 @@
 module Main exposing (..)
 
-import Http
-import Browser
-import Random
-import Array exposing (Array)
 
-import Monocle.Optional exposing (Optional)
+import Random
+import Browser
+import Array exposing (Array)
+import String exposing (split)
+
 import Monocle.Lens exposing (Lens)
 
 import Html.Styled exposing (..)
@@ -14,7 +14,8 @@ import Html.Styled.Events exposing (onClick)
 
 import Parser exposing (..)
 import WikipediaTypes exposing (..)
-import String exposing (split)
+import HammerEvents exposing (HammerEvent,onSwipe,onSwipeRight)
+
 
 import Css
 import Tailwind.Breakpoints as Breakpoints
@@ -58,6 +59,7 @@ type Msg
     | Next 
     | Previous
     | RandomNumber Int
+
 
 -- -- Read Wikipedia JSONL file
 -- getFile: Cmd Msg
@@ -189,17 +191,22 @@ view model =
           ]]][
           
         -- previous wikipedia container
-          div[css[Tw.flex, 
+          div[
+            HammerEvents.onSwipeRight( \_ -> Previous),
+            css[Tw.flex, 
                   Tw.items_center,
                   Tw.justify_center]][
 
         -- previous button
-         div[css [Tw.z_10,
+         div[
+         
+          css [Tw.z_10,
                   Tw.absolute, 
                   Tw.transform,
                   Tw.translate_x_36,Tw.translate_y_0]][
 
             button [onClick Previous,
+                    
                     css[
                     Tw.bg_color Tw.custom_pink,
                     Tw.border,
@@ -312,18 +319,22 @@ view model =
         ],
                  
         -- next wikipedia container
-        div[css[
+        div[ 
+      HammerEvents.onSwipeLeft( \_ -> Next),
+        css[
                 Tw.flex, 
                 Tw.items_center,
                 Tw.justify_center
-            ]][
+            ]
+             ][
           -- next button
-          div[css [Tw.z_10,
+          div[  css [Tw.z_10,
                   Tw.absolute, 
                   Tw.transform,
                   Tw.translate_x_64,Tw.translate_y_0
               ]][
-              button[onClick Next,
+              button[onClick Next, 
+                     
                     css[
                       Tw.bg_color Tw.pink_400,
                       Tw.border,
@@ -364,7 +375,8 @@ view model =
               Tw.border,
               Tw.border_color Tw.gray_900, 
               Tw.rounded
-            ]][]],
+            ]
+            ][]],
             
            -- wikipedia title (next)
            div[

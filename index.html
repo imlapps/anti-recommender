@@ -7,6 +7,7 @@
       src="https://kit.fontawesome.com/ce2cdb58d7.js"
       crossorigin="anonymous"
     ></script>
+    <script src="hammer.min.js"></script>
     <script type="text/javascript" src="elm.js"></script>
     <link rel="stylesheet" href="style.css" />
   </head>
@@ -23,10 +24,13 @@
     };
 
     (async () => {
+      var elmNode = document.getElementById("myapp");
       var app = Elm.Main.init({
-        node: document.getElementById("myapp"),
+        node: elmNode,
         flags: await readFile(),
       });
+      var hammertime = new Hammer(elmNode, { domEvents: true });
+      hammertime.get("swipe").set({ direction: Hammer.DIRECTION_ALL });
     })();
   </script>
 </html>
