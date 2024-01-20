@@ -3,35 +3,29 @@ module Main exposing (..)
 
 import Random
 import Browser
-import Array exposing (Array)
-import String exposing (split)
 
-import Monocle.Lens exposing (Lens)
+import Array 
 
 import Html.Styled exposing (..)
 import Html.Styled.Attributes exposing (..)
 import Html.Styled.Events exposing (onClick)
 
+import Lenses exposing (..)
 import Parser exposing (..)
-import WikipediaTypes exposing (..)
-import HammerEvents exposing (HammerEvent, onSwipe,onSwipeRight)
+import Extractors exposing (..)
+import HammerEvents exposing (HammerEvent, onSwipe, onSwipeRight)
 
+import Ratings exposing (..)
+
+import Msg exposing (..)
+import Model exposing (..)
+import WikipediaTypes exposing (..)
 
 import Css
-import Tailwind.Breakpoints as Breakpoints
-import Tailwind.Utilities as Tw
 import Tailwind.Theme as Tw
+import Tailwind.Utilities as Tw
+import Tailwind.Breakpoints as Breakpoints
 
-
--- MODEL
-type LoadDataStatus = Failure | Loading | Success (Array WikipediaRecord)
-type alias Model =  
-                  {  
-                    loadDataStatus: LoadDataStatus
-                   , currentWikipediaIndex: Int
-                   , randomWikipediaIndex: Int
-                   , numberOfWikipediaRecords: Int
-                  }
 
 -- MAIN
 main : Program String Model Msg
@@ -51,23 +45,6 @@ init flags = (
              randomWikipediaIndex = 13, 
              numberOfWikipediaRecords = (Array.length wikipediaRecordsArray)},
   Cmd.none)
-
-
--- UPDATE
-type Msg
-  = GotText (Result String String) 
-    | Next 
-    | Previous
-    | RandomNumber Int
-
-
--- -- Read Wikipedia JSONL file
--- getFile: Cmd Msg
--- getFile = Http.get
---       { url = "/src/storage/mini-wikipedia.output.txt"
---       , expect = Http.expectString GotText
---       }
-
 
 
 -- UPDATE
@@ -115,34 +92,11 @@ randomNumberGenerator : Model -> Cmd Msg
 randomNumberGenerator model = 
                  Random.generate RandomNumber (Random.int 2 (model.numberOfWikipediaRecords - 2))
 
--- Lenses
-
--- Lens for the model's currentWikipediaIndex field
-modelCurrentWikipediaIndexLens : Lens Model Int
-modelCurrentWikipediaIndexLens = 
-     Lens .currentWikipediaIndex (\b a -> { a | currentWikipediaIndex = b})
-
--- Lens for the model's randomWikipediaIndex field
-modelRandomWikipediaIndexLens : Lens Model Int
-modelRandomWikipediaIndexLens = 
-     Lens .randomWikipediaIndex (\b a -> { a | randomWikipediaIndex = b})
-
--- Lens for the model's numberOfWikipediaRecords field
-modelNumberOfWikipediaRecordsLens : Lens Model Int
-modelNumberOfWikipediaRecordsLens = 
-     Lens .numberOfWikipediaRecords (\b a -> { a | numberOfWikipediaRecords = b})
-
--- Lens for the model's loadDataStatus field
-modelLoadDataStatusLens : Lens Model LoadDataStatus
-modelLoadDataStatusLens =
-     Lens .loadDataStatus (\b a -> { a | loadDataStatus = b})
-
 
 -- SUBSCRIPTIONS
 subscriptions : Model -> Sub Msg
 subscriptions model =
   Sub.none
-
 
 -- VIEW
 view : Model -> Html Msg
@@ -156,18 +110,18 @@ view model =
 
     Success wikipediaRecordsArray ->
 
-      div[css[Tw.bg_color Tw.neutral_950]][
+      div[css[Tw.bg_color Tw.neutral_950]]
+      
+      [
       -- header  
-      div[css[Tw.flex, 
+      div[ css[Tw.flex, 
               Tw.pl_8, 
               Tw.text_left, 
               Tw.bg_color Tw.custom_blue,
               Tw.py_4,
-              Tw.font_serif
-             ]]
-             [div[css[Tw.flex, 
-                      Tw.text_color Tw.white]]
-                  [h1[][text("NerdSwipe")]]],
+              Tw.font_serif,
+              Tw.text_color Tw.white
+             ] ][h1[][text("NerdSwipe")]],
              
       -- main container
       div [css[
@@ -177,7 +131,7 @@ view model =
             Tw.justify_between]]
       [ 
       -- gallery container
-      div[css [Tw.flex, 
+      div[ css [Tw.flex, 
                Tw.flex_row, 
                Tw.justify_between, 
                Tw.bg_color Tw.black,
@@ -186,46 +140,34 @@ view model =
           Breakpoints.lg[
             Tw.pr_4,
             Tw.pl_4
-          ]]][
+          ]] ][
           
         -- previous wikipedia container
           div[
             HammerEvents.onSwipeRight( \_ -> Previous),
             css[Tw.flex, 
                   Tw.items_center,
-                  Tw.justify_center]][
+                  Tw.justify_center]
+      ][
 
         -- previous button
          div[
-         
-          css [Tw.z_10,
-                  Tw.absolute, 
-                  Tw.transform,
-                  Tw.translate_x_36,Tw.translate_y_0]][
-
-            button [onClick Previous,
-                    
-                    css[
-                    Tw.bg_color Tw.custom_blue,
-                    Tw.border,
-                    Tw.text_color Tw.zinc_100,
-                    Tw.border_color Tw.custom_blue, 
-                    Tw.rounded,
-                    Tw.text_5xl, Tw.cursor_pointer,
-                    Tw.px_4, Tw.py_3] ] 
-                [   
-                i [class "fa-solid fa-chevron-left"][]
-                ]
+         css [Tw.z_10,
+              Tw.absolute, 
+              Tw.transform, 
+              Tw.translate_y_0,
+              Tw.translate_x_36]          
+        ][
+            buttonComponent Previous
          ],
       
         -- previous content
          div [ css [Tw.hidden,
-              
                Breakpoints.lg[
                     Tw.block,
                     Tw.opacity_40]
-            ]] [ 
-
+            ] ] [ 
+    
         -- wikipedia image (Previous)
         div[
           css[
@@ -318,7 +260,7 @@ view model =
                  
         -- next wikipedia container
         div[ 
-      HammerEvents.onSwipeLeft( \_ -> Next),
+          HammerEvents.onSwipeLeft( \_ -> Next),
         css[
                 Tw.flex, 
                 Tw.items_center,
@@ -329,22 +271,9 @@ view model =
           div[  css [Tw.z_10,
                   Tw.absolute, 
                   Tw.transform,
-                  Tw.translate_x_64,Tw.translate_y_0
+                  Tw.translate_x_36, Tw.translate_y_0
               ]][
-              button[onClick Next, 
-                     
-                    css[
-                      Tw.bg_color Tw.custom_blue,
-                      Tw.border,
-                      Tw.text_color Tw.zinc_100,
-                      Tw.border_color Tw.custom_blue, 
-                      Tw.rounded,
-                      Tw.text_5xl, Tw.cursor_pointer,
-                      Tw.px_4, Tw.py_3
-                   ]] 
-                [   
-                i [class "fa-solid fa-chevron-right"][]
-                ]
+                buttonComponent Next
          ],
       
         -- next content
@@ -530,7 +459,7 @@ view model =
           Tw.justify_center
         ]
       ][
-            div[
+        div[
           class "scrollbar",
             css [
               Tw.overflow_y_auto,        
@@ -583,192 +512,18 @@ view model =
 
       -- footer
       div[][
-            div[
-        css
-            [ 
+      div[css[ 
               Tw.bg_color Tw.custom_blue,
               Tw.p_4, 
               Tw.text_center,
-              Tw.text_color Tw.white
-            ]
+              Tw.text_color Tw.white]
       ][
         text("© 2024 NerdSwipe. All Rights Reserved.")
       ]
       ]
       ]
    
--- extract Wikipedia Title from Wikipedia Record
-extractWikipediaTitleFromWikipediaRecord : Maybe WikipediaRecord -> Html Msg
-extractWikipediaTitleFromWikipediaRecord record =
-        case record of 
-        Nothing ->
-          text ("Nothing")
-        Just wikiRecord ->
-            case wikiRecord.abstract_info of 
-              Nothing ->
-                text ("Nothing")
-              Just abstract_info ->
-                 text (abstract_info.title)
 
--- extract Wikipedia URL from Wikipedia Record
-extractWikipediaURLFromWikipediaRecord : Maybe WikipediaRecord -> String
-extractWikipediaURLFromWikipediaRecord record =
-        case record of 
-          Nothing ->
-            "Nothing"
-          Just wikiRecord ->
-            case wikiRecord.abstract_info of 
-              Nothing ->
-                "Nothing"
-              Just abstract_info ->
-                 abstract_info.url
-
--- extract Wikipedia Abstract from Wikipedia Record
-extractWikipediaAbstractFromWikipediaRecord : Maybe WikipediaRecord -> Html Msg
-extractWikipediaAbstractFromWikipediaRecord record =
-        case record of 
-        Nothing ->
-          text ("Nothing")
-        Just wikiRecord ->
-            case wikiRecord.abstract_info of 
-              Nothing ->
-                text("Nothing")
-              Just abstract_info ->
-                 if ((List.length (split " " abstract_info.abstract)) >= 20) then
-                 text(abstract_info.abstract) else text("Not Available")
-
--- extract Wikipedia Image URL from Wikipedia Record
-extractWikipediaImageURLFromWikipediaRecord : Maybe WikipediaRecord -> String 
-extractWikipediaImageURLFromWikipediaRecord record = 
-        case record of 
-        Nothing ->
-          ""
-        Just wikiRecord ->
-            case wikiRecord.abstract_info of 
-              Nothing ->
-                ""
-              Just abstract_info ->
-                 abstract_info.image
-
--- extract Wikipedia Sublinks List from Wikipedia Record
-extractWikipediaSublinksFromWikipediaRecord: Maybe WikipediaRecord -> List(Html Msg)
-extractWikipediaSublinksFromWikipediaRecord record =
-        case record of 
-          Nothing ->
-            [li [] [a [][text("Nothing")]]]
-          Just wikiRecord ->
-            case wikiRecord.sublinks of 
-              Nothing ->
-               [li [] [a [][text("Nothing")]]]
-              Just sublinks ->
-                (List.map createSublinkItemElement sublinks)
-
--- extract Sublink Item from Sublink List and create HTML element
-createSublinkItemElement : Sublink -> Html msg
-createSublinkItemElement sublink = 
-        a [href sublink.link, target "_blank",
-                              css [
-                  Tw.no_underline,
-                  Tw.text_color Tw.gray_900
-            ]] [ li [
-        css[ 
-              Tw.block,
-              Tw.text_xl
-            , Tw.bg_color Tw.black
-            , Tw.text_color Tw.white
-            , Tw.rounded
-            , Tw.px_2
-            , Tw.py_4
-            , Tw.my_0_dot_5
-            , Tw.font_serif
-            , Css.hover [ Tw.bg_color Tw.custom_blue, Tw.text_color Tw.white ],
-            Tw.mr_1
-            , Css.lastChild
-                [ Tw.mr_0
-                ]
-          ]
-        ][ text (( sublink.anchor)) ]]
-
-
--- extract external Wikipedia Links List from Wikipedia Record
-extractExternalWikipediaLinksFromWikipediaRecord: Maybe WikipediaRecord -> List(Html Msg)
-extractExternalWikipediaLinksFromWikipediaRecord record =
-        case record of 
-          Nothing ->
-            [li [] [a [][text("Nothing")]]]
-          Just wikiRecord ->
-            case wikiRecord.external_links of 
-              Nothing ->
-               [li [] [a [][text("Nothing")]]]
-              Just external_links ->
-                (List.map createExternalLinkItemElement external_links)
-
--- extract ExternalLink Item from Sublink List and create HTML element
-createExternalLinkItemElement : ExternalLink -> Html msg
-createExternalLinkItemElement externallink = 
-        a [href externallink.link, target "_blank",
-                              css [
-                  Tw.no_underline,
-                  Tw.text_color Tw.gray_900
-            ]] [ li [
-        css[ 
-              Tw.block,
-              Tw.text_xl
-            , Tw.bg_color Tw.black
-            , Tw.text_color Tw.white
-            , Tw.rounded
-            , Tw.px_2
-            , Tw.py_4
-            , Tw.my_0_dot_5
-            , Tw.font_serif
-            , Css.hover [ Tw.bg_color Tw.custom_blue],
-            Tw.mr_1
-            , Css.lastChild
-                [ Tw.mr_0
-                ]
-          ]
-        ][ text (( externallink.title)) ]]
-
--- extract Wikipedia Category List from Wikipedia Record
-extractWikipediaCategoriesFromWikipediaRecord: Maybe WikipediaRecord -> List(Html Msg)
-extractWikipediaCategoriesFromWikipediaRecord record =
-        case record of 
-          Nothing ->
-            [li [] [a [][text("Nothing")]]]
-          Just wikiRecord ->
-            case wikiRecord.categories of 
-              Nothing ->
-               [li [] [a [][text("Nothing")]]]
-              Just categories ->
-                (List.map createCategoryItemElement categories)
-
--- extract Category Item from Category List and create HTML element
-createCategoryItemElement : Category -> Html msg
-createCategoryItemElement category = 
-
-          a [href ("https://en.wikipedia.org/" ++ category.link), target "_blank",
-                      css [
-                  Tw.no_underline,
-                  Tw.text_color Tw.gray_900
-            ]] 
-          [ li [
-          css[ 
-              Tw.block,
-              Tw.text_xl
-            , Tw.font_serif
-            , Tw.bg_color Tw.black
-            , Tw.text_color Tw.white
-            , Tw.rounded
-            , Tw.px_2
-            , Tw.py_4
-            , Tw.my_0_dot_5
-            , Css.hover [ Tw.bg_color Tw.custom_blue],
-            Tw.mr_1
-            , Css.lastChild
-                [ Tw.mr_0
-                ]
-          ]
-          ][ text ((category.text))]]
 
 -- Create HTML Element for random items
 createRandomItemElement : Maybe WikipediaRecord -> Html Msg
@@ -825,70 +580,21 @@ createRandomItemElement record =
         ] 
   ]]
 
--- HTML Element for a 5-Star rating scale
-ratings : Html(msg)
-ratings =  div
-        [ class "rate"
-        ]
-        [ input
-            [ type_ "radio"
-            , id "star5"
-            , name "rate"
-            , value "5"
-            ]
-            []
-        , label
-            [ for "star5"
-            , title "text"
-            ]
-            [ text "5 stars" ]
-        , input
-            [ type_ "radio"
-            , id "star4"
-            , name "rate"
-            , value "4"
-            ]
-            []
-        , label
-            [ for "star4"
-            , title "text"
-            ]
-            [ text "4 stars" ]
-        , input
-            [ type_ "radio"
-            , id "star3"
-            , name "rate"
-            , value "3"
-            ]
-            []
-        , label
-            [ for "star3"
-            , title "text"
-            ]
-            [ text "3 stars" ]
-        , input
-            [ type_ "radio"
-            , id "star2"
-            , name "rate"
-            , value "2"
-            ]
-            []
-        , label
-            [ for "star2"
-            , title "text"
-            ]
-            [ text "2 stars" ]
-        , input
-            [ type_ "radio"
-            , id "star1"
-            , name "rate"
-            , value "1"
-            ]
-            []
-        , label
-            [ for "star1"
-            , title "text"
-            ]
-            [ text "1 star" ]
-        ]
-    
+
+
+buttonComponent: Msg -> Html Msg 
+buttonComponent msg = button [onClick msg,  
+                  css[
+                    Tw.bg_color Tw.custom_blue,
+                    Tw.border,
+                    Tw.text_color Tw.zinc_100,
+                    Tw.border_color Tw.custom_blue, 
+                    Tw.rounded,
+                    Tw.text_5xl, Tw.cursor_pointer,
+                    Tw.px_4, Tw.py_3] ][ 
+                case msg of 
+                  Next -> i [class "fa-solid fa-chevron-right"][]
+                  Previous -> i [class "fa-solid fa-chevron-left"][]
+                  _ -> i[][]
+                ]
+

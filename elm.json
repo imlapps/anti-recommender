@@ -2,7 +2,10 @@
     "type": "application",
     "source-directories": [
         "src",
-        "src/HammerEvents"
+        "src/HammerEvents",
+        "src/UIComponents",
+        "src/Types",
+        "src/Helpers"
     ],
     "elm-version": "0.19.1",
     "dependencies": {
