@@ -1,9 +1,15 @@
-module Extractors exposing (..)
+module Extractors exposing (extractExternalWikipediaLinksFromWikipediaRecord, 
+                            extractWikipediaCategoriesFromWikipediaRecord, 
+                            extractWikipediaImageURLFromWikipediaRecord, 
+                            extractWikipediaSublinksFromWikipediaRecord, 
+                            extractWikipediaAbstractFromWikipediaRecord, 
+                            extractWikipediaTitleFromWikipediaRecord, 
+                            extractWikipediaURLFromWikipediaRecord)
 
 import WikipediaTypes exposing (..)
 import Msg exposing (..) 
 
-import UIComponents.CreateElements exposing (..)
+import CreateElements exposing (..)
 
 import String exposing (split)
 import Html.Styled exposing (..)

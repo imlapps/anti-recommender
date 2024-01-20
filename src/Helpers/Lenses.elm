@@ -1,4 +1,4 @@
-module Lenses exposing (..)
+module Lenses exposing (modelCurrentWikipediaIndexLens, modelLoadDataStatusLens, modelNumberOfWikipediaRecordsLens, modelRandomWikipediaIndexLens)
 
 import Model exposing (..)
 import Monocle.Lens exposing (Lens)

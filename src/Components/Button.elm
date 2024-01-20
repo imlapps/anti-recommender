@@ -1,4 +1,4 @@
-module Button exposing (..)
+module Button exposing (buttonComponent)
 
 import Msg exposing (..) 
 

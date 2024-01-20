@@ -1,4 +1,4 @@
-module UIComponents.CreateElements exposing (createCategoryItemElement,
+module CreateElements exposing (createCategoryItemElement,
                                 createExternalLinkItemElement,
                                 createSublinkItemElement)
 

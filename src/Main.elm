@@ -338,7 +338,6 @@ view model =
           ]
         ]
       ][       
-        -- Abstract
         div[
           css [
           Breakpoints.lg[
@@ -346,7 +345,8 @@ view model =
             Tw.pl_12
             ]
           ]
-        ][         
+        ][ 
+          -- Abstract        
           div[
             css [
               Tw.pt_4
@@ -432,12 +432,24 @@ view model =
             Tw.justify_center,
             Tw.pb_10,
           Breakpoints.lg[
-              Tw.pb_5
+            Tw.pb_5
              ]
           ]
          ][
           ratings
          ],
+          div[css[
+            Tw.flex,
+            Tw.justify_center,
+            Tw.text_color Tw.white,
+            Tw.pt_4
+          ]][
+            h4[
+              css[Breakpoints.lg[
+                Tw.py_4
+              ]]
+            ][text("Rate this Wikipedia article?")]
+          ],
 
          -- Categories View  
          div[][
@@ -446,8 +458,8 @@ view model =
               Tw.flex, 
               Tw.justify_center, 
               Tw.text_color Tw.white, 
-              Tw.font_serif,
-              Tw.mt_8
+              Tw.font_serif
+         
             ]
           ][
             h1[
