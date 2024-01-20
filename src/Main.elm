@@ -8,13 +8,14 @@ import Array
 
 import Html.Styled exposing (..)
 import Html.Styled.Attributes exposing (..)
-import Html.Styled.Events exposing (onClick)
+
 
 import Lenses exposing (..)
 import Parser exposing (..)
 import Extractors exposing (..)
 import HammerEvents exposing (HammerEvent, onSwipe, onSwipeRight)
 
+import Button exposing (..)
 import Ratings exposing (..)
 
 import Msg exposing (..)
@@ -144,7 +145,7 @@ view model =
           
         -- previous wikipedia container
           div[
-            HammerEvents.onSwipeRight( \_ -> Previous),
+            HammerEvents.onSwipe( \_ -> Previous),
             css[Tw.flex, 
                   Tw.items_center,
                   Tw.justify_center]
@@ -260,7 +261,7 @@ view model =
                  
         -- next wikipedia container
         div[ 
-          HammerEvents.onSwipeLeft( \_ -> Next),
+          HammerEvents.onSwipe( \_ -> Next),
         css[
                 Tw.flex, 
                 Tw.items_center,
@@ -580,21 +581,4 @@ createRandomItemElement record =
         ] 
   ]]
 
-
-
-buttonComponent: Msg -> Html Msg 
-buttonComponent msg = button [onClick msg,  
-                  css[
-                    Tw.bg_color Tw.custom_blue,
-                    Tw.border,
-                    Tw.text_color Tw.zinc_100,
-                    Tw.border_color Tw.custom_blue, 
-                    Tw.rounded,
-                    Tw.text_5xl, Tw.cursor_pointer,
-                    Tw.px_4, Tw.py_3] ][ 
-                case msg of 
-                  Next -> i [class "fa-solid fa-chevron-right"][]
-                  Previous -> i [class "fa-solid fa-chevron-left"][]
-                  _ -> i[][]
-                ]
 
