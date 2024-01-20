@@ -14,7 +14,7 @@ import Html.Styled.Events exposing (onClick)
 
 import Parser exposing (..)
 import WikipediaTypes exposing (..)
-import HammerEvents exposing (HammerEvent,onSwipe,onSwipeRight)
+import HammerEvents exposing (HammerEvent, onSwipe,onSwipeRight)
 
 
 import Css
@@ -156,22 +156,22 @@ view model =
 
     Success wikipediaRecordsArray ->
 
-      div[][
+      div[css[Tw.bg_color Tw.neutral_950]][
       -- header  
       div[css[Tw.flex, 
               Tw.pl_8, 
               Tw.text_left, 
-              Tw.text_color Tw.custom_pink,
-              Tw.border_b_8,
-              Tw.border_color Tw.black,
-              Tw.bg_radial_gradient,
+              Tw.bg_color Tw.custom_blue,
               Tw.py_4,
               Tw.font_serif
              ]]
-             [h1[][text("NerdSwipe")]],
+             [div[css[Tw.flex, 
+                      Tw.text_color Tw.white]]
+                  [h1[][text("NerdSwipe")]]],
              
       -- main container
       div [css[
+            Tw.pt_8,
             Tw.flex, 
             Tw.flex_col, 
             Tw.justify_between]]
@@ -181,8 +181,6 @@ view model =
                Tw.flex_row, 
                Tw.justify_between, 
                Tw.bg_color Tw.black,
-               Tw.border_b_8,
-               Tw.border_color Tw.black,
                Tw.pr_10,
                Tw.pl_10,
           Breakpoints.lg[
@@ -208,10 +206,10 @@ view model =
             button [onClick Previous,
                     
                     css[
-                    Tw.bg_color Tw.custom_pink,
+                    Tw.bg_color Tw.custom_blue,
                     Tw.border,
                     Tw.text_color Tw.zinc_100,
-                    Tw.border_color Tw.black, 
+                    Tw.border_color Tw.custom_blue, 
                     Tw.rounded,
                     Tw.text_5xl, Tw.cursor_pointer,
                     Tw.px_4, Tw.py_3] ] 
@@ -255,7 +253,7 @@ view model =
             css[ 
               Tw.flex, 
               Tw.justify_center, 
-              Tw.text_color Tw.pink_400, 
+              Tw.text_color Tw.white, 
               Tw.font_serif
               ]
             ][
@@ -307,7 +305,7 @@ view model =
             css[ 
               Tw.flex, 
               Tw.justify_center, 
-              Tw.text_color Tw.pink_400, 
+              Tw.text_color Tw.white, 
               Tw.font_serif
               ]
             ][
@@ -336,10 +334,10 @@ view model =
               button[onClick Next, 
                      
                     css[
-                      Tw.bg_color Tw.pink_400,
+                      Tw.bg_color Tw.custom_blue,
                       Tw.border,
                       Tw.text_color Tw.zinc_100,
-                      Tw.border_color Tw.black, 
+                      Tw.border_color Tw.custom_blue, 
                       Tw.rounded,
                       Tw.text_5xl, Tw.cursor_pointer,
                       Tw.px_4, Tw.py_3
@@ -383,7 +381,7 @@ view model =
             css[ 
               Tw.flex, 
               Tw.justify_center, 
-              Tw.text_color Tw.pink_400, 
+              Tw.text_color Tw.white, 
               Tw.font_serif
               ]
             ][
@@ -396,12 +394,14 @@ view model =
           ]
         ]
       ],
+
       div[
         css[
           Tw.flex,
           Tw.flex_col,
           Tw.justify_center,
           Tw.bg_color Tw.neutral_950,
+          Tw.pb_6,
         Breakpoints.lg[
           Tw.flex_row,
           Tw.pt_4
@@ -419,27 +419,30 @@ view model =
         ][         
           div[
             css [
-              Tw.pb_4
+              Tw.pt_4
           ]][
              div[
             css [
               Tw.flex, 
               Tw.justify_center, 
-              Tw.text_color Tw.pink_400, 
+              Tw.text_color Tw.white, 
               Tw.font_serif
             ]
           ][
             h1[
               css[ Tw.py_2,
                    Tw.pb_4]
-            ][text("Abstract")]
+
+            ][
+              text("ABSTRACT")
+            ]
           ],
           div[css [
                   Tw.text_2xl, 
                   Tw.flex,
                   Tw.justify_center,
                   Tw.self_center,
-                  Tw.text_color Tw.gray_200
+                  Tw.text_color Tw.white
               ]][
                 p[] [extractWikipediaAbstractFromWikipediaRecord (Array.get model.currentWikipediaIndex wikipediaRecordsArray)]
               ]
@@ -448,15 +451,16 @@ view model =
           div[
             css [ 
               Tw.hidden,
+
               Breakpoints.lg[
               Tw.flex, 
               Tw.justify_center, 
-              Tw.text_color Tw.pink_400, 
+              Tw.text_color Tw.white, 
               Tw.font_serif,
               Tw.py_4]
             ]
           ][
-            h1[][text("External Links")]
+            h1[][text("EXTERNAL LINKS")]
           ]
           ,
           div[
@@ -511,14 +515,14 @@ view model =
             css [
               Tw.flex, 
               Tw.justify_center, 
-              Tw.text_color Tw.pink_400, 
+              Tw.text_color Tw.white, 
               Tw.font_serif,
               Tw.mt_8
             ]
           ][
             h1[
               css[Tw.py_4]
-            ][text("Categories")]
+            ][text("CATEGORIES")]
           ],
         div[
           css[
@@ -554,11 +558,11 @@ view model =
             css [
               Tw.flex, 
               Tw.justify_center, 
-              Tw.text_color Tw.pink_400, 
+              Tw.text_color Tw.white, 
               Tw.font_serif
             ]][
           h1[
-            css[Tw.pt_2, Tw.pb_4]][text("Explore")]
+            css[Tw.pt_2, Tw.pb_4]][text("EXPLORE")]
           ],
 
           -- Generate 5 random Wikipedia Articles
@@ -578,16 +582,18 @@ view model =
       ],
 
       -- footer
-      div[
+      div[][
+            div[
         css
             [ 
-              Tw.bg_color Tw.neutral_950,
+              Tw.bg_color Tw.custom_blue,
               Tw.p_4, 
               Tw.text_center,
               Tw.text_color Tw.white
             ]
       ][
-        text("© 2023 NerdSwipe. All Rights Reserved.")
+        text("© 2024 NerdSwipe. All Rights Reserved.")
+      ]
       ]
       ]
    
@@ -669,13 +675,13 @@ createSublinkItemElement sublink =
               Tw.block,
               Tw.text_xl
             , Tw.bg_color Tw.black
-            , Tw.text_color Tw.pink_400
+            , Tw.text_color Tw.white
             , Tw.rounded
             , Tw.px_2
             , Tw.py_4
             , Tw.my_0_dot_5
             , Tw.font_serif
-            , Css.hover [ Tw.bg_color Tw.pink_400, Tw.text_color Tw.white ],
+            , Css.hover [ Tw.bg_color Tw.custom_blue, Tw.text_color Tw.white ],
             Tw.mr_1
             , Css.lastChild
                 [ Tw.mr_0
@@ -709,13 +715,13 @@ createExternalLinkItemElement externallink =
               Tw.block,
               Tw.text_xl
             , Tw.bg_color Tw.black
-            , Tw.text_color Tw.pink_400
+            , Tw.text_color Tw.white
             , Tw.rounded
             , Tw.px_2
             , Tw.py_4
             , Tw.my_0_dot_5
             , Tw.font_serif
-            , Css.hover [ Tw.bg_color Tw.pink_400, Tw.text_color Tw.white ],
+            , Css.hover [ Tw.bg_color Tw.custom_blue],
             Tw.mr_1
             , Css.lastChild
                 [ Tw.mr_0
@@ -751,12 +757,12 @@ createCategoryItemElement category =
               Tw.text_xl
             , Tw.font_serif
             , Tw.bg_color Tw.black
-            , Tw.text_color Tw.pink_400
+            , Tw.text_color Tw.white
             , Tw.rounded
             , Tw.px_2
             , Tw.py_4
             , Tw.my_0_dot_5
-            , Css.hover [ Tw.bg_color Tw.pink_400, Tw.text_color Tw.white ],
+            , Css.hover [ Tw.bg_color Tw.custom_blue],
             Tw.mr_1
             , Css.lastChild
                 [ Tw.mr_0
@@ -777,7 +783,7 @@ createRandomItemElement record =
             Tw.border_color Tw.gray_900, 
             Tw.rounded_lg,
             Tw.bg_color Tw.black,
-            Css.hover [ Tw.bg_color Tw.pink_400]
+            Css.hover [ Tw.bg_color Tw.custom_blue]
             ]
         ][
           a[
@@ -809,7 +815,7 @@ createRandomItemElement record =
                css [Tw.bg_color Tw.white]][]],
           div[
             css[ 
-              Tw.text_color Tw.pink_400, 
+              Tw.text_color Tw.white, 
               Tw.font_serif,
               Css.hover [Tw.text_color Tw.white ]
               ]

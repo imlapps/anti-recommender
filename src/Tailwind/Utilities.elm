@@ -6079,6 +6079,16 @@ h_128 =
     Css.property "height" "32rem"
 
 
+h_132 : Css.Style
+h_132 =
+    Css.property "height" "33rem"
+
+
+h_136 : Css.Style
+h_136 =
+    Css.property "height" "34rem"
+
+
 h_14 : Css.Style
 h_14 =
     Css.property "height" "3.5rem"
@@ -6092,11 +6102,6 @@ h_144 =
 h_16 : Css.Style
 h_16 =
     Css.property "height" "4rem"
-
-
-h_160 : Css.Style
-h_160 =
-    Css.property "height" "40rem"
 
 
 h_1_dot_5 : Css.Style
