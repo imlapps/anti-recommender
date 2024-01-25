@@ -1,5 +1,5 @@
 from pydantic import BaseModel 
-from typing import List, Dict, Tuple
+from typing import List
 
 class WikipediaRecord(BaseModel):
     """A Pydantic Model to contain Wikipedia Abstracts"""

@@ -9,6 +9,10 @@ import os
 @asynccontextmanager 
 async def lifespan(app: FastAPI):
 
+    """
+    A lifespan event to read in the Wikipedia output data and persist it in storage.
+    """
+        
     file_path = os.getcwd()+"\\app\\data\\mini-wikipedia.output.txt"
     
     wikipedia_storage.read_wikipedia_data(file_path)
@@ -25,6 +29,12 @@ app.include_router(router)
 
 @app.get("/")
 async def root():
+
+    """
+    A path operation function of the root endpoint.
+    It returns the first Wikipedia record stored in wikipedia_storage.  
+    """
+
     return app.state.wikipedia_storage.get_current_record()
 
 
