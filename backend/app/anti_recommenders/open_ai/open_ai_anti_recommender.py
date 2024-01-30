@@ -1,11 +1,11 @@
 import logging 
 from typing import Tuple, Any
 from abc import abstractmethod
-
+from langchain.schema.runnable import RunnableSerializable
 from ..anti_recommender import AntiRecommender
 
 
-class OpenAIAntiRecommender(AntiRecommender):
+class OpenAiAntiRecommender(AntiRecommender):
     """A concrete implementation of AntiRecommender that uses the OpenAI API."""
 
     def __init__(self) -> None:
@@ -19,7 +19,7 @@ class OpenAIAntiRecommender(AntiRecommender):
         
         self.__logger = logging.getLogger()
 
-    def create_query(self, wikipedia_title: str) -> str:
+    def _create_query(self, wikipedia_title: str) -> str:
         """Create a query with the given wikipedia title for the LLM"""
 
         query = "What are 10 Wikipedia articles on the featured list that are dissimilar but surprisingly similar to the \
@@ -28,31 +28,23 @@ class OpenAIAntiRecommender(AntiRecommender):
         
         return query
     
-    def get_template(self) -> str:
-        """Gets the template for the LLM"""
-        return self.template  
-    
-    def set_template(self, template:str)-> None:
-        """Sets the template for the LLM"""
-        self.template = template
 
-    def get_logger(self) -> Any:
+    def _get_logger(self) -> Any:
         """Gets the logger for the LLM"""
         return self.__logger
 
     @abstractmethod
-    def build_model(self) -> None:
+    def _build_model(self) -> RunnableSerializable[Any, str]:
+        pass
+
+    @abstractmethod
+    def _generate_response(self, query: str, chain) -> str:
         pass
     
     @abstractmethod
-    def generate_anti_recommendations(self, wikipedia_title: str  = "") -> Tuple[Tuple, ...]:
+    def _parse_response(self, response: str) -> Tuple[Tuple[str, ...], ...]:
         pass 
 
     @abstractmethod
-    def generate_response(self, query: str, chain) -> str:
-        pass
-    
-    @abstractmethod
-    def parse_response(self, response: str) -> Tuple[Tuple, ...]:
+    def generate_anti_recommendations(self, wikipedia_title: str  = "") -> Tuple[Tuple[str, ...], ...]:
         pass 
-

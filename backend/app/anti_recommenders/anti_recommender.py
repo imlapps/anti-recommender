@@ -1,4 +1,6 @@
+from typing import Tuple
 from abc import ABC, abstractmethod 
+
 
 class AntiRecommender(ABC):
     """
@@ -6,5 +8,5 @@ class AntiRecommender(ABC):
     """
 
     @abstractmethod 
-    def generate_anti_recommendations(self) -> None:
+    def generate_anti_recommendations(self) -> Tuple[Tuple, ...]:
         pass

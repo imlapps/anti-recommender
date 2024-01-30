@@ -1,4 +1,4 @@
-encoding_list = ['ascii',
+encodings_list = ['ascii',
  'big5',
  'big5hkscs',
  'cp037',
