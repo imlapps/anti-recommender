@@ -1,7 +1,7 @@
 import logging 
-from typing import Tuple, Any
+from typing import Tuple
 from abc import abstractmethod
-from langchain.schema.runnable import RunnableSerializable
+from langchain.schema.runnable import RunnableSequence
 from ..anti_recommender import AntiRecommender
 
 
@@ -27,18 +27,14 @@ class OpenAiAntiRecommender(AntiRecommender):
                  Give each answer on a new line, and in the format: Number - Title - URL."
         
         return query
-    
 
-    def _get_logger(self) -> Any:
-        """Gets the logger for the LLM"""
-        return self.__logger
 
     @abstractmethod
-    def _build_model(self) -> RunnableSerializable[Any, str]:
+    def _build_model(self) -> RunnableSequence:
         pass
 
     @abstractmethod
-    def _generate_response(self, query: str, chain) -> str:
+    def _generate_response(self, query: str, chain: RunnableSequence) -> str:
         pass
     
     @abstractmethod
