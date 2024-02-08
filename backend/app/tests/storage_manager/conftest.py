@@ -7,6 +7,8 @@ from app.data.wikipedia_output_path import wikipedia_output_path
 
 @pytest.fixture(scope="module")
 def storage_wikipedia_data():
+    """This fixture returns a dictionary containing sample Wikipedia articles."""
+
     return {
         "test-wikipedia-article-1": {
             "test-info": "test info for test-wikipedia-article-1"
@@ -16,6 +18,11 @@ def storage_wikipedia_data():
 
 @pytest.fixture(scope="module")
 def current_wikipedia_record_data(storage_wikipedia_data):
+    """
+    This fixture accesses storage_wikipedia_data and
+    returns a tuple that contains the first entry in the fixture.
+    """
+
     return tuple(
         [
             {
@@ -29,6 +36,11 @@ def current_wikipedia_record_data(storage_wikipedia_data):
 
 @pytest.fixture(scope="module")
 def storage(module_mocker, storage_wikipedia_data):
+    """
+    This fixture yields a Storage object.
+    The values of storage_wikipedia_data are read into the Storage object.
+    """
+
     _storage = Storage()
 
     module_mocker.patch.object(
@@ -44,6 +56,10 @@ def storage(module_mocker, storage_wikipedia_data):
 
 @pytest.fixture(scope="module")
 def storage_manager(storage):
+    """
+    This fixture yields a StorageManager object.
+    the StorageManager object is initialized with the storage fixture and a default wikipedia output path.
+    """
     _storage_manager = StorageManager(storage, wikipedia_output_path)
 
     yield _storage_manager

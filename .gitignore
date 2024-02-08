@@ -1,3 +1,4 @@
+*.pyc
 elm-stuff
 elm.js
 nerdswipe_venv
