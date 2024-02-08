@@ -18,12 +18,18 @@ SAMPLE_PARSED_MODEL_RESPONSE = tuple([("Title", "https://en.wikipedia.org/wiki/T
 
 @pytest.fixture(scope="class")
 def call_regular_open_ai_anti_recommender():
+    """This fixture returns a RegularOpenAiAntiRecommender object."""
     return RegularOpenAiAntiRecommender()
 
 
 class TestBuildModel:
+    """
+    This class contains a suite of tests that ensure that RegularOpenAiAntiRecommender._build_model() works as expected.
+    """
 
     def test_build_model_success(self, call_regular_open_ai_anti_recommender):
+        """Test that RegularOpenAiAntiRecommender._build_model() successfully builds an OpenAI model."""
+
         chain = call_regular_open_ai_anti_recommender._build_model()
 
         assert chain.middle[1].model_name == OPEN_AI_MODEL_NAME
@@ -31,6 +37,7 @@ class TestBuildModel:
     def test_raises_failed_prompt_creation_exception(
         self, call_regular_open_ai_anti_recommender, mocker
     ):
+        """Test that RegularOpenAiAntiRecommender._build_model() raises an Exception when it cannot generate a prompt."""
 
         # Mock PromptTemplate's from_template method and return an Exception
         mocker.patch.object(PromptTemplate, "from_template", return_value=Exception)
@@ -40,8 +47,12 @@ class TestBuildModel:
 
 
 class TestCreateQuery:
+    """
+    This class contains a suite of tests that ensure that RegularOpenAiAntiRecommender._create_query() works as expected.
+    """
 
     def test_create_query_success(self, call_regular_open_ai_anti_recommender):
+        """Test that RegularOpenAiAntiRecommender._create_query() successfully creates a query with a given title."""
 
         query = call_regular_open_ai_anti_recommender._create_query(SAMPLE_TITLE)
 
@@ -49,10 +60,13 @@ class TestCreateQuery:
 
 
 class TestGenerateResponse:
+    """
+    This class contains a suite of tests that ensure that RegularOpenAiAntiRecommender._generate_response() works as expected.
+    """
 
     @pytest.fixture(scope="class")
     def create_generate_response_param(self, call_regular_open_ai_anti_recommender):
-
+        """This is fixture returns parameters that can be used in RegularOpenAiAntiRecommender._generate_response()."""
         return tuple(
             [SAMPLE_QUERY, call_regular_open_ai_anti_recommender._build_model()]
         )
@@ -63,6 +77,7 @@ class TestGenerateResponse:
         create_generate_response_param,
         mocker,
     ):
+        """Test that RegularOpenAiAntiRecommender._generate_response() successfully generates a response from a model."""
 
         # Mock RunnableSerializable's invoke method and return an LLM response
         mocker.patch.object(
@@ -80,6 +95,7 @@ class TestGenerateResponse:
     def test_raises_failed_chain_invocation_exception(
         call_regular_open_ai_anti_recommender, create_generate_response_param, mocker
     ):
+        """Test that RegularOpenAiAntiRecommender._generate_response() raises an Exception when it is unable to invoke the given model."""
 
         # Mock RunnableSerializable's invoke method and return an Exception
         mocker.patch.object(RunnableSequence, "invoke", return_value=Exception)
@@ -91,9 +107,12 @@ class TestGenerateResponse:
 
 
 class TestParseResponse:
+    """
+    This class contains a suite of tests that ensure that RegularOpenAiAntiRecommender._parse_response() works as expected.
+    """
 
     def test_parse_response(self, call_regular_open_ai_anti_recommender):
-
+        """Test that RegularOpenAiAntiRecommender._parse_response() successfully parses and returns a model's response."""
         assert (
             call_regular_open_ai_anti_recommender._parse_response(SAMPLE_MODEL_RESPONSE)
             == SAMPLE_PARSED_MODEL_RESPONSE
@@ -101,9 +120,14 @@ class TestParseResponse:
 
 
 class TestGenerateAntiRecommendations:
+    """
+    This class contains a suite of tests that ensure that RegularOpenAiAntiRecommender._generate_anti_recommendations() works as expected.
+    """
+
     def test_generate_anti_recommendations(
         self, mocker, call_regular_open_ai_anti_recommender
     ):
+        """Test that RegularOpenAiAntiRecommender._generate_anti_recommendations() successfully generates anti-recommendations for a given Wikipedia title."""
 
         # Mock RegularOpenAiAntiRecommender's _parse_response method and return a sample response
         mocker.patch.object(

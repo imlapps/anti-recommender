@@ -26,8 +26,8 @@ class Storage(object):
 
     def pop_title_from_stack(self) -> str | None:
         """
-        Remove an item from the from of the stack.
-        Return None if the stack is empty.
+        Remove an item from the front of the stack.
+        Return None, if the stack is empty.
         """
         if len(self.__stack) > 0:
             return self.__stack.pop()
@@ -49,12 +49,10 @@ class Storage(object):
     def current_title(self, title: str = "") -> None:
         """Set the title of the current Wikipedia record."""
 
-        # Use the first item in wikipedia_data
-
         self.__current_title = title
 
     def get_current_record(self) -> Tuple[Dict, ...]:
-        """Return the record of the current Wikipedia record."""
+        """Return the record of the current Wikipedia article."""
 
         return tuple(
             [

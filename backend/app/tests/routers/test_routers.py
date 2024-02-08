@@ -5,6 +5,8 @@ from app.routers.dependencies import *
 
 
 def mock_current_wikipedia_article():
+    """Mock current wikipedia article values."""
+
     return tuple(
         [
             {
@@ -17,6 +19,8 @@ def mock_current_wikipedia_article():
 
 
 def mock_next_wikipedia_articles():
+    """Mock next wikipedia article values."""
+
     return tuple(
         [
             {
@@ -27,6 +31,8 @@ def mock_next_wikipedia_articles():
 
 
 def mock_previous_wikipedia_article():
+    """Mock previous wikipedia article values."""
+
     return tuple(
         [
             {
@@ -55,7 +61,7 @@ app.dependency_overrides[get_current_wikipedia_article] = mock_current_wikipedia
 
 def test_next():
     """
-    Tests an endpoint /next with a mock method that returns a tuple of a Wikipedia article.
+    Tests the endpoint /next with a mock method that returns a tuple of a Wikipedia article.
     """
 
     response = client.get(url="/ap1/v1/wikipedia/next")
