@@ -1,6 +1,8 @@
 from typing import Tuple, Dict, List
 from app.utils.json import json_loader
 
+__all__ = ["Storage"]
+
 
 class Storage(object):
     """

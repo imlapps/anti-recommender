@@ -20,4 +20,4 @@ def get_previous_wikipedia_article(request: Request):
 
 
 def get_current_wikipedia_article(request: Request):
-    return request.app.state.storage_manager.retrieve_current_wikipedia_articles()
+    return request.app.state.storage_manager.retrieve_current_wikipedia_article()

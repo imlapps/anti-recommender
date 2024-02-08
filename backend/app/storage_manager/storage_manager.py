@@ -5,6 +5,8 @@ from typing_extensions import Annotated
 from app.anti_recommenders.anti_recommender_proxy import AntiRecommenderProxy
 from app.storage_manager.storage.storage import Storage
 
+__all__ = ["StorageManager"]
+
 
 class StorageManager(object):
     def __init__(self, storage: Storage, wikipedia_output_path) -> None:

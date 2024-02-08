@@ -6,6 +6,8 @@ from langchain.schema import StrOutputParser
 
 from app.anti_recommenders.open_ai.open_ai_anti_recommender import OpenAiAntiRecommender
 
+__all__ = ["RegularOpenAiAntiRecommender"]
+
 
 class RegularOpenAiAntiRecommender(OpenAiAntiRecommender):
     """A subclass of the OpenAI Anti-Recommender"""

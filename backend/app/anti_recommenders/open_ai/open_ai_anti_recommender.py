@@ -1,8 +1,10 @@
-import logging 
+import logging
 from typing import Tuple
 from abc import abstractmethod
 from langchain.schema.runnable import RunnableSequence
 from ..anti_recommender import AntiRecommender
+
+__all__ = ["OpenAiAntiRecommender"]
 
 
 class OpenAiAntiRecommender(AntiRecommender):
@@ -16,18 +18,21 @@ class OpenAiAntiRecommender(AntiRecommender):
                         Question: {question}
                         Helpful Answer:
                         """
-        
+
         self.__logger = logging.getLogger()
 
     def _create_query(self, wikipedia_title: str) -> str:
         """Create a query with the given wikipedia title for the LLM"""
 
-        query = "What are 10 Wikipedia articles on the featured list that are dissimilar but surprisingly similar to the \
-                 Wikipedia article "+ wikipedia_title + "? \
+        query = (
+            "What are 10 Wikipedia articles on the featured list that are dissimilar but surprisingly similar to the \
+                 Wikipedia article "
+            + wikipedia_title
+            + "? \
                  Give each answer on a new line, and in the format: Number - Title - URL."
-        
-        return query
+        )
 
+        return query
 
     @abstractmethod
     def _build_model(self) -> RunnableSequence:
@@ -36,11 +41,13 @@ class OpenAiAntiRecommender(AntiRecommender):
     @abstractmethod
     def _generate_response(self, query: str, chain: RunnableSequence) -> str:
         pass
-    
-    @abstractmethod
-    def _parse_response(self, response: str) -> Tuple[Tuple[str, ...], ...]:
-        pass 
 
     @abstractmethod
-    def generate_anti_recommendations(self, wikipedia_title: str  = "") -> Tuple[Tuple[str, ...], ...]:
-        pass 
+    def _parse_response(self, response: str) -> Tuple[Tuple[str, ...], ...]:
+        pass
+
+    @abstractmethod
+    def generate_anti_recommendations(
+        self, wikipedia_title: str = ""
+    ) -> Tuple[Tuple[str, ...], ...]:
+        pass

@@ -4,6 +4,9 @@ from .anti_recommender import AntiRecommender
 from .open_ai.regular_open_ai_anti_recommender import RegularOpenAiAntiRecommender
 
 
+__all__ = ["AntiRecommenderProxy"]
+
+
 class AntiRecommenderProxy(AntiRecommender):
     """
     The Proxy class for the anti-recommendation engine.
