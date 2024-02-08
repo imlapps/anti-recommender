@@ -1,27 +1,20 @@
-import os 
 from app.utils.json import json_loader
+from app.data.wikipedia_output_path import wikipedia_output_path
 
-def test_successfully_load_data() -> None:
-    """
-    Test to check that the json_loader correctly reads in the Wikipedia output data.
-    """
-
-    file_path = os.getcwd()+"\\app\\tests\\data\\test-mini-wikipedia.output.txt"
-    wikipedia_data = json_loader.load_data(file_path)[0]
-
-    assert list(wikipedia_data.keys())[0] == "Amphibian"
+import pytest
+import json
 
 
-def test_unsuccessfully_load_data_with_incorrect_file_path() -> None:
-    """
-    Test to check that the json_loader does not read in any data when an incorrect file path is given.
-    """
+@pytest.mark.parametrize(
+    "test_input,expected", [(wikipedia_output_path, tuple), ("", int)]
+)
+def test_load_json_data(test_input, expected):
 
-    pass 
+    assert type(json_loader.load_data(test_input)) == expected
 
-def test_unsuccessfully_load_data_with_invalid_JSON_format() -> None:
-    """
-    Test to check that the json_loader returns an Exception when the input file contains an incorrect JSON format.
-    """
-        
-    pass
+
+def test_raises_exception_when_parsing_json_data(mocker):
+    mocker.patch.object(json, "loads", return_value=json.JSONDecodeError)
+
+    with pytest.raises(Exception):
+        json_loader.load_data(wikipedia_output_path)

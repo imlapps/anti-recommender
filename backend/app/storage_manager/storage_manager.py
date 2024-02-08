@@ -39,7 +39,6 @@ class StorageManager(object):
         )
 
         # Set the first item in wikipedia_articles as the new current title in storage.
-
         current_title = ""
 
         if wikipedia_articles[0]:
