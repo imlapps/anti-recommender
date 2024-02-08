@@ -1,9 +1,7 @@
 import pytest
-from app.storage_manager.storage_manager import StorageManager
+
 from app.storage_manager.storage.storage import Storage
 from app.data.wikipedia_output_path import wikipedia_output_path
-
-from app.utils.json import json_loader
 from app.anti_recommenders.anti_recommender_proxy import AntiRecommenderProxy
 
 
