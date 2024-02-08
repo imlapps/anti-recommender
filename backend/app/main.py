@@ -1,38 +1,30 @@
 from fastapi import FastAPI
 from contextlib import asynccontextmanager
 
-from app.routers.records import router 
-from app.storage.storage import storage as wikipedia_storage
+from app.routers.routers import router
+
+from app.storage_manager.storage.storage import Storage
+from app.storage_manager.storage_manager import StorageManager
+
 from app.data.wikipedia_output_path import wikipedia_output_path
 
-@asynccontextmanager 
-async def lifespan(app: FastAPI):
 
+@asynccontextmanager
+async def lifespan(app: FastAPI):
     """
     A lifespan event to read in the Wikipedia output data and persist it in storage.
     """
-           
-    wikipedia_storage.read_wikipedia_data(wikipedia_output_path)
-    wikipedia_storage.set_current_title(first_title = True)
-    
-    app.state.wikipedia_storage = wikipedia_storage
+    storage_manager = StorageManager(
+        storage=Storage(), wikipedia_output_path=wikipedia_output_path
+    )
+    storage_manager.initialize_wikipedia_data()
 
-    yield 
+    app.state.storage_manager = storage_manager
 
-    app.state.wikipedia_storage.reset()
+    yield
 
-app = FastAPI(lifespan = lifespan)
+    app.state.storage_manager.reset_storage_manager()
+
+
+app = FastAPI(lifespan=lifespan)
 app.include_router(router)
-
-@app.get("/")
-async def root():
-
-    """
-    A path operation function of the root endpoint.
-    It returns the first Wikipedia record stored in wikipedia_storage.  
-    """
-
-    return app.state.wikipedia_storage.get_current_record()
-
-
-
