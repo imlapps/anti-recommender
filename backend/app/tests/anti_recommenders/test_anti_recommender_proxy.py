@@ -61,7 +61,7 @@ class GenerateAntiRecommendation:
 
         if anti_recommender_object == "RegularOpenAiAntiRecommender":
 
-            # Mock RegularOpenAiAntiRecommender's _parse_response method and return a sample response
+            # Mock RegularOpenAiAntiRecommender's _parse_response() method and return a sample response
             mocker.patch.object(
                 RegularOpenAiAntiRecommender,
                 "_generate_response",
