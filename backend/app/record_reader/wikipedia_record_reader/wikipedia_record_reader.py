@@ -4,9 +4,10 @@ import json
 import logging as logger
 from typing import TYPE_CHECKING
 
-from ..record_reader import RecordReader
 from app.utils.encodings.encodings_list import encodings
 from app.utils.models.wikipedia_record import WikipediaRecord
+
+from ..record_reader import RecordReader
 
 if TYPE_CHECKING:
     from pathlib import Path
