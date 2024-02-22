@@ -1,4 +1,4 @@
-encodings_list = frozenset(
+encodings = frozenset(
     [
         "ascii",
         "big5",
