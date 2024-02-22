@@ -6,7 +6,7 @@ from app.routers.routers import router
 from app.storage_manager.storage.storage import Storage
 from app.storage_manager.storage_manager import StorageManager
 
-from app.data.wikipedia_output_path import wikipedia_output_path
+from backend.app.old.wikipedia_output_path import wikipedia_output_path
 
 
 @asynccontextmanager
