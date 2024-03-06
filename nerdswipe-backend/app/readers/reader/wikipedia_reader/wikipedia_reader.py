@@ -2,7 +2,7 @@ import json
 from pathlib import Path
 from collections.abc import Generator
 
-from app.models.record import Record
+from app.models.record.record import Record
 from app.readers.reader.reader import Reader
 from app.utils.encodings.encodings_list import encodings
 

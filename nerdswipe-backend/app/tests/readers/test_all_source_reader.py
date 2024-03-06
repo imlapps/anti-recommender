@@ -1,8 +1,6 @@
-
-
 import pytest
 
-from app.models.record import Record
+from app.models.record.record import Record
 from app.readers.all_source_reader import AllSourceReader
 
 

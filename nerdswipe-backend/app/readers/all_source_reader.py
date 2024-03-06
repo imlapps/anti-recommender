@@ -4,12 +4,8 @@ from dotenv import load_dotenv
 from pathlib import Path
 from collections.abc import Generator
 
-from app.models.record import Record
+from app.models.record.record import Record
 from app.readers.reader.wikipedia_reader.wikipedia_reader import WikipediaReader
-from typing import TYPE_CHECKING
-
-if TYPE_CHECKING:
-    from app.readers.reader.reader import Reader
 
 
 class AllSourceReader:
@@ -20,8 +16,7 @@ class AllSourceReader:
 
     def __init__(self) -> None:
         self.__record_type: str | None = self.__get_record_type()
-        self.__file_output_path: str | None = self.__get_output_path()
-        self.__reader: Reader | None = None
+        self.__file_output_path: Path | None = self.__get_output_path()
 
     def __get_record_type(self) -> str | None:
         """Retrieve the record type from environment variables."""
@@ -44,7 +39,7 @@ class AllSourceReader:
         """ Read in output data and yield Records."""
         if self.__file_output_path:
             if self.__record_type == "Wikipedia":
-                self.__reader = WikipediaReader(
+                reader = WikipediaReader(
                     file_path=self.__file_output_path)
 
-            yield from self.__reader.read()
+            yield from reader.read()

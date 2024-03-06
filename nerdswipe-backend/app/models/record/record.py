@@ -18,5 +18,5 @@ class Record(BaseModel):
         link: str = ""
 
     abstract_info: AbstractInfo = AbstractInfo()
-    categories: tuple[Categories, ...] = None
-    externallinks: tuple[ExternalLink, ...] = None
+    categories: tuple[Categories, ...] | None = None
+    externallinks: tuple[ExternalLink, ...] | None = None

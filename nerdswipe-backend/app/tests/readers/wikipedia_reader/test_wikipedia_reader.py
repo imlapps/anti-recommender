@@ -5,7 +5,7 @@ from pathlib import Path
 import pytest
 from dotenv import load_dotenv
 
-from app.models.record import Record
+from app.models.record.record import Record
 from app.readers.reader.wikipedia_reader.wikipedia_reader import WikipediaReader
 
 
