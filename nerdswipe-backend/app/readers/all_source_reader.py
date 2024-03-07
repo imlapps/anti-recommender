@@ -7,7 +7,7 @@ from app.readers.reader.wikipedia_reader.wikipedia_reader import WikipediaReader
 
 
 class AllSourceReader:
-    """A multiplexor of different Readers.
+    """A multiplexer for different Readers.
 
     Read in output data and yield them as Records.
     """

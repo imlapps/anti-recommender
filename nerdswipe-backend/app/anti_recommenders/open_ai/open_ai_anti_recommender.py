@@ -7,6 +7,11 @@ from app.models.anti_recommendation.anti_recommendation import AntiRecommendatio
 
 
 class OpenAiAntiRecommender(AntiRecommender):
+    """
+    A concrete implementation of AntiRecommender that uses
+    OpenAI's large language model to generate anti-recommendations.
+    """
+
     def __init__(self) -> None:
         self._template = """
                 Use the following pieces of context to answer the question at the end.

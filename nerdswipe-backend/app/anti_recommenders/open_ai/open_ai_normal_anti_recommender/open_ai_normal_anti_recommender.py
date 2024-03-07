@@ -9,6 +9,11 @@ from app.models.anti_recommendation.anti_recommendation import AntiRecommendatio
 
 
 class OpenAiNormalAntiRecommender(OpenAiAntiRecommender):
+    """
+    A subclass of OpenAiAntiRecommender that relies solely on
+    the large language model's parametric knowledge to generate anti-recommendations.
+    """
+
     def __init__(self) -> None:
         super().__init__()
         self.open_ai_normal_chain: RunnableSerializable | None = None

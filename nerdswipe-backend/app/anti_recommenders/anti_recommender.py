@@ -4,9 +4,6 @@ from collections.abc import Generator
 from app.models.anti_recommendation.anti_recommendation import AntiRecommendation
 
 
-__all__ = ["AntiRecommender"]
-
-
 class AntiRecommender(ABC):
     """
     An interface to generate anti-recommendations of a record.

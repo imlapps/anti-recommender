@@ -12,6 +12,10 @@ if TYPE_CHECKING:
 
 
 class AntiRecommenderProxy:
+    """
+    A multiplexer for different anti-recommenders.
+    """
+
     def __init__(self) -> None:
         self.__type: str | None = self.__get_anti_recommender_type()
         self.__anti_recommender: AntiRecommender | None = None
