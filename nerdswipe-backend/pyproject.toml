@@ -38,6 +38,7 @@ lint.ignore = [
     "N815",   # Mixed-case variables
     "S101",   # Use of assert
     "TRY003", # Avoid specifying long messages outside the exception class
+
 ]
 lint.select = ["ALL"]
 src = ["app"]

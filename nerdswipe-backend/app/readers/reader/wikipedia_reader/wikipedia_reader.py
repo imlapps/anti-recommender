@@ -20,8 +20,7 @@ class WikipediaReader(Reader):
         """Read in Wikipedia output data and yield Records."""
 
         json_list = (
-            self.__file_path.open(
-                mode="r", encoding="utf-8").read().strip().split("\n")
+            self.__file_path.open(mode="r", encoding="utf-8").read().strip().split("\n")
         )
 
         for json_str in json_list:
