@@ -1,5 +1,5 @@
 from collections.abc import Generator
-from app.utils.config.config import config
+from app.models.settings.settings import config
 
 from app.models.anti_recommendation.anti_recommendation import AntiRecommendation
 from app.anti_recommenders.open_ai.open_ai_normal_anti_recommender.open_ai_normal_anti_recommender import (

@@ -4,9 +4,9 @@ from collections.abc import Collection
 from pathlib import Path
 from pytest_mock import MockFixture
 
-from app.utils.config.config import config
+from app.models.settings.settings import config
 from app.readers.all_source_reader import AllSourceReader
-from app.readers.reader.wikipedia_reader.wikipedia_reader import WikipediaReader
+from app.readers.reader.wikipedia_reader import WikipediaReader
 from app.anti_recommendation_engine.anti_recommendation_engine import (
     AntiRecommendationEngine,
 )

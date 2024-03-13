@@ -1,9 +1,9 @@
 from pathlib import Path
 from collections.abc import Generator
 
-from app.utils.config.config import config
+from app.models.settings.settings import config
 from app.models.record.record import Record
-from app.readers.reader.wikipedia_reader.wikipedia_reader import WikipediaReader
+from app.readers.reader.wikipedia_reader import WikipediaReader
 
 
 class AllSourceReader:
@@ -38,5 +38,4 @@ class AllSourceReader:
         if self.__file_output_path:
             if self.__record_type == "Wikipedia":
                 reader = WikipediaReader(self.__file_output_path)
-
-            yield from reader.read()
+                yield from reader.read()
