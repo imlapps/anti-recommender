@@ -9,12 +9,12 @@ class ReadersInstantiator:
     An Instantiator for the different Readers.
     """
 
-    def __init__(self):
-        self.__record_types: frozenset[str] | None = self.__retrieve_record_types(
+    def __init__(self) -> None:
+        self.__record_types: frozenset[str] | None = self.__get_record_types(
         )
         self.__file_output_paths: list[Path] = self.__get_output_paths()
 
-    def __retrieve_record_types(self) -> frozenset[str] | None:
+    def __get_record_types(self) -> frozenset[str] | None:
         """Retrieve a frozenset of record types from settings."""
 
         if settings.record_types:
@@ -30,13 +30,12 @@ class ReadersInstantiator:
         ]
 
     def provide_readers(self) -> tuple[Reader, ...] | None:
-        """Return a tuple of Readers depending on the record type obtained from settings. 
-           Readers are instantiated with Paths that contain the corresponding record types in the Path names.
+        """Return a tuple of Readers depending on the record type obtained from settings.
+        Readers are instantiated with Paths that contain the corresponding record types in the Path names.
         """
         if self.__record_types:
             readers = []
-
-            for record_type in self.__retrieve_record_types():
+            for record_type in self.__record_types:
                 if record_type.lower() == "wikipedia":
                     readers.extend(
                         [

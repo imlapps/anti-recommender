@@ -1,4 +1,3 @@
-
 from collections.abc import Generator
 
 
@@ -8,7 +7,7 @@ from app.readers.reader.reader import Reader
 from app.readers.readers_instantiator import ReadersInstantiator
 
 
-class AllSourceReader:
+class AllSourceReader(Reader):
     """A multiplexer for different Readers.
 
     Read in output data and yield them as Records.
@@ -26,5 +25,6 @@ class AllSourceReader:
 
     def read(self) -> Generator[Record, None, None]:
         """Read in output data and yield Records."""
-        for reader in self.__readers:
-            yield from reader.read()
+        if self.__readers:
+            for reader in self.__readers:
+                yield from reader.read()

@@ -1,11 +1,10 @@
-import pytest
 from typing import Any
+import pytest
+from collections.abc import Collection
 from pathlib import Path
 from pytest_mock import MockFixture
-from collections.abc import Collection
 
-
-from app.models.settings import settings
+from app.models.settings.settings import settings
 from app.readers.all_source_reader import AllSourceReader
 from app.readers.reader.wikipedia_reader import WikipediaReader
 from app.anti_recommendation_engine.anti_recommendation_engine import (
@@ -30,7 +29,7 @@ def wikipedia_output_path() -> Path:
     """Return the Path of the Wikipedia output file."""
 
     return [
-        Path(__file__).parent.parent / "data" / file_name
+        Path(__file__).parent.parent.parent / "data" / file_name
         for file_name in settings.output_file_names
         if "wikipedia" in file_name.lower()
     ][0]
@@ -45,7 +44,7 @@ def wikipedia_reader(wikipedia_output_path: Path) -> WikipediaReader:
 
 @pytest.fixture()
 def anti_recommender_generator() -> AntiRecommendationGenerator:
-    """Yield an AntiRecommenderProxy object."""
+    """Yield an AntiRecommenderGenerator object."""
 
     return AntiRecommendationGenerator()
 

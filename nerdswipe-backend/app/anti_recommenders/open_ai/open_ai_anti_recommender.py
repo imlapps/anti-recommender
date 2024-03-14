@@ -21,7 +21,7 @@ class OpenAiAntiRecommender(AntiRecommender):
                 Helpful Answer:
                 """
 
-    def create_query(self, record_key: str) -> str:
+    def _create_query(self, record_key: str) -> str:
         """Create a query with the given wikipedia title for the LLM"""
 
         return (
@@ -33,15 +33,15 @@ class OpenAiAntiRecommender(AntiRecommender):
         )
 
     @abstractmethod
-    def build_chain(self) -> None:
+    def _build_chain(self) -> None:
         pass
 
     @abstractmethod
-    def generate_response(self, query: str) -> str | None:
+    def _generate_response(self, query: str) -> str | None:
         pass
 
     @abstractmethod
-    def parse_response(
+    def _parse_response(
         self, response: str
     ) -> Generator[AntiRecommendation, None, None]:
         pass

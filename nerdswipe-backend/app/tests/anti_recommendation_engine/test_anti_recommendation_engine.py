@@ -5,7 +5,7 @@ from app.models.anti_recommendation.anti_recommendation import AntiRecommendatio
 from app.models.record.record import Record
 from pytest_mock import MockFixture
 
-from app.anti_recommenders.anti_recommender_proxy import AntiRecommenderProxy
+from app.anti_recommenders.anti_recommender_generator import AntiRecommendationGenerator
 from app.readers.all_source_reader import AllSourceReader
 
 
@@ -31,7 +31,7 @@ def test_generate_anti_recommendations(
     """Test that AntiRecommendationEngine.generate_anti_recommendations() returns a tuple of anti-recommendations."""
 
     mocker.patch.object(
-        AntiRecommenderProxy,
+        AntiRecommendationGenerator,
         "generate_anti_recommendations",
         return_value=anti_recommendations,
     )
@@ -51,7 +51,7 @@ def test_get_previous_anti_recommendation(
     """Test that AntiRecommendationEngine.get_previous_anti_recommendation() returns a tuple of the previous anti-recommendation."""
 
     mocker.patch.object(
-        AntiRecommenderProxy,
+        AntiRecommendationGenerator,
         "generate_anti_recommendations",
         return_value=anti_recommendations,
     )

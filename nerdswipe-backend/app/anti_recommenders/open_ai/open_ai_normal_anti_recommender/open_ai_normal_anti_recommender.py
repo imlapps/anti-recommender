@@ -18,7 +18,7 @@ class OpenAiNormalAntiRecommender(OpenAiAntiRecommender):
         super().__init__()
         self.open_ai_normal_chain: RunnableSerializable | None = None
 
-    def build_chain(self) -> None:
+    def _build_chain(self) -> None:
         """Build a chain that consists of an OpenAI prompt, large language model and an output parser."""
 
         model = OpenAI()
@@ -29,7 +29,7 @@ class OpenAiNormalAntiRecommender(OpenAiAntiRecommender):
             {"question": RunnablePassthrough()} | prompt | model | StrOutputParser()
         )
 
-    def generate_response(self, query: str) -> str | None:
+    def _generate_response(self, query: str) -> str | None:
         """Invoke the OpenAI Large Language Model and generate a response."""
 
         if self.open_ai_normal_chain:
@@ -37,7 +37,7 @@ class OpenAiNormalAntiRecommender(OpenAiAntiRecommender):
 
         return None
 
-    def parse_response(
+    def _parse_response(
         self, response: str
     ) -> Generator[AntiRecommendation, None, None]:
         """Extract anti-recommendations from the response and yield AntiRecommendation records."""
@@ -65,9 +65,9 @@ class OpenAiNormalAntiRecommender(OpenAiAntiRecommender):
     ) -> Generator[AntiRecommendation, None, None]:
         """Yield anti-recommendations of a given record key."""
 
-        self.build_chain()
-        query = self.create_query(record_key)
-        response = self.generate_response(query)
+        self._build_chain()
+        query = self._create_query(record_key)
+        response = self._generate_response(query)
 
         if response:
-            yield from self.parse_response(response)
+            yield from self._parse_response(response)

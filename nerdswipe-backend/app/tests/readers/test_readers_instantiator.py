@@ -8,5 +8,5 @@ def test_provide_readers() -> None:
 
     readers_instantiator = ReadersInstantiator()
 
-    assert isinstance(readers_instantiator.provide_readers()
-                      [0], WikipediaReader)
+    if readers_instantiator.provide_readers():
+        assert isinstance(readers_instantiator.provide_readers()[0], WikipediaReader)

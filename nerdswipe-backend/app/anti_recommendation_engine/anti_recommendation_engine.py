@@ -1,14 +1,15 @@
 from typing import Any
 
-from app.anti_recommenders.anti_recommender_proxy import AntiRecommenderProxy
+from app.anti_recommenders.anti_recommender_generator import AntiRecommendationGenerator
 from app.models.record.record import Record
 from app.readers.all_source_reader import AllSourceReader
 
 
 class AntiRecommendationEngine:
     def __init__(self) -> None:
-        self.__record_store: tuple[dict[str, Record], ...] = self.load_records()
-        self.__anti_recommender_proxy: AntiRecommenderProxy = AntiRecommenderProxy()
+        self.__record_store: tuple[dict[str,
+                                        Record], ...] = self.load_records()
+        self.__anti_recommender_proxy: AntiRecommendationGenerator = AntiRecommendationGenerator()
         self.__stack: list[tuple[dict[str, Any], ...]] = []
         self.current_anti_recommendations: list[dict[str, Any]] = []
 
@@ -49,7 +50,8 @@ class AntiRecommendationEngine:
                 # if current_anti_recommendations is not empty, add its contents to the stack
                 # and replace it with the serialized main record and new anti-recommendations.
                 if self.current_anti_recommendations:
-                    self.__stack.append(tuple(self.current_anti_recommendations))
+                    self.__stack.append(
+                        tuple(self.current_anti_recommendations))
                     self.current_anti_recommendations = [
                         self.__record_store[0][record_key].model_dump(),
                         *anti_recommendations,
