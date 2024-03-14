@@ -4,7 +4,7 @@ from collections.abc import Collection
 from pathlib import Path
 from pytest_mock import MockFixture
 
-from app.models.settings.settings import config
+from app.models.settings import settings
 from app.readers.all_source_reader import AllSourceReader
 from app.readers.reader.wikipedia_reader import WikipediaReader
 from app.anti_recommendation_engine.anti_recommendation_engine import (
@@ -25,15 +25,14 @@ def all_source_reader() -> AllSourceReader:
 
 
 @pytest.fixture()
-def wikipedia_output_path() -> Path | None:
+def wikipedia_output_path() -> Path:
     """Return the Path of the Wikipedia output file."""
 
-    file_name = config[0].get("WIKIPEDIA_OUTPUT_FILE_NAME", None)
-
-    if file_name:
-        return Path(__file__).parent.parent / "data" / file_name
-
-    return None
+    return [
+        Path(__file__).parent.parent / "data" / file_name
+        for file_name in settings.output_file_names
+        if "wikipedia" in file_name.lower()
+    ][0]
 
 
 @pytest.fixture()

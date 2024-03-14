@@ -12,7 +12,7 @@ class ReadersInstantiator:
     def __init__(self):
         self.__record_types: frozenset[str] | None = self.__retrieve_record_types(
         )
-        self.__file_output_paths: list[Path] | None = self.__get_output_paths()
+        self.__file_output_paths: list[Path] = self.__get_output_paths()
 
     def __retrieve_record_types(self) -> frozenset[str] | None:
         """Retrieve a frozenset of record types from settings."""
@@ -21,7 +21,7 @@ class ReadersInstantiator:
             return settings.record_types
         return None
 
-    def __get_output_paths(self) -> list[Path] | None:
+    def __get_output_paths(self) -> list[Path]:
         """Retrieve output file names from settings and return a list of file output paths."""
 
         return [
