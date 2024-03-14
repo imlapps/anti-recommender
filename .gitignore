@@ -2,4 +2,4 @@
 elm-stuff
 elm.js
 nerdswipe_venv
-nerdswipe-backend/.env.secret
+backend/.env.secret
