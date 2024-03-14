@@ -5,7 +5,6 @@ from pytest_mock import MockFixture
 from collections.abc import Collection
 
 
-from app.models.settings import settings
 from app.readers.all_source_reader import AllSourceReader
 from app.readers.reader.wikipedia_reader import WikipediaReader
 from app.anti_recommendation_engine.anti_recommendation_engine import (
@@ -29,11 +28,7 @@ def all_source_reader() -> AllSourceReader:
 def wikipedia_output_path() -> Path:
     """Return the Path of the Wikipedia output file."""
 
-    return [
-        Path(__file__).parent.parent / "data" / file_name
-        for file_name in settings.output_file_names
-        if "wikipedia" in file_name.lower()
-    ][0]
+    return Path(__file__).parent.parent / "data" / "mini-wikipedia.output.txt"
 
 
 @pytest.fixture()
@@ -83,18 +78,6 @@ def anti_recommendations() -> tuple[AntiRecommendation, ...]:
         AntiRecommendation(
             title="Leonardo da Vinci",
             url="https://en.wikipedia.org/wiki/Leonardo_da_Vinci",
-        ),
-    )
-
-
-@pytest.fixture()
-def anti_recommendation() -> tuple[AntiRecommendation, ...]:
-    """Yield a single anti-recommendation."""
-
-    return (
-        AntiRecommendation(
-            title="Laplace's Demon",
-            url="https://en.wikipedia.org/wiki/Laplace's_demon",
         ),
     )
 
@@ -219,21 +202,24 @@ def records(serialized_records: tuple[Any, ...]) -> tuple[Record, ...]:
 
 
 @pytest.fixture()
-def record_store(records: tuple[Record, ...]) -> tuple[dict[str, Record], ...]:
-    """Return a tuple containing a dictionary of Records."""
+def record_store(records: tuple[Record, ...]) -> dict[str, Record]:
+    """Return a dictionary of Records."""
     _record_store = {}
 
     for record in records:
-        _record_store[record.abstract_info.title] = record
+        abstract_info = record.abstract_info
+        if abstract_info:
+            _record_store[abstract_info.title] = record
 
-    return (_record_store,)
+    return _record_store
 
 
 @pytest.fixture()
 def anti_recommendation_engine_with_mocked_load_records(
-    mocker: MockFixture, record_store: tuple[dict[str, Record], ...]
+    mocker: MockFixture, record_store: dict[str, Record]
 ) -> AntiRecommendationEngine:
     """Yield an AntiRecommendationEngine object and mock AntiRecommendationEngine.load_records()."""
+
     mocker.patch.object(
         AntiRecommendationEngine, "load_records", return_value=record_store
     )

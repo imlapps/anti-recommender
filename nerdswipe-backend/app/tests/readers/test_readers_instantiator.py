@@ -7,6 +7,6 @@ def test_provide_readers() -> None:
     depending on the record_types in the environment variables."""
 
     readers_instantiator = ReadersInstantiator()
-
-    if readers_instantiator.provide_readers():
-        assert isinstance(readers_instantiator.provide_readers()[0], WikipediaReader)
+    readers = readers_instantiator.provide_readers()
+    if readers:
+        assert isinstance(readers[0], WikipediaReader)

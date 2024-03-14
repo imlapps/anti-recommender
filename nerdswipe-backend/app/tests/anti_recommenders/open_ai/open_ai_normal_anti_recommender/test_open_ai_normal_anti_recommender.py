@@ -13,8 +13,9 @@ def test_create_query(
 ) -> None:
     """Test that OpenAiNormalAntiRecommender._create_query() returns an OpenAI query when passed a record key."""
 
-    assert record_key in open_ai_normal_anti_recommender._create_query(
-        record_key)
+    assert record_key in open_ai_normal_anti_recommender._create_query(  # noqa: SLF001
+        record_key
+    )
 
 
 def test_build_chain(
@@ -22,7 +23,7 @@ def test_build_chain(
 ) -> None:
     """Test that OpenAiNormalAntiRecommender._build_chain() initializes the OpenAiNormalAntiRecommender._open_ai_normal_chain."""
 
-    open_ai_normal_anti_recommender._build_chain()
+    open_ai_normal_anti_recommender._build_chain()  # noqa: SLF001
 
     assert isinstance(
         open_ai_normal_anti_recommender.open_ai_normal_chain, RunnableSequence
@@ -44,11 +45,11 @@ def test_generate_response(
         return_value=model_response,
     )
 
-    open_ai_normal_anti_recommender._build_chain()
+    open_ai_normal_anti_recommender._build_chain()  # noqa: SLF001
 
     assert (
-        open_ai_normal_anti_recommender._generate_response(
-            open_ai_normal_anti_recommender._create_query(record_key)
+        open_ai_normal_anti_recommender._generate_response(  # noqa: SLF001
+            open_ai_normal_anti_recommender._create_query(record_key)  # noqa: SLF001
         )
         == model_response
     )
@@ -64,7 +65,7 @@ def test_parse_response(
     anti_recommendation_records = []
 
     anti_recommendation_records = list(
-        open_ai_normal_anti_recommender._parse_response(model_response)
+        open_ai_normal_anti_recommender._parse_response(model_response)  # noqa: SLF001
     )
     assert tuple(anti_recommendation_records) == anti_recommendations
 
@@ -86,7 +87,6 @@ def test_generate_anti_recommendations(
     assert (
         anti_recommendations[0].title
         == next(
-            open_ai_normal_anti_recommender.generate_anti_recommendations(
-                record_key)
+            open_ai_normal_anti_recommender.generate_anti_recommendations(record_key)
         ).title
     )

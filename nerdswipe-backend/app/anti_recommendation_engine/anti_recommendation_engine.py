@@ -1,80 +1,74 @@
-from typing import Any
-
 from app.anti_recommenders.anti_recommender_generator import AntiRecommendationGenerator
 from app.models.record.record import Record
 from app.readers.all_source_reader import AllSourceReader
 
 
 class AntiRecommendationEngine:
-    def __init__(self) -> None:
-        self.__record_store: tuple[dict[str,
-                                        Record], ...] = self.load_records()
-        self.__anti_recommender_proxy: AntiRecommendationGenerator = AntiRecommendationGenerator()
-        self.__stack: list[tuple[dict[str, Any], ...]] = []
-        self.current_anti_recommendations: list[dict[str, Any]] = []
+    """
+    The main AntiRecommendationEngine for the NerdSwipe backend.
+    It retrieves AntiRecommendations from the AntiRecommendationGenerator and possesses methods
+    which return tuples of Records that have the same titles as the generated AntiRecommendations or previous AntiRecommendations.
+    """
 
-    def load_records(self) -> tuple[dict[str, Record], ...]:
+    def __init__(self) -> None:
+        self.__record_store: dict[str, Record] = self.load_records()
+        self.__anti_recommendation_generator: AntiRecommendationGenerator = (
+            AntiRecommendationGenerator()
+        )
+        self.__stack: list[list[Record]] = []
+        self.__current_anti_recommendation_records: list[Record] = []
+
+    def load_records(self) -> dict[str, Record]:
         """Load records from AllSourceReader and store them in __record_store."""
 
         records = {}
         all_source_reader = AllSourceReader()
 
         for record in all_source_reader.read():
-            records[record.abstract_info.title] = record
+            abstract_info = record.abstract_info
+            if abstract_info:
+                records[abstract_info.title] = record
 
-        return (records,)
+        return records
 
-    def generate_anti_recommendations(
+    def generate_anti_recommendation_records(
         self, record_key: str | None = None
-    ) -> tuple[dict[str, dict[str, str]], ...]:
-        """Generate anti-recommendations of a record."""
+    ) -> tuple[Record, ...]:
+        """Return a tuple of Records that have the same title as the generated AntiRecommendations."""
+        records_of_anti_recommendations: list[Record] = []
 
-        # Ensure that record_key is initialized
-        if not record_key and self.current_anti_recommendations:
-            record_key = self.current_anti_recommendations[0]["abstract_info"]["title"]
-        elif not record_key:
-            record_key = next(iter(self.__record_store[0].keys()))
+        # Use key of first Record in __record_store as the record_key
+        if not record_key:
+            record_key = next(iter(self.__record_store.keys()))
 
-        anti_recommendations: list[dict[str, dict[str, str]]] = []
+        # Retrieve Records that have the same title of the generated AntiRecommendations
+        records_of_anti_recommendations = [
+            self.__record_store[anti_recommendation.title]
+            for anti_recommendation in self.__anti_recommendation_generator.generate_anti_recommendations(
+                record_key
+            )
+            if anti_recommendation.title in self.__record_store
+        ]
 
-        if record_key:
-            anti_recommendations = [
-                self.__record_store[0][anti_recommendation.title].model_dump()
-                for anti_recommendation in self.__anti_recommender_proxy.generate_anti_recommendations(
-                    record_key
-                )
-                if anti_recommendation.title in self.__record_store[0]
+        if records_of_anti_recommendations:
+
+            if self.__current_anti_recommendation_records:
+
+                self.__stack.append(self.__current_anti_recommendation_records)
+
+            self.__current_anti_recommendation_records = [
+                self.__record_store[record_key],
+                *records_of_anti_recommendations,
             ]
 
-            if anti_recommendations and record_key in self.__record_store[0]:
-                # if current_anti_recommendations is not empty, add its contents to the stack
-                # and replace it with the serialized main record and new anti-recommendations.
-                if self.current_anti_recommendations:
-                    self.__stack.append(
-                        tuple(self.current_anti_recommendations))
-                    self.current_anti_recommendations = [
-                        self.__record_store[0][record_key].model_dump(),
-                        *anti_recommendations,
-                    ]
-                else:
-                    # if current_anti_recommendations is empty, set its value to the serialized main record and new anti-recommendations.
-                    # An empty current_anti_recommendation implies that this is the first batch of anti-recommendations generated, and it
-                    # serves to seed the /root endpoint on start-up.
-                    self.current_anti_recommendations.extend(
-                        [
-                            self.__record_store[0][record_key].model_dump(),
-                            *anti_recommendations,
-                        ]
-                    )
+        return tuple(records_of_anti_recommendations)
 
-        return tuple(anti_recommendations)
-
-    def get_previous_anti_recommendations(
+    def get_previous_anti_recommendation_records(
         self,
-    ) -> tuple[dict[Any, Any], ...]:
-        """Return a tuple that contains previous anti-recommendations."""
+    ) -> tuple[Record, ...] | None:
+        """Return a tuple of Records that have the same titles as previous AntiRecommendations"""
 
         if self.__stack:
-            return self.__stack.pop()
+            return tuple(self.__stack.pop())
 
-        return ({},)
+        return None

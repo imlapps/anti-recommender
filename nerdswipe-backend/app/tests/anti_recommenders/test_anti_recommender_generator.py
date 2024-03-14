@@ -28,7 +28,6 @@ def test_generate_anti_recommendations(
         anti_recommendation_records = []
 
         anti_recommendation_records = list(
-            anti_recommender_generator.generate_anti_recommendations(
-                record_key)
+            anti_recommender_generator.generate_anti_recommendations(record_key)
         )
         assert tuple(anti_recommendation_records) == anti_recommendations

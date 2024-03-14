@@ -1,4 +1,3 @@
-
 from collections.abc import Generator
 from app.models.settings.settings import settings
 
@@ -18,7 +17,7 @@ class AntiRecommendationGenerator(AntiRecommender):
     """
 
     def __init__(self) -> None:
-        self.__type: str | None = settings.anti_recommender_type
+        self.__type: str = settings.anti_recommender_type
         self.__anti_recommender: AntiRecommender | None = None
 
     def generate_anti_recommendations(
@@ -26,7 +25,8 @@ class AntiRecommendationGenerator(AntiRecommender):
     ) -> Generator[AntiRecommendation, None, None]:
         """Yield anti-recommendations of a given record key."""
 
-        if self.__type.lower() == "openai":
-            if settings.openai_api_key:
-                self.__anti_recommender = OpenAiNormalAntiRecommender()
+        if self.__type.lower() == "openai" and settings.openai_api_key:
+            self.__anti_recommender = OpenAiNormalAntiRecommender()
+
+        if self.__anti_recommender:
             yield from self.__anti_recommender.generate_anti_recommendations(record_key)

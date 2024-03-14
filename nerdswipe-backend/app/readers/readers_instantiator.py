@@ -10,9 +10,8 @@ class ReadersInstantiator:
     """
 
     def __init__(self) -> None:
-        self.__record_types: frozenset[str] | None = self.__get_record_types(
-        )
-        self.__file_output_paths: list[Path] = self.__get_output_paths()
+        self.__record_types: frozenset[str] | None = self.__get_record_types()
+        self.__file_output_paths: list[Path] | None = self.__get_output_paths()
 
     def __get_record_types(self) -> frozenset[str] | None:
         """Retrieve a frozenset of record types from settings."""
@@ -21,22 +20,26 @@ class ReadersInstantiator:
             return settings.record_types
         return None
 
-    def __get_output_paths(self) -> list[Path]:
+    def __get_output_paths(self) -> list[Path] | None:
         """Retrieve output file names from settings and return a list of file output paths."""
 
-        return [
-            Path(__file__).parent.parent / "data" / file_name
-            for file_name in settings.output_file_names
-        ]
+        if settings.output_file_names:
+            return [
+                Path(__file__).parent.parent / "data" / file_name
+                for file_name in settings.output_file_names
+            ]
+
+        return None
 
     def provide_readers(self) -> tuple[Reader, ...] | None:
         """Return a tuple of Readers depending on the record type obtained from settings.
         Readers are instantiated with Paths that contain the corresponding record types in the Path names.
         """
-        if self.__record_types:
+        if self.__record_types and self.__file_output_paths:
             readers = []
             for record_type in self.__record_types:
                 if record_type.lower() == "wikipedia":
+
                     readers.extend(
                         [
                             WikipediaReader(file_output_path)
