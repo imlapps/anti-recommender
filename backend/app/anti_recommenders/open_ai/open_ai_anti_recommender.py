@@ -1,6 +1,6 @@
 from collections.abc import Generator
 from abc import abstractmethod
-
+from typing import Callable
 
 from app.anti_recommenders.anti_recommender import AntiRecommender
 from app.models.anti_recommendation.anti_recommendation import AntiRecommendation
@@ -32,19 +32,23 @@ class OpenAiAntiRecommender(AntiRecommender):
                  Give each answer on a new line, and in the format: Number - Title - URL."
         )
 
-    @abstractmethod
-    def _build_chain(self) -> None:
-        pass
-
-    @abstractmethod
-    def _generate_response(self, query: str) -> str | None:
-        pass
-
-    @abstractmethod
-    def _parse_response(
-        self, response: str
+    def _generate_anti_recommendendations(
+        self,
+        record_key: str,
+        callable_to_build_chain: Callable,
+        callable_to_create_query: Callable,
+        callable_to_generate_llm_response: Callable,
+        callable_to_parse_llm_response: Callable,
     ) -> Generator[AntiRecommendation, None, None]:
-        pass
+        """Create a generalized workflow that yields AntiRecommendations."""
+
+        open_ai_chain = callable_to_build_chain()
+        open_ai_query = callable_to_create_query(record_key)
+        generate_open_ai_llm_response = callable_to_generate_llm_response(
+            open_ai_chain, open_ai_query
+        )
+
+        yield from callable_to_parse_llm_response(generate_open_ai_llm_response)
 
     @abstractmethod
     def generate_anti_recommendations(
