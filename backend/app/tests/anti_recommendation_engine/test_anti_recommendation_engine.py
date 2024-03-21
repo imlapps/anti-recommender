@@ -1,11 +1,16 @@
 from app.anti_recommendation_engine.anti_recommendation_engine import (
     AntiRecommendationEngine,
 )
-from app.models.anti_recommendation.anti_recommendation import AntiRecommendation
-from app.models.record.record import Record
+from app.anti_recommenders.open_ai.open_ai_normal_anti_recommender import (
+    OpenAiNormalAntiRecommender,
+)
+from app.models.anti_recommendation import AntiRecommendation
+from app.models.record import Record
+
+import pytest
 from pytest_mock import MockFixture
 
-from app.anti_recommenders.anti_recommender_generator import AntiRecommendationGenerator
+
 from app.readers.all_source_reader import AllSourceReader
 
 
@@ -13,46 +18,76 @@ def test_load_records(
     mocker: MockFixture,
     anti_recommendation_engine: AntiRecommendationEngine,
     records: tuple[Record, ...],
-    record_store: tuple[dict[str, Record], ...],
+    records_by_key: tuple[dict[str, Record], ...],
 ) -> None:
     """Test that AntiRecommendationEngine.load_records() successfully reads in records for AntiRecommendationEngine's record store."""
 
     mocker.patch.object(AllSourceReader, "read", return_value=records)
 
-    assert anti_recommendation_engine.load_records() == record_store
+    assert anti_recommendation_engine.load_records() == records_by_key
 
 
-def test_generate_anti_recommendation_records_with_no_record_key_passed(
+@pytest.mark.parametrize(
+    "anti_recommender_type, AntiRecommender", [
+        ("open_ai", OpenAiNormalAntiRecommender)]
+)
+def test_generate_anti_recommendations(
+    anti_recommender_type: str,
+    AntiRecommender: str,
+    mocker: MockFixture,
+    model_response: str,
+    record_key: str,
+    anti_recommendation_engine: AntiRecommendationEngine,
+    anti_recommendations: tuple[AntiRecommendation, ...],
+) -> None:
+    """Test that AntiRecommendationEngine.generate_anti_recommendations yields AntiRecommendations of a given record key."""
+    if anti_recommender_type == "open_ai":
+        mocker.patch.object(
+            AntiRecommender,
+            "_generate_llm_response",
+            return_value=model_response,
+        )
+
+    assert (
+        next(anti_recommendation_engine.generate_anti_recommendations(record_key)).title
+        == anti_recommendations[0].title
+    )
+
+
+def test_generate_initial_anti_recommendation_records(
     mocker: MockFixture,
     anti_recommendation_engine_with_mocked_load_records: AntiRecommendationEngine,
     records: tuple[Record, ...],
     anti_recommendations: tuple[AntiRecommendation, ...],
 ) -> None:
-    """Test that AntiRecommendationEngine.generate_anti_recommendations() returns a tuple containing records of anti-recommendations."""
+    """Test that AntiRecommendationEngine.generate_initial_anti_recommendation_records() returns a tuple of Records
+    with keys that match the AntiRecommendations of the first Record in records."""
 
     mocker.patch.object(
-        AntiRecommendationGenerator,
+        AntiRecommendationEngine,
         "generate_anti_recommendations",
         return_value=anti_recommendations,
     )
 
     assert (
-        anti_recommendation_engine_with_mocked_load_records.generate_anti_recommendation_records()
+        anti_recommendation_engine_with_mocked_load_records.generate_initial_anti_recommendation_records()
         == records[1:]
     )
 
 
-def test_generate_anti_recommendation_records_with_record_key_passed(
+def test_generate_anti_recommendation_records(
     mocker: MockFixture,
-    record_key: str,
     anti_recommendation_engine_with_mocked_load_records: AntiRecommendationEngine,
     records: tuple[Record, ...],
+    record_key: str,
     anti_recommendations: tuple[AntiRecommendation, ...],
 ) -> None:
-    """Test that AntiRecommendationEngine.generate_anti_recommendations() returns a tuple containing records of anti-recommendations."""
+    """Test that AntiRecommendationEngine.generate_anti_recommendation_records() returns a tuple of Records
+    with keys that match the AntiRecommendations of record_key.
+    """
 
     mocker.patch.object(
-        AntiRecommendationGenerator,
+        AntiRecommendationEngine,
         "generate_anti_recommendations",
         return_value=anti_recommendations,
     )
@@ -75,12 +110,12 @@ def test_get_previous_anti_recommendation(
     """Test that AntiRecommendationEngine.get_previous_anti_recommendation() returns a tuple containing records of previous anti-recommendations."""
 
     mocker.patch.object(
-        AntiRecommendationGenerator,
+        AntiRecommendationEngine,
         "generate_anti_recommendations",
         return_value=anti_recommendations,
     )
 
-    anti_recommendation_engine_with_mocked_load_records.generate_anti_recommendation_records()
+    anti_recommendation_engine_with_mocked_load_records.generate_initial_anti_recommendation_records()
     anti_recommendation_engine_with_mocked_load_records.generate_anti_recommendation_records(
         record_key
     )

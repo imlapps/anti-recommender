@@ -12,6 +12,7 @@ from app.anti_recommendation_engine.anti_recommendation_engine import (
 )
 from app.models.anti_recommendation import AntiRecommendation
 from app.models.record import Record
+from app.models.wikipedia_article.wikipedia_article import WikipediaArticle
 from app.anti_recommenders.open_ai.open_ai_normal_anti_recommender import (
     OpenAiNormalAntiRecommender,
 )
@@ -190,30 +191,28 @@ def serialized_records() -> tuple[dict[str, Collection[Collection[str]]], ...]:
 @pytest.fixture()
 def records(serialized_records: tuple[Any, ...]) -> tuple[Record, ...]:
     """Return a tuple of Records."""
-    return tuple(Record(**record) for record in serialized_records)
+    return tuple(WikipediaArticle(**record["abstract_info"], **record) for record in serialized_records)
 
 
 @pytest.fixture()
-def record_store(records: tuple[Record, ...]) -> dict[str, Record]:
+def records_by_key(records: tuple[Record, ...]) -> dict[str, Record]:
     """Return a dictionary of Records."""
     _record_store = {}
 
     for record in records:
-        abstract_info = record.abstract_info
-        if abstract_info:
-            _record_store[abstract_info.title] = record
+        _record_store[record.title] = record
 
     return _record_store
 
 
 @pytest.fixture()
 def anti_recommendation_engine_with_mocked_load_records(
-    mocker: MockFixture, record_store: dict[str, Record]
+    mocker: MockFixture, records_by_key: dict[str, Record]
 ) -> AntiRecommendationEngine:
     """Yield an AntiRecommendationEngine object and mock AntiRecommendationEngine.load_records()."""
 
     mocker.patch.object(
-        AntiRecommendationEngine, "load_records", return_value=record_store
+        AntiRecommendationEngine, "load_records", return_value=records_by_key
     )
 
     return AntiRecommendationEngine()

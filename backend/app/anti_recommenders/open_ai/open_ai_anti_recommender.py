@@ -3,7 +3,7 @@ from abc import abstractmethod
 from typing import Callable
 
 from app.anti_recommenders.anti_recommender import AntiRecommender
-from app.models.anti_recommendation.anti_recommendation import AntiRecommendation
+from app.models.anti_recommendation import AntiRecommendation
 
 
 class OpenAiAntiRecommender(AntiRecommender):

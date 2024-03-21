@@ -1,11 +1,11 @@
 from collections.abc import Generator
 
 
-from app.models.record.record import Record
+from app.models.record import Record
 from app.readers.reader.reader import Reader
 
 from app.readers.create_readers import create_readers
-from app.models.settings.settings import settings
+from app.models.settings import settings
 
 
 class AllSourceReader(Reader):
@@ -21,4 +21,5 @@ class AllSourceReader(Reader):
     def read(self) -> Generator[Record, None, None]:
         """Read in output data and yield Records."""
         for reader in self.__readers:
-            yield from reader.read()
+            if reader:
+                yield from reader.read()

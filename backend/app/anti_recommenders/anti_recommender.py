@@ -1,7 +1,7 @@
 from abc import ABC, abstractmethod
 from collections.abc import Generator
 
-from app.models.anti_recommendation.anti_recommendation import AntiRecommendation
+from app.models.anti_recommendation import AntiRecommendation
 
 
 class AntiRecommender(ABC):

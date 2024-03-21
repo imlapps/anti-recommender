@@ -6,7 +6,7 @@ from langchain.schema import StrOutputParser
 
 from collections.abc import Generator
 from app.anti_recommenders.open_ai.open_ai_anti_recommender import OpenAiAntiRecommender
-from app.models.anti_recommendation.anti_recommendation import AntiRecommendation
+from app.models.anti_recommendation import AntiRecommendation
 
 
 class OpenAiNormalAntiRecommender(OpenAiAntiRecommender):

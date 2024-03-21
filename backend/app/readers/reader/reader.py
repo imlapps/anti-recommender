@@ -1,7 +1,7 @@
 from collections.abc import Generator
 from abc import ABC, abstractmethod
 
-from app.models.record.record import Record
+from app.models.record import Record
 
 
 class Reader(ABC):
