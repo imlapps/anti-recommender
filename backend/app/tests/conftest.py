@@ -210,11 +210,11 @@ def records_by_key(records: tuple[Record, ...]) -> dict[str, Record]:
 
 @pytest.fixture(scope="session")
 def anti_recommendation_engine_with_mocked_load_records(
-    mocker: MockFixture, records_by_key: dict[str, Record]
+    session_mocker: MockFixture, records_by_key: dict[str, Record]
 ) -> AntiRecommendationEngine:
     """Yield an AntiRecommendationEngine object and mock AntiRecommendationEngine.load_records()."""
 
-    mocker.patch.object(
+    session_mocker.patch.object(
         AntiRecommendationEngine, "load_records", return_value=records_by_key
     )
 

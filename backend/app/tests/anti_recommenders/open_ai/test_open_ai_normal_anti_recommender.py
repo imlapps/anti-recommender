@@ -29,7 +29,7 @@ def test_create_query(
 
 
 def test_generate_llm_response(
-    mocker: MockFixture,
+    session_mocker: MockFixture,
     open_ai_normal_anti_recommender: OpenAiNormalAntiRecommender,
     model_response: str,
     record_key: str,
@@ -37,7 +37,7 @@ def test_generate_llm_response(
     """Test that OpenAiNormalAntiRecommender._generate_llm_response() returns a response from an OpenAI large language model."""
 
     # Mock RunnableSerializable's invoke method and return an LLM response
-    mocker.patch.object(
+    session_mocker.patch.object(
         RunnableSequence,
         "invoke",
         return_value=model_response,
@@ -70,7 +70,7 @@ def test_parse_llm_response(
 
 
 def test_generate_anti_recommendations(
-    mocker: MockFixture,
+    session_mocker: MockFixture,
     open_ai_normal_anti_recommender: OpenAiNormalAntiRecommender,
     record_key: str,
     model_response: str,
@@ -78,7 +78,7 @@ def test_generate_anti_recommendations(
 ) -> None:
     """Test that OpenAiNormalAntiRecommender.generate_anti_recommendations() yields AntiRecommendations of a given record key."""
 
-    mocker.patch.object(
+    session_mocker.patch.object(
         OpenAiNormalAntiRecommender,
         "_generate_llm_response",
         return_value=model_response,

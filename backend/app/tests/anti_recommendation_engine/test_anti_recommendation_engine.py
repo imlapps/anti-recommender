@@ -13,14 +13,14 @@ from app.readers.all_source_reader import AllSourceReader
 
 
 def test_load_records(
-    mocker: MockFixture,
+    session_mocker: MockFixture,
     anti_recommendation_engine: AntiRecommendationEngine,
     records: tuple[Record, ...],
     records_by_key: tuple[dict[str, Record], ...],
 ) -> None:
     """Test that AntiRecommendationEngine.load_records() successfully reads in Records for AntiRecommendationEngine's records_by_key."""
 
-    mocker.patch.object(AllSourceReader, "read", return_value=records)
+    session_mocker.patch.object(AllSourceReader, "read", return_value=records)
 
     assert anti_recommendation_engine.load_records() == records_by_key
 
@@ -31,7 +31,7 @@ def test_load_records(
 )
 def test_generate_anti_recommendations(  # noqa: PLR0913
     record_key: str,
-    mocker: MockFixture,
+    session_mocker: MockFixture,
     model_response: str,
     anti_recommender: str,
     anti_recommender_type: str,
@@ -40,7 +40,7 @@ def test_generate_anti_recommendations(  # noqa: PLR0913
 ) -> None:
     """Test that AntiRecommendationEngine.generate_anti_recommendations() yields AntiRecommendations of a given record key."""
     if anti_recommender_type == "open_ai":
-        mocker.patch.object(
+        session_mocker.patch.object(
             anti_recommender,
             "_generate_llm_response",
             return_value=model_response,
@@ -53,7 +53,7 @@ def test_generate_anti_recommendations(  # noqa: PLR0913
 
 
 def test_get_initial_records_of_anti_recommendations(
-    mocker: MockFixture,
+    session_mocker: MockFixture,
     anti_recommendation_engine_with_mocked_load_records: AntiRecommendationEngine,
     records: tuple[Record, ...],
     anti_recommendations: tuple[AntiRecommendation, ...],
@@ -61,7 +61,7 @@ def test_get_initial_records_of_anti_recommendations(
     """Test that AntiRecommendationEngine.get_initial_records_of_anti_recommendations() returns a tuple of Records
     with keys that match the AntiRecommendations of the first Record in records."""
 
-    mocker.patch.object(
+    session_mocker.patch.object(
         AntiRecommendationEngine,
         "generate_anti_recommendations",
         return_value=anti_recommendations,
@@ -74,7 +74,7 @@ def test_get_initial_records_of_anti_recommendations(
 
 
 def test_get_records_of_anti_recommendations(
-    mocker: MockFixture,
+    session_mocker: MockFixture,
     anti_recommendation_engine_with_mocked_load_records: AntiRecommendationEngine,
     records: tuple[Record, ...],
     record_key: str,
@@ -84,7 +84,7 @@ def test_get_records_of_anti_recommendations(
     with keys that match the AntiRecommendations of record_key.
     """
 
-    mocker.patch.object(
+    session_mocker.patch.object(
         AntiRecommendationEngine,
         "generate_anti_recommendations",
         return_value=anti_recommendations,
@@ -99,7 +99,7 @@ def test_get_records_of_anti_recommendations(
 
 
 def test_get_previous_records_of_anti_recommendations(
-    mocker: MockFixture,
+    session_mocker: MockFixture,
     anti_recommendation_engine_with_mocked_load_records: AntiRecommendationEngine,
     records: tuple[Record, ...],
     record_key: str,
@@ -107,7 +107,7 @@ def test_get_previous_records_of_anti_recommendations(
 ) -> None:
     """Test that AntiRecommendationEngine.get_previous_records_of_anti_recommendations() returns a tuple containing Records of previous AntiRecommendations."""
 
-    mocker.patch.object(
+    session_mocker.patch.object(
         AntiRecommendationEngine,
         "generate_anti_recommendations",
         return_value=anti_recommendations,
@@ -128,9 +128,9 @@ def test_get_previous_records_of_anti_recommendations(
 def test_get_previous_records_of_anti_recommendations_with_empty_stack(
     anti_recommendation_engine: AntiRecommendationEngine,
 ) -> None:
-    """Test that AntiRecommendationEngine.get_previous_records_of_anti_recommendations() returns None when its stack is empty."""
+    """Test that AntiRecommendationEngine.get_previous_records_of_anti_recommendations() returns a tuple of None when its stack is empty."""
 
     assert (
-        anti_recommendation_engine.get_previous_records_of_anti_recommendations()
+        anti_recommendation_engine.get_previous_records_of_anti_recommendations()[0]
         is None
     )

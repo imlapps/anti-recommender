@@ -31,7 +31,7 @@ class WikipediaReader(Reader):
                     json_obj = json.loads(bytes(json_str, encoding))
                     break
 
-                wikipedia_record = WikipediaArticle(
+                wikipedia_article = WikipediaArticle(
                     **(json_obj["record"]["abstract_info"]), **(json_obj["record"])
                 )
-                yield wikipedia_record
+                yield wikipedia_article
