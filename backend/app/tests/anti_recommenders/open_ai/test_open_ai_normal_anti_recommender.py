@@ -13,10 +13,8 @@ def test_build_chain(
 ) -> None:
     """Test that OpenAiNormalAntiRecommender._build_chain() returns an OpenAI chain of type RunnableSerializable."""
 
-    # noqa: SLF001
-
     assert isinstance(
-        open_ai_normal_anti_recommender._build_chain(), RunnableSerializable
+        open_ai_normal_anti_recommender._build_chain(), RunnableSerializable  # noqa: SLF001
     )
 
 

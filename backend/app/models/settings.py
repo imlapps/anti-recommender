@@ -18,7 +18,7 @@ class RecordType(str, Enum):
     wikipedia = "Wikipedia"
 
 
-class __Settings(BaseSettings):  # noqa: N801
+class Settings(BaseSettings):
     """A Pydantic BaseSetting to hold environment variables."""
 
     record_types: frozenset[RecordType] | None = None
@@ -47,4 +47,4 @@ class __Settings(BaseSettings):  # noqa: N801
         ]
 
 
-settings = __Settings(output_file_paths=None)
+settings = Settings(output_file_paths=None)

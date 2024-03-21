@@ -39,7 +39,7 @@ class AntiRecommendationEngine(AntiRecommender):
 
         return records
 
-    def generate_initial_anti_recommendation_records(self):
+    def generate_initial_anti_recommendation_records(self) -> tuple[Record, ...]:
         """Return a tuple of Records that have the same key as AntiRecommendations of the first key in __records_by_key."""
 
         record_key = next(iter(self.__records_by_key.keys()))
@@ -81,7 +81,7 @@ class AntiRecommendationEngine(AntiRecommender):
         if self.__stack:
             return tuple(self.__stack.pop())
 
-        return tuple(None,)
+        return (None,)
 
     def generate_anti_recommendations(self, record_key: str) -> Generator[AntiRecommendation, None, None]:
         """Yield AntiRecommendations of record_key."""

@@ -28,22 +28,22 @@ def test_load_records(
 
 
 @pytest.mark.parametrize(
-    "anti_recommender_type, AntiRecommender", [
+    ("anti_recommender_type", "anti_recommender"), [
         ("open_ai", OpenAiNormalAntiRecommender)]
 )
-def test_generate_anti_recommendations(
-    anti_recommender_type: str,
-    AntiRecommender: str,
+def test_generate_anti_recommendations(  # noqa: PLR0913
+    record_key: str,
     mocker: MockFixture,
     model_response: str,
-    record_key: str,
+    anti_recommender: str,
+    anti_recommender_type: str,
     anti_recommendation_engine: AntiRecommendationEngine,
     anti_recommendations: tuple[AntiRecommendation, ...],
 ) -> None:
     """Test that AntiRecommendationEngine.generate_anti_recommendations yields AntiRecommendations of a given record key."""
     if anti_recommender_type == "open_ai":
         mocker.patch.object(
-            AntiRecommender,
+            anti_recommender,
             "_generate_llm_response",
             return_value=model_response,
         )

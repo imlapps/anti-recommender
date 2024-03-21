@@ -1,4 +1,4 @@
-from pydantic import BaseModel, ConfigDict, ValidationInfo, field_validator
+from pydantic import BaseModel, ConfigDict
 
 
 class Record(BaseModel):

@@ -1,6 +1,6 @@
 from collections.abc import Generator
 from abc import abstractmethod
-from typing import Callable
+from collections.abc import Callable
 
 from app.anti_recommenders.anti_recommender import AntiRecommender
 from app.models.anti_recommendation import AntiRecommendation
@@ -32,7 +32,7 @@ class OpenAiAntiRecommender(AntiRecommender):
                  Give each answer on a new line, and in the format: Number - Title - URL."
         )
 
-    def _generate_anti_recommendendations(
+    def _generate_anti_recommendendations(  # noqa: PLR0913
         self,
         record_key: str,
         callable_to_build_chain: Callable,
