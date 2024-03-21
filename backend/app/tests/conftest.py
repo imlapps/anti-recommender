@@ -12,10 +12,9 @@ from app.anti_recommendation_engine.anti_recommendation_engine import (
 )
 from app.models.anti_recommendation.anti_recommendation import AntiRecommendation
 from app.models.record.record import Record
-from app.anti_recommenders.open_ai.open_ai_normal_anti_recommender.open_ai_normal_anti_recommender import (
+from app.anti_recommenders.open_ai.open_ai_normal_anti_recommender import (
     OpenAiNormalAntiRecommender,
 )
-from app.anti_recommenders.anti_recommender_generator import AntiRecommendationGenerator
 
 
 @pytest.fixture()
@@ -36,13 +35,6 @@ def wikipedia_reader(wikipedia_output_path: Path) -> WikipediaReader:
     """Yield a WikipediaReader object."""
 
     return WikipediaReader(file_path=wikipedia_output_path)
-
-
-@pytest.fixture()
-def anti_recommender_generator() -> AntiRecommendationGenerator:
-    """Yield an AntiRecommenderProxy object."""
-
-    return AntiRecommendationGenerator()
 
 
 @pytest.fixture()

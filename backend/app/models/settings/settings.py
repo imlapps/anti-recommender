@@ -42,7 +42,7 @@ class __Settings(BaseSettings):  # noqa: N801
     def convert_to_list_of_file_paths(cls, output_file_names: list[str]) -> list[Path]:
         """Convert the list of file names in the environment variables into a list of Path objects."""
         return [
-            Path(__file__).parent.parent / "data" / file_name
+            Path(__file__).parent.parent.parent / "data" / file_name
             for file_name in output_file_names
         ]
 

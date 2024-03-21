@@ -1,7 +1,7 @@
 from app.models.anti_recommendation.anti_recommendation import AntiRecommendation
 from pytest_mock import MockFixture
 
-from langchain.schema.runnable import Runnable, RunnableSerializable
+from langchain.schema.runnable import RunnableSequence, RunnableSerializable
 
 from app.anti_recommenders.open_ai.open_ai_normal_anti_recommender import (
     OpenAiNormalAntiRecommender,
@@ -40,7 +40,7 @@ def test_generate_llm_response(
 
     # Mock RunnableSerializable's invoke method and return an LLM response
     mocker.patch.object(
-        Runnable,
+        RunnableSequence,
         "invoke",
         return_value=model_response,
     )

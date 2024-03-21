@@ -4,7 +4,8 @@ from collections.abc import Generator
 from app.models.record.record import Record
 from app.readers.reader.reader import Reader
 
-from app.readers.readers_instantiator import ReadersInstantiator
+from app.readers.create_readers import create_readers
+from app.models.settings.settings import settings
 
 
 class AllSourceReader(Reader):
@@ -14,17 +15,10 @@ class AllSourceReader(Reader):
     """
 
     def __init__(self) -> None:
-        self.__readers: tuple[Reader, ...] | None = self.__get_readers()
-
-    def __get_readers(self) -> tuple[Reader, ...] | None:
-        """Get a tuple of Readers from ReadersInstantiator"""
-
-        readers_instantiator = ReadersInstantiator()
-
-        return readers_instantiator.provide_readers()
+        self.__readers: tuple[Reader | None, ...] = create_readers(
+            settings=settings)
 
     def read(self) -> Generator[Record, None, None]:
         """Read in output data and yield Records."""
-        if self.__readers:
-            for reader in self.__readers:
-                yield from reader.read()
+        for reader in self.__readers:
+            yield from reader.read()
