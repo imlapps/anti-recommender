@@ -12,13 +12,18 @@ def create_readers(settings: Settings) -> tuple[Reader | None, ...]:
     readers = []
     if settings.record_types:
         for record_type in settings.record_types:
-            if record_type and record_type.lower() == "wikipedia" and settings.output_file_paths:
+            if (
+                record_type
+                and record_type.lower() == "wikipedia"
+                and settings.output_file_paths
+            ):
 
                 readers.extend(
                     [
                         WikipediaReader(output_file_path)
                         for output_file_path in settings.output_file_paths
-                        if record_type.lower() in str(output_file_path) and output_file_path
+                        if record_type.lower() in str(output_file_path)
+                        and output_file_path
                     ]
                 )
 
