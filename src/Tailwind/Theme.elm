@@ -248,9 +248,11 @@ module Tailwind.Theme exposing
     , rose_900
     , rose_950
     , custom_gray
+    , custom_gray_2
     , custom_black_1
     , custom_black_2
     , custom_pink
+    , custom_blue
     , Opacity
     , opacity0
     , opacity5
@@ -530,9 +532,11 @@ If you want to extend the set of available colors or opacities, take a look [con
 @docs rose_900
 @docs rose_950
 @docs custom_gray
+@docs custom_gray_2
 @docs custom_black_1
 @docs custom_black_2
 @docs custom_pink
+@docs custom_blue
 
 
 ### Opacities
@@ -1827,7 +1831,12 @@ rose_950 =
 
 custom_gray : Color
 custom_gray =
-    Tw.Color "rgb" "34" "34" "34" Tw.ViaVariable
+    Tw.Color "rgb" "208" "211" "212" Tw.ViaVariable
+
+
+custom_gray_2 : Color
+custom_gray_2 =
+    Tw.Color "rgb" "136" "136" "136" Tw.ViaVariable
 
 
 custom_black_1 : Color
@@ -1843,6 +1852,11 @@ custom_black_2 =
 custom_pink : Color
 custom_pink =
     Tw.Color "rgb" "255" "108" "201" Tw.ViaVariable
+
+
+custom_blue : Color
+custom_blue =
+    Tw.Color "rgb" "65" "182" "230" Tw.ViaVariable
 
 
 opacity0 : Opacity
