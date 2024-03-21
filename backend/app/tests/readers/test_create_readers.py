@@ -1,4 +1,4 @@
-from app.models.settings.settings import settings
+from app.models.settings import settings
 from app.readers.create_readers import create_readers
 from app.readers.reader.wikipedia_reader import WikipediaReader
 

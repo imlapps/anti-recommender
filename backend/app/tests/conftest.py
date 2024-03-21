@@ -10,8 +10,8 @@ from app.readers.reader.wikipedia_reader import WikipediaReader
 from app.anti_recommendation_engine.anti_recommendation_engine import (
     AntiRecommendationEngine,
 )
-from app.models.anti_recommendation.anti_recommendation import AntiRecommendation
-from app.models.record.record import Record
+from app.models.anti_recommendation import AntiRecommendation
+from app.models.record import Record
 from app.anti_recommenders.open_ai.open_ai_normal_anti_recommender import (
     OpenAiNormalAntiRecommender,
 )

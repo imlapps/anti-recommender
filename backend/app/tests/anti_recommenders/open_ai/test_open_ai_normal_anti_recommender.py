@@ -1,4 +1,4 @@
-from app.models.anti_recommendation.anti_recommendation import AntiRecommendation
+from app.models.anti_recommendation import AntiRecommendation
 from pytest_mock import MockFixture
 
 from langchain.schema.runnable import RunnableSequence, RunnableSerializable
