@@ -1,38 +1,27 @@
-from enum import Enum
 from pathlib import Path
 
 from pydantic import Field, field_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
-config_parent_path = Path(__file__).parent.parent.parent
+from app.models.settings_types import AntiRecommenderType, RecordType
 
-
-class AntiRecommenderType(str, Enum):
-    """An enum of anti-recommender types."""
-
-    open_ai = "OpenAI"
-
-
-class RecordType(str, Enum):
-    """An enum of record types."""
-
-    wikipedia = "Wikipedia"
+CONFIG_FILE_PATH = Path(__file__).parent.parent.parent
 
 
 class Settings(BaseSettings):
     """A Pydantic BaseSetting to hold environment variables."""
 
-    record_types: frozenset[RecordType] | None = None
-    output_file_paths: frozenset[Path] | None = Field(
-        validation_alias="output_file_names"
+    record_types: frozenset[RecordType | None] = frozenset()
+    output_file_paths: frozenset[Path | None] = Field(
+        default=frozenset(), validation_alias="output_file_names"
     )
     anti_recommender_type: AntiRecommenderType = AntiRecommenderType.open_ai
     openai_api_key: str | None = None
 
     model_config = SettingsConfigDict(
         env_file=(
-            config_parent_path / ".env.local",
-            config_parent_path / ".env.secret",
+            CONFIG_FILE_PATH / ".env.local",
+            CONFIG_FILE_PATH / ".env.secret",
         ),
         extra="ignore",
         env_file_encoding="utf-8",
@@ -49,4 +38,4 @@ class Settings(BaseSettings):
         ]
 
 
-settings = Settings(output_file_paths=None)
+settings = Settings()
