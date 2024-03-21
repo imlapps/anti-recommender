@@ -1,6 +1,5 @@
-from collections.abc import Generator
 from abc import abstractmethod
-from collections.abc import Callable
+from collections.abc import Callable, Generator
 
 from app.anti_recommenders.anti_recommender import AntiRecommender
 from app.models.anti_recommendation import AntiRecommendation
@@ -9,7 +8,7 @@ from app.models.anti_recommendation import AntiRecommendation
 class OpenAiAntiRecommender(AntiRecommender):
     """
     A concrete implementation of AntiRecommender that uses
-    OpenAI's large language model to generate anti-recommendations.
+    OpenAI's large language model to generate AntiRecommendations.
     """
 
     def __init__(self) -> None:
@@ -22,7 +21,7 @@ class OpenAiAntiRecommender(AntiRecommender):
                 """
 
     def _create_query(self, record_key: str) -> str:
-        """Create a query with the given wikipedia title for the LLM"""
+        """Create a query with the given Wikipedia title for the LLM"""
 
         return (
             "What are 10 Wikipedia articles on the featured list that are dissimilar but surprisingly similar to the \

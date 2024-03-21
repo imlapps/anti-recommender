@@ -1,4 +1,5 @@
 from pydantic import ValidationInfo, field_validator
+
 from app.models.record import Record
 from app.models.wikipedia_article.category import Category
 from app.models.wikipedia_article.external_links import ExternalLink

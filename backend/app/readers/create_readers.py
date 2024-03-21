@@ -1,11 +1,11 @@
+from app.models.settings import Settings
 from app.readers.reader.reader import Reader
 from app.readers.reader.wikipedia_reader import WikipediaReader
-from app.models.settings import Settings
 
 
 def create_readers(settings: Settings) -> tuple[Reader | None, ...]:
     """
-    Return a tuple of Readers depending on the record type obtained from settings.
+    Return a tuple of Readers depending on the record type in settings.
     Readers are instantiated with Paths that contain the corresponding record types in the Path names.
     """
 

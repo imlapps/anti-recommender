@@ -1,29 +1,38 @@
-
 from collections.abc import Generator
-from app.models.record import Record
-from app.readers.all_source_reader import AllSourceReader
+
 from app.anti_recommenders.anti_recommender import AntiRecommender
-from app.anti_recommenders.open_ai.open_ai_normal_anti_recommender import OpenAiNormalAntiRecommender
-from app.models.settings import settings
+from app.anti_recommenders.open_ai.open_ai_normal_anti_recommender import (
+    OpenAiNormalAntiRecommender,
+)
 from app.models.anti_recommendation import AntiRecommendation
+from app.models.record import Record
+from app.models.settings import settings
+from app.readers.all_source_reader import AllSourceReader
 
 
 class AntiRecommendationEngine(AntiRecommender):
-    """
-    The main AntiRecommendationEngine for the NerdSwipe backend.
+    """AntiRecommendationEngine for the NerdSwipe backend.
 
+    Yields AntiRecommendations of a record_key,
+    Returns a tuple of Records that match the AntiRecommendations of a record_key,
+    Returns a tuple of Records that were the previous Records of AntiRecommendations.
     """
 
     def __init__(self) -> None:
         self.__records_by_key: dict[str, Record] = self.load_records()
-        self.__anti_recommender: AntiRecommender | None = self.__select_anti_recommender()
+        self.__anti_recommender: AntiRecommender | None = (
+            self.__select_anti_recommender()
+        )
         self.__stack: list[list[Record]] = []
         self.__current_anti_recommendation_records: list[Record] = []
 
     def __select_anti_recommender(self) -> AntiRecommender | None:
-        """Return an AntiRecommender based on values stored in settings."""
+        """Select and return an AntiRecommender based on values stored in settings."""
 
-        if settings.anti_recommender_type.lower() == "openai" and settings.openai_api_key:
+        if (
+            settings.anti_recommender_type.lower() == "openai"
+            and settings.openai_api_key
+        ):
             return OpenAiNormalAntiRecommender()
 
         return None
@@ -39,21 +48,21 @@ class AntiRecommendationEngine(AntiRecommender):
 
         return records
 
-    def generate_initial_anti_recommendation_records(self) -> tuple[Record, ...]:
+    def get_initial_records_of_anti_recommendations(self) -> tuple[Record, ...]:
         """Return a tuple of Records that have the same key as AntiRecommendations of the first key in __records_by_key."""
 
         record_key = next(iter(self.__records_by_key.keys()))
 
-        return self.generate_anti_recommendation_records(record_key)
+        return self.get_records_of_anti_recommendations(record_key)
 
-    def generate_anti_recommendation_records(
+    def get_records_of_anti_recommendations(
         self, record_key: str
     ) -> tuple[Record, ...]:
         """Return a tuple of Records that have the same key as the AntiRecommendations of record_key."""
 
         records_of_anti_recommendations: list[Record] = []
 
-        # Retrieve Records that have the same title of the generated AntiRecommendations
+        # Retrieve Records that have the same key as the generated AntiRecommendations.
         records_of_anti_recommendations = [
             self.__records_by_key[anti_recommendation.title]
             for anti_recommendation in self.generate_anti_recommendations(record_key)
@@ -73,17 +82,19 @@ class AntiRecommendationEngine(AntiRecommender):
 
         return tuple(records_of_anti_recommendations)
 
-    def get_previous_anti_recommendation_records(
+    def get_previous_records_of_anti_recommendations(
         self,
     ) -> tuple[Record | None, ...]:
-        """Return a tuple of Records that have the same titles as previous AntiRecommendations."""
+        """Return a tuple of Records that were the previous Records of AntiRecommendations."""
 
         if self.__stack:
             return tuple(self.__stack.pop())
 
         return (None,)
 
-    def generate_anti_recommendations(self, record_key: str) -> Generator[AntiRecommendation, None, None]:
+    def generate_anti_recommendations(
+        self, record_key: str
+    ) -> Generator[AntiRecommendation, None, None]:
         """Yield AntiRecommendations of record_key."""
 
         if self.__anti_recommender:

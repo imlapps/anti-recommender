@@ -1,11 +1,10 @@
-from app.models.anti_recommendation import AntiRecommendation
-from pytest_mock import MockFixture
-
 from langchain.schema.runnable import RunnableSequence, RunnableSerializable
+from pytest_mock import MockFixture
 
 from app.anti_recommenders.open_ai.open_ai_normal_anti_recommender import (
     OpenAiNormalAntiRecommender,
 )
+from app.models.anti_recommendation import AntiRecommendation
 
 
 def test_build_chain(
@@ -14,7 +13,8 @@ def test_build_chain(
     """Test that OpenAiNormalAntiRecommender._build_chain() returns an OpenAI chain of type RunnableSerializable."""
 
     assert isinstance(
-        open_ai_normal_anti_recommender._build_chain(), RunnableSerializable  # noqa: SLF001
+        open_ai_normal_anti_recommender._build_chain(),  # noqa: SLF001
+        RunnableSerializable,
     )
 
 
@@ -46,7 +46,7 @@ def test_generate_llm_response(
     assert (
         open_ai_normal_anti_recommender._generate_llm_response(  # noqa: SLF001
             open_ai_normal_anti_recommender._create_query(record_key),  # noqa: SLF001
-            open_ai_normal_anti_recommender._build_chain()  # noqa: SLF001
+            open_ai_normal_anti_recommender._build_chain(),  # noqa: SLF001
         )
         == model_response
     )
@@ -57,12 +57,14 @@ def test_parse_llm_response(
     anti_recommendations: tuple[AntiRecommendation, ...],
     model_response: str,
 ) -> None:
-    """Test that OpenAiNormalAntiRecommender._parse_llm_response() yields parsed anti-recommendation records."""
+    """Test that OpenAiNormalAntiRecommender._parse_llm_response() yields parsed AntiRecommendations."""
 
     anti_recommendation_records = []
 
     anti_recommendation_records = list(
-        open_ai_normal_anti_recommender._parse_llm_response(model_response)  # noqa: SLF001
+        open_ai_normal_anti_recommender._parse_llm_response(  # noqa: SLF001
+            model_response
+        )
     )
     assert tuple(anti_recommendation_records) == anti_recommendations
 
@@ -74,7 +76,7 @@ def test_generate_anti_recommendations(
     model_response: str,
     anti_recommendations: tuple[AntiRecommendation, ...],
 ) -> None:
-    """Test that OpenAiNormalAntiRecommender.generate_anti_recommendations() yields anti-recommendations of a given record key."""
+    """Test that OpenAiNormalAntiRecommender.generate_anti_recommendations() yields AntiRecommendations of a given record key."""
 
     mocker.patch.object(
         OpenAiNormalAntiRecommender,
@@ -84,7 +86,6 @@ def test_generate_anti_recommendations(
     assert (
         anti_recommendations[0].title
         == next(
-            open_ai_normal_anti_recommender.generate_anti_recommendations(
-                record_key)
+            open_ai_normal_anti_recommender.generate_anti_recommendations(record_key)
         ).title
     )

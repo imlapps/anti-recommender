@@ -1,57 +1,57 @@
-import pytest
-from typing import Any
-from pathlib import Path
-from pytest_mock import MockFixture
 from collections.abc import Collection
+from pathlib import Path
+from typing import Any
 
+import pytest
+from pytest_mock import MockFixture
 
-from app.readers.all_source_reader import AllSourceReader
-from app.readers.reader.wikipedia_reader import WikipediaReader
 from app.anti_recommendation_engine.anti_recommendation_engine import (
     AntiRecommendationEngine,
+)
+from app.anti_recommenders.open_ai.open_ai_normal_anti_recommender import (
+    OpenAiNormalAntiRecommender,
 )
 from app.models.anti_recommendation import AntiRecommendation
 from app.models.record import Record
 from app.models.wikipedia_article.wikipedia_article import WikipediaArticle
-from app.anti_recommenders.open_ai.open_ai_normal_anti_recommender import (
-    OpenAiNormalAntiRecommender,
-)
+from app.readers.all_source_reader import AllSourceReader
+from app.readers.reader.wikipedia_reader import WikipediaReader
 
 
-@pytest.fixture()
+@pytest.fixture(scope="session")
 def all_source_reader() -> AllSourceReader:
     """Yield an AllSourceReader object."""
     return AllSourceReader()
 
 
-@pytest.fixture()
+@pytest.fixture(scope="session")
 def wikipedia_output_path() -> Path:
     """Return the Path of the Wikipedia output file."""
 
     return Path(__file__).parent.parent / "data" / "mini-wikipedia.output.txt"
 
 
-@pytest.fixture()
+@pytest.fixture(scope="session")
 def wikipedia_reader(wikipedia_output_path: Path) -> WikipediaReader:
     """Yield a WikipediaReader object."""
 
     return WikipediaReader(file_path=wikipedia_output_path)
 
 
-@pytest.fixture()
+@pytest.fixture(scope="session")
 def open_ai_normal_anti_recommender() -> OpenAiNormalAntiRecommender:
     """Yield an OpenAiNormalAntiRecommender object."""
     return OpenAiNormalAntiRecommender()
 
 
-@pytest.fixture()
+@pytest.fixture(scope="session")
 def record_key() -> str:
     """Return a sample record key."""
 
     return "Nikola Tesla"
 
 
-@pytest.fixture()
+@pytest.fixture(scope="session")
 def model_response() -> str:
     """Return a sample response from a large language model."""
 
@@ -59,7 +59,7 @@ def model_response() -> str:
             2 - Leonardo da Vinci - https://en.wikipedia.org/wiki/Leonardo_da_Vinci"
 
 
-@pytest.fixture()
+@pytest.fixture(scope="session")
 def anti_recommendations() -> tuple[AntiRecommendation, ...]:
     """Return a tuple of anti-recommendations."""
 
@@ -75,7 +75,7 @@ def anti_recommendations() -> tuple[AntiRecommendation, ...]:
     )
 
 
-@pytest.fixture()
+@pytest.fixture(scope="session")
 def serialized_records() -> tuple[dict[str, Collection[Collection[str]]], ...]:
     """Return a tuple of serialized records."""
 
@@ -188,13 +188,16 @@ def serialized_records() -> tuple[dict[str, Collection[Collection[str]]], ...]:
     )
 
 
-@pytest.fixture()
+@pytest.fixture(scope="session")
 def records(serialized_records: tuple[Any, ...]) -> tuple[Record, ...]:
     """Return a tuple of Records."""
-    return tuple(WikipediaArticle(**record["abstract_info"], **record) for record in serialized_records)
+    return tuple(
+        WikipediaArticle(**record["abstract_info"], **record)
+        for record in serialized_records
+    )
 
 
-@pytest.fixture()
+@pytest.fixture(scope="session")
 def records_by_key(records: tuple[Record, ...]) -> dict[str, Record]:
     """Return a dictionary of Records."""
     _record_store = {}
@@ -205,7 +208,7 @@ def records_by_key(records: tuple[Record, ...]) -> dict[str, Record]:
     return _record_store
 
 
-@pytest.fixture()
+@pytest.fixture(scope="session")
 def anti_recommendation_engine_with_mocked_load_records(
     mocker: MockFixture, records_by_key: dict[str, Record]
 ) -> AntiRecommendationEngine:
@@ -218,7 +221,7 @@ def anti_recommendation_engine_with_mocked_load_records(
     return AntiRecommendationEngine()
 
 
-@pytest.fixture()
+@pytest.fixture(scope="session")
 def anti_recommendation_engine() -> AntiRecommendationEngine:
     """Yield an AntiRecommendationEngine object."""
 

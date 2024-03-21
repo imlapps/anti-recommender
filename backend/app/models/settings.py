@@ -1,7 +1,8 @@
-from pathlib import Path
 from enum import Enum
+from pathlib import Path
+
+from pydantic import Field, field_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
-from pydantic import field_validator, Field
 
 config_parent_path = Path(__file__).parent.parent.parent
 
@@ -23,7 +24,8 @@ class Settings(BaseSettings):
 
     record_types: frozenset[RecordType] | None = None
     output_file_paths: frozenset[Path] | None = Field(
-        validation_alias="output_file_names")
+        validation_alias="output_file_names"
+    )
     anti_recommender_type: AntiRecommenderType = AntiRecommenderType.open_ai
     openai_api_key: str | None = None
 
@@ -34,7 +36,7 @@ class Settings(BaseSettings):
         ),
         extra="ignore",
         env_file_encoding="utf-8",
-        validate_default=False
+        validate_default=False,
     )
 
     @field_validator("output_file_paths", mode="before")

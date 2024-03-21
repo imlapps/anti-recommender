@@ -2,7 +2,9 @@ from pydantic import BaseModel, ConfigDict
 
 
 class Record(BaseModel):
-    """Pydantic Model to hold a record."""
+    """Pydantic Model to hold a record.
+    `title` is the key of Record.
+    """
 
     title: str
     url: str

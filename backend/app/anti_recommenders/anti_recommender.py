@@ -6,7 +6,7 @@ from app.models.anti_recommendation import AntiRecommendation
 
 class AntiRecommender(ABC):
     """
-    An interface to generate anti-recommendations of a record.
+    An interface to generate AntiRecommendations of a record.
     """
 
     @abstractmethod
