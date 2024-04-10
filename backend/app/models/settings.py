@@ -2,8 +2,8 @@ from pathlib import Path
 
 from pydantic import Field, field_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
+from app.models.types import AntiRecommenderType, RecordType
 
-from app.models.settings_types import AntiRecommenderType, RecordType
 
 CONFIG_FILE_PATH = Path(__file__).parent.parent.parent
 
@@ -11,11 +11,11 @@ CONFIG_FILE_PATH = Path(__file__).parent.parent.parent
 class Settings(BaseSettings):
     """A Pydantic BaseSetting to hold environment variables."""
 
-    record_types: frozenset[RecordType | None] = frozenset()
-    output_file_paths: frozenset[Path | None] = Field(
+    record_types: frozenset[RecordType] = frozenset()
+    output_file_paths: frozenset[Path] = Field(
         default=frozenset(), validation_alias="output_file_names"
     )
-    anti_recommender_type: AntiRecommenderType = AntiRecommenderType.open_ai
+    anti_recommender_type: AntiRecommenderType = AntiRecommenderType.OPEN_AI
     openai_api_key: str | None = None
 
     model_config = SettingsConfigDict(
@@ -30,7 +30,7 @@ class Settings(BaseSettings):
 
     @field_validator("output_file_paths", mode="before")
     @classmethod
-    def convert_to_list_of_file_paths(cls, output_file_names: list[str]) -> list[Path]:
+    def convert_to_list_of_file_paths(cls, output_file_names: list[str]) -> frozenset[Path]:
         """Convert the list of file names in the environment variables into a list of Path objects."""
         return [
             Path(__file__).parent.parent / "data" / file_name
