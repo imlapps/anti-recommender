@@ -30,7 +30,7 @@ class Settings(BaseSettings):
 
     @field_validator("output_file_paths", mode="before")
     @classmethod
-    def convert_to_list_of_file_paths(cls, output_file_names: list[str]) -> frozenset[Path]:
+    def convert_to_list_of_file_paths(cls, output_file_names: frozenset[str]) -> frozenset[Path]:
         """Convert the list of file names in the environment variables into a list of Path objects."""
         return [
             Path(__file__).parent.parent / "data" / file_name

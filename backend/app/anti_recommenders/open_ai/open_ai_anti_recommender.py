@@ -1,8 +1,9 @@
 from abc import abstractmethod
-from collections.abc import Callable, Generator
-
+from collections.abc import Callable, Iterator
+from langchain.schema.runnable import RunnableSerializable
 from app.anti_recommenders.anti_recommender import AntiRecommender
 from app.models.anti_recommendation import AntiRecommendation
+from app.models.types import RecordType
 
 
 class OpenAiAntiRecommender(AntiRecommender):
@@ -20,37 +21,38 @@ class OpenAiAntiRecommender(AntiRecommender):
                 Helpful Answer:
                 """
 
-    def _create_query(self, record_key: str) -> str:
-        """Create a query with the given Wikipedia title for the LLM"""
+    def _create_query(self, record_key: str, record_type: RecordType = RecordType.WIKIPEDIA) -> str:
+        """Create a query for the large language model with the given record key."""
 
-        return (
-            "What are 10 Wikipedia articles on the featured list that are dissimilar but surprisingly similar to the \
-                 Wikipedia article "
-            + record_key
-            + "? \
-                 Give each answer on a new line, and in the format: Number - Title - URL."
-        )
+        if record_type is RecordType.WIKIPEDIA:
+            return (
+                "What are 10 Wikipedia articles on the featured list that are dissimilar but surprisingly similar to the \
+                    Wikipedia article "
+                + record_key
+                + "? \
+                    Give each answer on a new line, and in the format: Number - Title - URL."
+            )
 
     def _generate_anti_recommendendations(  # noqa: PLR0913
         self,
         record_key: str,
-        callable_to_build_chain: Callable,
-        callable_to_create_query: Callable,
-        callable_to_generate_llm_response: Callable,
-        callable_to_parse_llm_response: Callable,
-    ) -> Generator[AntiRecommendation, None, None]:
+        build_chain: Callable[[], RunnableSerializable],
+        create_query: Callable[[str, RecordType], str],
+        generate_llm_response: Callable[[str, RunnableSerializable], str],
+        parse_llm_response: Callable[[str], Iterator[AntiRecommendation, None, None]],
+    ) -> Iterator[AntiRecommendation, None, None]:
         """Create a generalized workflow that yields AntiRecommendations."""
 
-        open_ai_chain = callable_to_build_chain()
-        open_ai_query = callable_to_create_query(record_key)
-        generate_open_ai_llm_response = callable_to_generate_llm_response(
+        open_ai_chain = build_chain()
+        open_ai_query = create_query(record_key)
+        generate_open_ai_llm_response = generate_llm_response(
             open_ai_chain, open_ai_query
         )
 
-        yield from callable_to_parse_llm_response(generate_open_ai_llm_response)
+        yield from parse_llm_response(generate_open_ai_llm_response)
 
     @abstractmethod
     def generate_anti_recommendations(
         self, record_key: str
-    ) -> Generator[AntiRecommendation, None, None]:
+    ) -> Iterator[AntiRecommendation, None, None]:
         pass
