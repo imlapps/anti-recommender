@@ -13,7 +13,7 @@ from app.anti_recommenders.open_ai.open_ai_normal_anti_recommender import (
 )
 from app.models.anti_recommendation import AntiRecommendation
 from app.models.record import Record
-from app.models.wikipedia_article.wikipedia_article import WikipediaArticle
+from app.models.wikipedia.article import Article
 from app.readers.all_source_reader import AllSourceReader
 from app.readers.reader.wikipedia_reader import WikipediaReader
 
@@ -192,7 +192,7 @@ def serialized_records() -> tuple[dict[str, Collection[Collection[str]]], ...]:
 def records(serialized_records: tuple[Any, ...]) -> tuple[Record, ...]:
     """Return a tuple of Records."""
     return tuple(
-        WikipediaArticle(**record["abstract_info"], **record)
+        Article(**record["abstract_info"], **record)
         for record in serialized_records
     )
 
