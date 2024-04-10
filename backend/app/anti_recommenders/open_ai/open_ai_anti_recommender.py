@@ -21,7 +21,7 @@ class OpenAiAntiRecommender(AntiRecommender):
                 Helpful Answer:
                 """
 
-    def _create_query(self, record_key: str, record_type: RecordType = RecordType.WIKIPEDIA) -> str:
+    def _create_query(self, record_key: str, record_type: RecordType) -> str:
         """Create a query for the large language model with the given record key."""
 
         if record_type is RecordType.WIKIPEDIA:
@@ -36,6 +36,7 @@ class OpenAiAntiRecommender(AntiRecommender):
     def _generate_anti_recommendendations(  # noqa: PLR0913
         self,
         record_key: str,
+        record_type: RecordType,
         build_chain: Callable[[], RunnableSerializable],
         create_query: Callable[[str, RecordType], str],
         generate_llm_response: Callable[[str, RunnableSerializable], str],
@@ -44,7 +45,7 @@ class OpenAiAntiRecommender(AntiRecommender):
         """Create a generalized workflow that yields AntiRecommendations."""
 
         open_ai_chain = build_chain()
-        open_ai_query = create_query(record_key)
+        open_ai_query = create_query(record_key, record_type)
         generate_open_ai_llm_response = generate_llm_response(
             open_ai_chain, open_ai_query
         )
@@ -53,6 +54,6 @@ class OpenAiAntiRecommender(AntiRecommender):
 
     @abstractmethod
     def generate_anti_recommendations(
-        self, record_key: str
+        self, record_key: str, record_type: RecordType
     ) -> Iterator[AntiRecommendation, None, None]:
         pass

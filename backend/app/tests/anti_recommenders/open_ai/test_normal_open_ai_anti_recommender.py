@@ -1,7 +1,7 @@
 from langchain.schema.runnable import RunnableSequence, RunnableSerializable
 from pytest_mock import MockFixture
 
-from backend.app.anti_recommenders.open_ai.normal_open_ai_anti_recommender import (
+from app.anti_recommenders.open_ai.normal_open_ai_anti_recommender import (
     NormalOpenAiAntiRecommender,
 )
 from app.models.anti_recommendation import AntiRecommendation
@@ -20,12 +20,13 @@ def test_build_chain(
 
 
 def test_create_query(
-    open_ai_normal_anti_recommender: NormalOpenAiAntiRecommender, record_key: str
+    open_ai_normal_anti_recommender: NormalOpenAiAntiRecommender, record_key: str,    record_type: RecordType
 ) -> None:
     """Test that OpenAiNormalAntiRecommender._create_query() returns an OpenAI query when passed a record key."""
 
     assert record_key in open_ai_normal_anti_recommender._create_query(  # noqa: SLF001
-        record_key
+        record_key,
+    record_type
     )
 
 
@@ -34,6 +35,7 @@ def test_generate_llm_response(
     open_ai_normal_anti_recommender: NormalOpenAiAntiRecommender,
     model_response: str,
     record_key: str,
+    record_type: RecordType
 ) -> None:
     """Test that OpenAiNormalAntiRecommender._generate_llm_response() returns a response from an OpenAI large language model."""
 
@@ -46,7 +48,7 @@ def test_generate_llm_response(
 
     assert (
         open_ai_normal_anti_recommender._generate_llm_response(  # noqa: SLF001
-            open_ai_normal_anti_recommender._create_query(record_key),  # noqa: SLF001
+            open_ai_normal_anti_recommender._create_query(record_key, record_type),  # noqa: SLF001
             open_ai_normal_anti_recommender._build_chain(),  # noqa: SLF001
         )
         == model_response
@@ -74,6 +76,7 @@ def test_generate_anti_recommendations(
     session_mocker: MockFixture,
     open_ai_normal_anti_recommender: NormalOpenAiAntiRecommender,
     record_key: str,
+    record_type: RecordType,
     model_response: str,
     anti_recommendations: tuple[AntiRecommendation, ...],
 ) -> None:
@@ -88,6 +91,6 @@ def test_generate_anti_recommendations(
         anti_recommendations[0].title
         == next(
             open_ai_normal_anti_recommender.generate_anti_recommendations(
-                record_key)
+                record_key, record_type)
         ).title
     )

@@ -1,5 +1,5 @@
 from collections.abc import Iterator
-from typing import Any
+from app.models.types import RecordType
 
 from langchain.prompts import PromptTemplate
 from langchain.schema import StrOutputParser
@@ -56,12 +56,13 @@ class NormalOpenAiAntiRecommender(OpenAiAntiRecommender):
             yield AntiRecommendation(title=title, url=url)
 
     def generate_anti_recommendations(
-        self, record_key: str
+        self, record_key: str, record_type: RecordType,
     ) -> Iterator[AntiRecommendation, None, None]:
         """Yield AntiRecommendations of a given record key."""
 
         yield from self._generate_anti_recommendendations(
             record_key,
+            record_type,
             self._build_chain,
             self._create_query,
             self._generate_llm_response,

@@ -8,14 +8,15 @@ from pytest_mock import MockFixture
 from app.anti_recommendation_engine.anti_recommendation_engine import (
     AntiRecommendationEngine,
 )
-from app.anti_recommenders.open_ai.open_ai_normal_anti_recommender import (
-    OpenAiNormalAntiRecommender,
+from app.anti_recommenders.open_ai.normal_open_ai_anti_recommender import (
+    NormalOpenAiAntiRecommender,
 )
 from app.models.anti_recommendation import AntiRecommendation
 from app.models.record import Record
 from app.models.wikipedia.article import Article
 from app.readers.all_source_reader import AllSourceReader
 from app.readers.reader.wikipedia_reader import WikipediaReader
+from app.models.types import RecordType
 
 
 @pytest.fixture(scope="session")
@@ -39,9 +40,9 @@ def wikipedia_reader(wikipedia_output_path: Path) -> WikipediaReader:
 
 
 @pytest.fixture(scope="session")
-def open_ai_normal_anti_recommender() -> OpenAiNormalAntiRecommender:
+def open_ai_normal_anti_recommender() -> NormalOpenAiAntiRecommender:
     """Yield an OpenAiNormalAntiRecommender object."""
-    return OpenAiNormalAntiRecommender()
+    return NormalOpenAiAntiRecommender()
 
 
 @pytest.fixture(scope="session")
@@ -49,6 +50,13 @@ def record_key() -> str:
     """Return a sample record key."""
 
     return "Nikola Tesla"
+
+
+@pytest.fixture(scope="session")
+def record_type() -> RecordType:
+    """Return a sample record type."""
+
+    return RecordType.WIKIPEDIA
 
 
 @pytest.fixture(scope="session")
@@ -209,20 +217,12 @@ def records_by_key(records: tuple[Record, ...]) -> dict[str, Record]:
 
 
 @pytest.fixture(scope="session")
-def anti_recommendation_engine_with_mocked_load_records(
-    session_mocker: MockFixture, records_by_key: dict[str, Record]
+def anti_recommendation_engine(
+    session_mocker: MockFixture, records: tuple[Record, ...]
 ) -> AntiRecommendationEngine:
-    """Yield an AntiRecommendationEngine object and mock AntiRecommendationEngine.load_records()."""
+    """Yield an AntiRecommendationEngine object."""
 
     session_mocker.patch.object(
-        AntiRecommendationEngine, "load_records", return_value=records_by_key
-    )
-
-    return AntiRecommendationEngine()
-
-
-@pytest.fixture(scope="session")
-def anti_recommendation_engine() -> AntiRecommendationEngine:
-    """Yield an AntiRecommendationEngine object."""
+        AllSourceReader, "read", return_value=records)
 
     return AntiRecommendationEngine()
