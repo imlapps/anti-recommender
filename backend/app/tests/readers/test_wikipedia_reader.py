@@ -1,4 +1,4 @@
-from backend.app.models.wikipedia.article import Article
+from app.models.wikipedia.article import Article
 from app.readers.reader.wikipedia_reader import WikipediaReader
 
 

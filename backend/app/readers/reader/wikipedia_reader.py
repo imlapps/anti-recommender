@@ -1,10 +1,11 @@
 import json
-from collections.abc import Generator
 from pathlib import Path
+from unidecode import unidecode
+from collections.abc import Iterator
+
 
 from app.models.wikipedia.article import Article
 from app.readers.reader.reader import Reader
-from app.utils.encodings.encodings_list import encodings
 
 
 class WikipediaReader(Reader):
@@ -16,23 +17,20 @@ class WikipediaReader(Reader):
     def __init__(self, file_path: Path) -> None:
         self.__file_path = file_path
 
-    def read(self) -> Generator[Article, None, None]:
+    def read(self) -> Iterator[Article, None, None]:
         """Read in Wikipedia output data and yield Records."""
 
-        json_list = (
-            self.__file_path.open(
-                mode="r", encoding="utf-8").read().strip().split("\n")
-        )
+        with self.__file_path.open(mode="r", encoding="utf-8") as json_file:
 
-        for json_str in json_list:
+            for json_line in json_file:
+                record_json = json.loads(json_line)
 
-            if "RECORD" in json_str:
-                json_obj = {}
-                for encoding in encodings:
-                    json_obj = json.loads(bytes(json_str, encoding))
-                    break
+                if record_json["type"] != "RECORD":
+                    continue
 
-                wikipedia_article = Article(
-                    **(json_obj["record"]["abstract_info"]), **(json_obj["record"])
+                json_obj = json.loads(
+                    unidecode(json.dumps(
+                        record_json["record"], ensure_ascii=False))
                 )
-                yield wikipedia_article
+
+                yield Article(**(json_obj["abstract_info"]), **(json_obj))
