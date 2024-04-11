@@ -1,5 +1,8 @@
 name: Continuous Integration
 on: [push]
+permissions:
+  checks: write
+  pull-requests: write
 jobs:
   backend-continuous-integration:
     name: Build and test
