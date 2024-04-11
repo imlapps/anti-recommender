@@ -23,6 +23,7 @@ class Settings(BaseSettings):
         env_file=(
             CONFIG_FILE_PATH / ".env.local",
             CONFIG_FILE_PATH / ".env.secret",
+            CONFIG_FILE_PATH / ".env.ci",
         ),
         extra="ignore",
         env_file_encoding="utf-8",

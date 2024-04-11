@@ -18,7 +18,7 @@
 
   <script type="text/javascript">
     const readFile = async () => {
-      const res = await fetch("./src/storage/mini-wikipedia.output.txt");
+      const res = await fetch("../backend/app/data/mini-wikipedia.output.txt");
       const response = await res.text();
       return response;
     };
