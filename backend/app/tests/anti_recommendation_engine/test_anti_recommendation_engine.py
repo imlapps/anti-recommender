@@ -1,3 +1,5 @@
+import pytest
+from app.models.settings import settings
 from app.anti_recommendation_engine.anti_recommendation_engine import (
     AntiRecommendationEngine,
 )
@@ -13,6 +15,7 @@ def test_get_previous_records_with_empty_stack(
     assert anti_recommendation_engine.get_previous_records()[0] is None
 
 
+@pytest.mark.skipif(settings.ci, reason="don't have OpenAI key in CI")
 def test_get_previous_records(
     records: tuple[Record, ...],
     record_key: str,
@@ -27,6 +30,7 @@ def test_get_previous_records(
     assert anti_recommendation_engine.get_previous_records()[0] == records[0]
 
 
+@pytest.mark.skipif(settings.ci, reason="don't have OpenAI key in CI")
 def test_get_initial_records(
     records: tuple[Record, ...],
     record_type: RecordType,
@@ -35,9 +39,11 @@ def test_get_initial_records(
     """Test that AntiRecommendationEngine.get_initial_records() returns a tuple of Records
     with keys that match the AntiRecommendations of the first Record in records."""
 
-    assert anti_recommendation_engine.get_initial_records(record_type) == records[1:]
+    assert anti_recommendation_engine.get_initial_records(
+        record_type) == records[1:]
 
 
+@pytest.mark.skipif(settings.ci, reason="don't have OpenAI key in CI")
 def test_get_next_records(
     records: tuple[Record, ...],
     record_key: str,
