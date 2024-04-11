@@ -18,6 +18,7 @@ class Settings(BaseSettings):
     anti_recommender_type: AntiRecommenderType = AntiRecommenderType.OPEN_AI
     openai_api_key: str | None = None
     ci: bool = False
+
     model_config = SettingsConfigDict(
         env_file=(
             CONFIG_FILE_PATH / ".env.local",

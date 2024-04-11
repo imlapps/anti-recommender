@@ -10,9 +10,18 @@ from app.readers.all_source_reader import AllSourceReader
 class AntiRecommendationEngine:
     """AntiRecommendationEngine for the NerdSwipe backend.
 
-    Yields AntiRecommendations of a record_key,
-    Returns a tuple of Records that match the AntiRecommendations of a record_key,
-    Returns a tuple of Records that were the previous Records of AntiRecommendations.
+    An AntiRecommendationEngine reaches out to an AntiRecommender to retrieve AntiRecommendations of a record_key.
+    record_type is the type of AntiRecommendations retrieved from the AntiRecommender.
+
+    An AntiRecommendationEngine consists of:
+        - __records_by_key: A dictionary of type str: Record, that holds Records obtained from storage.
+        - __current_anti_recommendation_records: A list of Records that are currently used for anti-recommendations.
+        - __stack: A stack that stores a list of Records that were previously used for anti-recommendations.
+
+    An AntiRecommendationEngine also:
+        - Returns a tuple of Records that match the AntiRecommendations of the first key in __records_by_key.
+        - Returns a tuple of Records that match the AntiRecommendations of a record_key.
+        - Returns a tuple of Records that matched the previous AntiRecommendations.
     """
 
     def __init__(self) -> None:
@@ -39,9 +48,9 @@ class AntiRecommendationEngine:
     def get_initial_records(self, record_type: str) -> tuple[Record, ...]:
         """Return a tuple of Records that have the same key as AntiRecommendations of the first key in __records_by_key."""
 
-        record_key = next(iter(self.__records_by_key.keys()))
-
-        return self.get_next_records(record_key, record_type)
+        return self.get_next_records(
+            next(iter(self.__records_by_key.keys())), record_type
+        )
 
     def get_next_records(self, record_key: str, record_type: str) -> tuple[Record, ...]:
         """Return a tuple of Records that have the same key as the AntiRecommendations of record_key."""

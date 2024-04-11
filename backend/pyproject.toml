@@ -1,7 +1,7 @@
 [tool.poetry]
 name = "backend"
 version = "0.1.0"
-description = ""
+description = "A FastAPI backend for NerdSwipe."
 authors = ["imlapps"]
 readme = "README.md"
 packages = [{include = "app"}]

@@ -11,7 +11,7 @@ from app.readers.reader.reader import Reader
 class WikipediaReader(Reader):
     """A concrete implementation of Reader.
 
-    Read in Wikipedia output data and yield them as WikipediaArticles.
+    Read in Wikipedia output data and yield them as Articles.
     """
 
     def __init__(self, file_path: Path) -> None:

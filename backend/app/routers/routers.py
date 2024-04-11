@@ -35,7 +35,7 @@ async def previous_records(request: Request) -> tuple[Record | None, ...]:
 @router.get("/initial_records")
 async def initial_records(record_type: str, request: Request) -> tuple[Record, ...]:
     """
-    A path operation function of the root endpoint.
+    A path operation function of the /initial_records endpoint.
     Returns the intial tuple of Records from the AntiRecommendationEngine.
     """
 

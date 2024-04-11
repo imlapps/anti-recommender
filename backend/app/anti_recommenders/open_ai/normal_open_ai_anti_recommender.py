@@ -13,6 +13,8 @@ class NormalOpenAiAntiRecommender(OpenAiAntiRecommender):
     """
     A subclass of OpenAiAntiRecommender that relies solely on
     the large language model's parametric knowledge to generate AntiRecommendations.
+
+    record_type is the type of AntiRecommendations generated from the large language model.
     """
 
     def _build_chain(self) -> RunnableSerializable:
@@ -59,7 +61,7 @@ class NormalOpenAiAntiRecommender(OpenAiAntiRecommender):
         record_key: str,
         record_type: str,
     ) -> Iterator[AntiRecommendation]:
-        """Yield AntiRecommendations of a given record key."""
+        """Yield AntiRecommendations of a given record key, and of type record_type."""
 
         yield from self._generate_anti_recommendendations(
             record_key,
