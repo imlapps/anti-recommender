@@ -1,14 +1,10 @@
-from collections.abc import Generator
-
 from app.anti_recommenders.anti_recommender import AntiRecommender
 from app.anti_recommenders.open_ai.normal_open_ai_anti_recommender import (
     NormalOpenAiAntiRecommender,
 )
-from app.models.anti_recommendation import AntiRecommendation
 from app.models.record import Record
 from app.models.settings import settings
 from app.readers.all_source_reader import AllSourceReader
-from app.models.types import RecordType
 
 
 class AntiRecommendationEngine:
@@ -23,11 +19,13 @@ class AntiRecommendationEngine:
         self.__records_by_key: dict[str, Record] = {
             record.title: record for record in AllSourceReader().read()
         }
-        self.__anti_recommender: AntiRecommender = self.__select_anti_recommender()
+        self.__anti_recommender: AntiRecommender | None = (
+            self.__select_anti_recommender()
+        )
         self.__stack: list[list[Record]] = []
         self.__current_anti_recommendation_records: list[Record] = []
 
-    def __select_anti_recommender(self) -> AntiRecommender:
+    def __select_anti_recommender(self) -> AntiRecommender | None:
         """Select and return an AntiRecommender based on values stored in settings."""
 
         if (
@@ -36,6 +34,8 @@ class AntiRecommendationEngine:
         ):
             return NormalOpenAiAntiRecommender()
 
+        return None
+
     def get_initial_records(self, record_type: str) -> tuple[Record, ...]:
         """Return a tuple of Records that have the same key as AntiRecommendations of the first key in __records_by_key."""
 
@@ -43,21 +43,21 @@ class AntiRecommendationEngine:
 
         return self.get_next_records(record_key, record_type)
 
-    def get_next_records(
-        self, record_key: str, record_type: str
-    ) -> tuple[Record, ...]:
+    def get_next_records(self, record_key: str, record_type: str) -> tuple[Record, ...]:
         """Return a tuple of Records that have the same key as the AntiRecommendations of record_key."""
 
         records_of_anti_recommendations: list[Record] = []
 
-        # Retrieve Records that have the same key as the generated AntiRecommendations.
-        records_of_anti_recommendations = [
-            self.__records_by_key[anti_recommendation.title]
-            for anti_recommendation in self.__anti_recommender.generate_anti_recommendations(
-                record_key, record_type
-            )
-            if anti_recommendation.title in self.__records_by_key
-        ]
+        if self.__anti_recommender:
+
+            # Retrieve Records that have the same key as the generated AntiRecommendations.
+            records_of_anti_recommendations = [
+                self.__records_by_key[anti_recommendation.title]
+                for anti_recommendation in self.__anti_recommender.generate_anti_recommendations(
+                    record_key, record_type
+                )
+                if anti_recommendation.title in self.__records_by_key
+            ]
 
         if records_of_anti_recommendations:
 

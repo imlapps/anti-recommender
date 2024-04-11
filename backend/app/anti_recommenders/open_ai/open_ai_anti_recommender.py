@@ -1,7 +1,8 @@
 from abc import abstractmethod
 from collections.abc import Callable, Iterator
-from typing import Any
+
 from langchain.schema.runnable import RunnableSerializable
+
 from app.anti_recommenders.anti_recommender import AntiRecommender
 from app.models.anti_recommendation import AntiRecommendation
 from app.models.types import RecordType
@@ -34,15 +35,17 @@ class OpenAiAntiRecommender(AntiRecommender):
                     Give each answer on a new line, and in the format: Number - Title - URL."
             )
 
+        return ""
+
     def _generate_anti_recommendendations(  # noqa: PLR0913
         self,
         record_key: str,
-        record_type: RecordType,
+        record_type: str,
         build_chain: Callable[[], RunnableSerializable],
-        create_query: Callable[[str, RecordType], str],
+        create_query: Callable[[str, str], str],
         generate_llm_response: Callable[[str, RunnableSerializable], str],
-        parse_llm_response: Callable[[str], Iterator[AntiRecommendation, None, None]],
-    ) -> Iterator[AntiRecommendation, None, None]:
+        parse_llm_response: Callable[[str], Iterator[AntiRecommendation]],
+    ) -> Iterator[AntiRecommendation]:
         """Create a generalized workflow that yields AntiRecommendations."""
 
         open_ai_chain = build_chain()
@@ -56,5 +59,5 @@ class OpenAiAntiRecommender(AntiRecommender):
     @abstractmethod
     def generate_anti_recommendations(
         self, record_key: str, record_type: str
-    ) -> Iterator[AntiRecommendation, None, None]:
+    ) -> Iterator[AntiRecommendation]:
         pass

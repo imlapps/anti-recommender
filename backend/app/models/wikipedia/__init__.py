@@ -1,3 +1,3 @@
-from .article import Article as Article
-from .category import Category as Category
-from .external_link import ExternalLink as ExternalLink
+from .article import Article  # noqa: F401
+from .category import Category  # noqa: F401
+from .external_link import ExternalLink  # noqa: F401

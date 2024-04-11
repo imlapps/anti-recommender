@@ -8,5 +8,5 @@ class Reader(ABC):
     """An interface to read and parse Records from storage."""
 
     @abstractmethod
-    def read(self) -> Iterator[Record, None, None]:
+    def read(self) -> Iterator[Record]:
         """Read in output data and yield Records."""

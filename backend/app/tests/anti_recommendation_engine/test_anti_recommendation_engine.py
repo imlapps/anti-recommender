@@ -1,6 +1,4 @@
 import pytest
-from pytest import FixtureRequest
-from app.models.settings import settings
 from pytest_mock import MockFixture
 
 from app.anti_recommendation_engine.anti_recommendation_engine import (
@@ -9,18 +7,16 @@ from app.anti_recommendation_engine.anti_recommendation_engine import (
 from app.anti_recommenders.open_ai.normal_open_ai_anti_recommender import (
     NormalOpenAiAntiRecommender,
 )
-from app.models.anti_recommendation import AntiRecommendation
 from app.models.record import Record
-from app.models.types import RecordType, AntiRecommenderType
-from app.anti_recommenders.anti_recommender import AntiRecommender
-
+from app.models.settings import settings
+from app.models.types import AntiRecommenderType, RecordType
 
 ANTI_RECOMMENDER_TYPES = frozenset([AntiRecommenderType.OPEN_AI])
 
 
 @pytest.fixture(autouse=True, params=ANTI_RECOMMENDER_TYPES, scope="module")
-def anti_recommender(
-    request: FixtureRequest,
+def _anti_recommender(
+    request: pytest.FixtureRequest,
     session_mocker: MockFixture,
     model_response: str,
 ) -> None:
@@ -33,10 +29,26 @@ def anti_recommender(
         )
 
 
-def test_get_previous_records(anti_recommendation_engine: AntiRecommendationEngine) -> None:
+def test_get_previous_records_with_empty_stack(
+    anti_recommendation_engine: AntiRecommendationEngine,
+) -> None:
     """Test that AntiRecommendationEngine.get_previous_records() returns a tuple of None when its stack is empty."""
 
     assert anti_recommendation_engine.get_previous_records()[0] is None
+
+
+def test_get_previous_records(
+    records: tuple[Record, ...],
+    record_key: str,
+    record_type: RecordType,
+    anti_recommendation_engine: AntiRecommendationEngine,
+) -> None:
+    """Test that AntiRecommendationEngine.get_previous_records() returns a tuple containing Records that match previous AntiRecommendations."""
+
+    anti_recommendation_engine.get_initial_records(record_type)
+    anti_recommendation_engine.get_next_records(record_key, record_type)
+
+    assert anti_recommendation_engine.get_previous_records()[0] == records[0]
 
 
 def test_get_initial_records(
@@ -47,8 +59,7 @@ def test_get_initial_records(
     """Test that AntiRecommendationEngine.get_initial_records() returns a tuple of Records
     with keys that match the AntiRecommendations of the first Record in records."""
 
-    assert anti_recommendation_engine.get_initial_records(
-        record_type) == records[1:]
+    assert anti_recommendation_engine.get_initial_records(record_type) == records[1:]
 
 
 def test_get_next_records(
@@ -65,17 +76,3 @@ def test_get_next_records(
         anti_recommendation_engine.get_next_records(record_key, record_type)
         == records[1:]
     )
-
-
-def test_get_previous_records(
-    records: tuple[Record, ...],
-    record_key: str,
-    record_type: RecordType,
-    anti_recommendation_engine: AntiRecommendationEngine,
-) -> None:
-    """Test that AntiRecommendationEngine.get_previous_records() returns a tuple containing Records that match previous AntiRecommendations."""
-
-    anti_recommendation_engine.get_initial_records(record_type)
-    anti_recommendation_engine.get_next_records(record_key, record_type)
-
-    assert anti_recommendation_engine.get_previous_records()[0] == records[0]

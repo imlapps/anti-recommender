@@ -13,10 +13,10 @@ from app.anti_recommenders.open_ai.normal_open_ai_anti_recommender import (
 )
 from app.models.anti_recommendation import AntiRecommendation
 from app.models.record import Record
+from app.models.types import RecordType
 from app.models.wikipedia.article import Article
 from app.readers.all_source_reader import AllSourceReader
 from app.readers.reader.wikipedia_reader import WikipediaReader
-from app.models.types import RecordType
 
 
 @pytest.fixture(scope="session")
@@ -200,8 +200,7 @@ def serialized_records() -> tuple[dict[str, Collection[Collection[str]]], ...]:
 def records(serialized_records: tuple[Any, ...]) -> tuple[Record, ...]:
     """Return a tuple of Records."""
     return tuple(
-        Article(**record["abstract_info"], **record)
-        for record in serialized_records
+        Article(**record["abstract_info"], **record) for record in serialized_records
     )
 
 
@@ -222,7 +221,6 @@ def anti_recommendation_engine(
 ) -> AntiRecommendationEngine:
     """Yield an AntiRecommendationEngine object."""
 
-    session_mocker.patch.object(
-        AllSourceReader, "read", return_value=records)
+    session_mocker.patch.object(AllSourceReader, "read", return_value=records)
 
     return AntiRecommendationEngine()

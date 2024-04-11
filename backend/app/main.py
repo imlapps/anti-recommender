@@ -1,12 +1,14 @@
-from fastapi import FastAPI
+from collections.abc import AsyncGenerator
 from contextlib import asynccontextmanager
 
-from app.routers.routers import router
+from fastapi import FastAPI
+
 from app.anti_recommendation_engine import AntiRecommendationEngine
+from app.routers.routers import router
 
 
 @asynccontextmanager
-async def lifespan(app: FastAPI):
+async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
     """
     A lifespan event to persist the AntiRecommendationEngine on start up.
     """
