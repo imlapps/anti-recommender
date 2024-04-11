@@ -1,5 +1,6 @@
 from abc import abstractmethod
 from collections.abc import Callable, Iterator
+from typing import Any
 from langchain.schema.runnable import RunnableSerializable
 from app.anti_recommenders.anti_recommender import AntiRecommender
 from app.models.anti_recommendation import AntiRecommendation
@@ -21,10 +22,10 @@ class OpenAiAntiRecommender(AntiRecommender):
                 Helpful Answer:
                 """
 
-    def _create_query(self, record_key: str, record_type: RecordType) -> str:
+    def _create_query(self, record_key: str, record_type: str) -> str:
         """Create a query for the large language model with the given record key."""
 
-        if record_type is RecordType.WIKIPEDIA:
+        if record_type.lower() == RecordType.WIKIPEDIA:
             return (
                 "What are 10 Wikipedia articles on the featured list that are dissimilar but surprisingly similar to the \
                     Wikipedia article "
@@ -47,13 +48,13 @@ class OpenAiAntiRecommender(AntiRecommender):
         open_ai_chain = build_chain()
         open_ai_query = create_query(record_key, record_type)
         generate_open_ai_llm_response = generate_llm_response(
-            open_ai_chain, open_ai_query
+            open_ai_query, open_ai_chain
         )
 
         yield from parse_llm_response(generate_open_ai_llm_response)
 
     @abstractmethod
     def generate_anti_recommendations(
-        self, record_key: str, record_type: RecordType
+        self, record_key: str, record_type: str
     ) -> Iterator[AntiRecommendation, None, None]:
         pass

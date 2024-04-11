@@ -53,7 +53,7 @@ def record_key() -> str:
 
 
 @pytest.fixture(scope="session")
-def record_type() -> RecordType:
+def record_type() -> str:
     """Return a sample record type."""
 
     return RecordType.WIKIPEDIA

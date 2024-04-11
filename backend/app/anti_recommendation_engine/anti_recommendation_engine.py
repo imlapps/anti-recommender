@@ -36,7 +36,7 @@ class AntiRecommendationEngine:
         ):
             return NormalOpenAiAntiRecommender()
 
-    def get_initial_records(self, record_type: RecordType) -> tuple[Record, ...]:
+    def get_initial_records(self, record_type: str) -> tuple[Record, ...]:
         """Return a tuple of Records that have the same key as AntiRecommendations of the first key in __records_by_key."""
 
         record_key = next(iter(self.__records_by_key.keys()))
@@ -44,7 +44,7 @@ class AntiRecommendationEngine:
         return self.get_next_records(record_key, record_type)
 
     def get_next_records(
-        self, record_key: str, record_type: RecordType
+        self, record_key: str, record_type: str
     ) -> tuple[Record, ...]:
         """Return a tuple of Records that have the same key as the AntiRecommendations of record_key."""
 

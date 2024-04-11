@@ -1,4 +1,5 @@
 from collections.abc import Iterator
+from typing import Any
 from app.models.types import RecordType
 
 from langchain.prompts import PromptTemplate
@@ -56,7 +57,7 @@ class NormalOpenAiAntiRecommender(OpenAiAntiRecommender):
             yield AntiRecommendation(title=title, url=url)
 
     def generate_anti_recommendations(
-        self, record_key: str, record_type: RecordType,
+        self, record_key: str, record_type: str,
     ) -> Iterator[AntiRecommendation, None, None]:
         """Yield AntiRecommendations of a given record key."""
 
