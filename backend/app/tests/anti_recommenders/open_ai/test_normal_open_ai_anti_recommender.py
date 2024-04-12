@@ -100,8 +100,10 @@ def test_generate_anti_recommendations(  # noqa: PLR0913
     assert (
         anti_recommendations[0].title
         == next(
-            open_ai_normal_anti_recommender.generate_anti_recommendations(
-                record_key, record_type
+            iter(
+                open_ai_normal_anti_recommender.generate_anti_recommendations(
+                    record_key, record_type
+                )
             )
         ).title
     )

@@ -1,4 +1,4 @@
-from collections.abc import Iterator
+from collections.abc import Iterable
 
 from app.models.record import Record
 from app.models.settings import settings
@@ -15,7 +15,7 @@ class AllSourceReader(Reader):
     def __init__(self) -> None:
         self.__readers: tuple[Reader, ...] = create_readers(settings=settings)
 
-    def read(self) -> Iterator[Record]:
+    def read(self) -> Iterable[Record]:
         """Read in output data and yield Records."""
         for reader in self.__readers:
             yield from reader.read()

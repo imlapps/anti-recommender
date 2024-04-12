@@ -1,9 +1,10 @@
 import pytest
-from app.models.settings import settings
+
 from app.anti_recommendation_engine.anti_recommendation_engine import (
     AntiRecommendationEngine,
 )
 from app.models.record import Record
+from app.models.settings import settings
 from app.models.types import RecordType
 
 
@@ -39,8 +40,7 @@ def test_get_initial_records(
     """Test that AntiRecommendationEngine.get_initial_records() returns a tuple of Records
     with keys that match the AntiRecommendations of the first Record in records."""
 
-    assert anti_recommendation_engine.get_initial_records(
-        record_type) == records[1:]
+    assert anti_recommendation_engine.get_initial_records(record_type) == records[1:]
 
 
 @pytest.mark.skipif(settings.ci, reason="don't have OpenAI key in CI")

@@ -1,5 +1,5 @@
 from abc import abstractmethod
-from collections.abc import Callable, Iterator
+from collections.abc import Callable, Iterable
 
 from langchain.schema.runnable import RunnableSerializable
 
@@ -44,8 +44,8 @@ class OpenAiAntiRecommender(AntiRecommender):
         build_chain: Callable[[], RunnableSerializable],
         create_query: Callable[[str, str], str],
         generate_llm_response: Callable[[str, RunnableSerializable], str],
-        parse_llm_response: Callable[[str], Iterator[AntiRecommendation]],
-    ) -> Iterator[AntiRecommendation]:
+        parse_llm_response: Callable[[str], Iterable[AntiRecommendation]],
+    ) -> Iterable[AntiRecommendation]:
         """Create a generalized workflow that yields AntiRecommendations."""
 
         open_ai_chain = build_chain()
@@ -59,5 +59,5 @@ class OpenAiAntiRecommender(AntiRecommender):
     @abstractmethod
     def generate_anti_recommendations(
         self, record_key: str, record_type: str
-    ) -> Iterator[AntiRecommendation]:
+    ) -> Iterable[AntiRecommendation]:
         pass
