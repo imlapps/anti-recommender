@@ -18,5 +18,4 @@ class AllSourceReader(Reader):
     def read(self) -> Iterator[Record]:
         """Read in output data and yield Records."""
         for reader in self.__readers:
-            if reader:
-                yield from reader.read()
+            yield from reader.read()
