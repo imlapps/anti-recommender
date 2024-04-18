@@ -3,9 +3,10 @@ from typing import Annotated
 from fastapi import APIRouter, Depends, Request
 
 from app.models.record import Record
+from app.models.types.record_type import RecordType
 from app.routers.dependencies import next_records_parameters
 
-router = APIRouter(prefix="/ap1/v1/nerdswipe", tags=["/api/v1/nerdswipe"])
+router = APIRouter(prefix="/api/v1/nerdswipe", tags=["/api/v1/nerdswipe"])
 
 
 @router.get("/next_records")
@@ -18,7 +19,7 @@ async def next_records(
     """
 
     return request.app.state.anti_recommendation_engine.get_next_records(
-        next_params["record_key"], next_params["record_type"]
+        record_key=next_params["record_key"], record_type=next_params["record_type"]
     )
 
 
@@ -33,10 +34,14 @@ async def previous_records(request: Request) -> tuple[Record | None, ...]:
 
 
 @router.get("/initial_records")
-async def initial_records(record_type: str, request: Request) -> tuple[Record, ...]:
+async def initial_records(
+    record_type: RecordType, request: Request
+) -> tuple[Record, ...]:
     """
     A path operation function of the /initial_records endpoint.
     Returns the intial tuple of Records from the AntiRecommendationEngine.
     """
 
-    return request.app.state.anti_recommendation_engine.get_initial_records(record_type)
+    return request.app.state.anti_recommendation_engine.get_initial_records(
+        record_type=record_type
+    )

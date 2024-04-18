@@ -23,10 +23,10 @@ class OpenAiAntiRecommender(AntiRecommender):
                 Helpful Answer:
                 """
 
-    def _create_query(self, record_key: str, record_type: str) -> str:
+    def _create_query(self, record_key: str, record_type: RecordType) -> str:
         """Create a query for the large language model with the given record key."""
 
-        if record_type.lower() == RecordType.WIKIPEDIA:
+        if record_type == RecordType.WIKIPEDIA:
             return (
                 "What are 10 Wikipedia articles on the featured list that are dissimilar but surprisingly similar to the \
                     Wikipedia article "
@@ -39,10 +39,11 @@ class OpenAiAntiRecommender(AntiRecommender):
 
     def _generate_anti_recommendendations(  # noqa: PLR0913
         self,
+        *,
         record_key: str,
-        record_type: str,
+        record_type: RecordType,
         build_chain: Callable[[], RunnableSerializable],
-        create_query: Callable[[str, str], str],
+        create_query: Callable[[str, RecordType], str],
         generate_llm_response: Callable[[str, RunnableSerializable], str],
         parse_llm_response: Callable[[str], Iterable[AntiRecommendation]],
     ) -> Iterable[AntiRecommendation]:
@@ -58,6 +59,6 @@ class OpenAiAntiRecommender(AntiRecommender):
 
     @abstractmethod
     def generate_anti_recommendations(
-        self, record_key: str, record_type: str
+        self, *, record_key: str, record_type: RecordType
     ) -> Iterable[AntiRecommendation]:
         pass

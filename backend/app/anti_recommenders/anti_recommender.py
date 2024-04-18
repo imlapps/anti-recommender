@@ -2,6 +2,7 @@ from abc import ABC, abstractmethod
 from collections.abc import Iterable
 
 from app.models.anti_recommendation import AntiRecommendation
+from app.models.types import RecordType
 
 
 class AntiRecommender(ABC):
@@ -11,6 +12,6 @@ class AntiRecommender(ABC):
 
     @abstractmethod
     def generate_anti_recommendations(
-        self, record_key: str, record_type: str
+        self, *, record_key: str, record_type: RecordType
     ) -> Iterable[AntiRecommendation]:
         pass

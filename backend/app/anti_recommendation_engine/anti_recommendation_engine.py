@@ -4,6 +4,7 @@ from app.anti_recommenders.open_ai.normal_open_ai_anti_recommender import (
 )
 from app.models.record import Record
 from app.models.settings import settings
+from app.models.types.record_type import RecordType
 from app.readers.all_source_reader import AllSourceReader
 
 
@@ -45,14 +46,16 @@ class AntiRecommendationEngine:
 
         return None
 
-    def get_initial_records(self, record_type: str) -> tuple[Record, ...]:
+    def get_initial_records(self, record_type: RecordType) -> tuple[Record, ...]:
         """Return a tuple of Records that have the same key as AntiRecommendations of the first key in __records_by_key."""
 
         return self.get_next_records(
-            next(iter(self.__records_by_key.keys())), record_type
+            record_key=next(iter(self.__records_by_key.keys())), record_type=record_type
         )
 
-    def get_next_records(self, record_key: str, record_type: str) -> tuple[Record, ...]:
+    def get_next_records(
+        self, *, record_key: str, record_type: RecordType
+    ) -> tuple[Record, ...]:
         """Return a tuple of Records that have the same key as the AntiRecommendations of record_key."""
 
         records_of_anti_recommendations: list[Record] = []
@@ -63,7 +66,7 @@ class AntiRecommendationEngine:
             records_of_anti_recommendations = [
                 self.__records_by_key[anti_recommendation.key]
                 for anti_recommendation in self.__anti_recommender.generate_anti_recommendations(
-                    record_key, record_type
+                    record_key=record_key, record_type=record_type
                 )
                 if anti_recommendation.key in self.__records_by_key
             ]
@@ -81,9 +84,7 @@ class AntiRecommendationEngine:
 
         return tuple(records_of_anti_recommendations)
 
-    def get_previous_records(
-        self,
-    ) -> tuple[Record, ...]:
+    def get_previous_records(self) -> tuple[Record, ...]:
         """Return a tuple of Records that matched the previous AntiRecommendations.
         Return an empty tuple if there were no such Records.
         """

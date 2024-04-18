@@ -31,7 +31,7 @@ def test_create_query(
     """Test that OpenAiNormalAntiRecommender._create_query() returns an OpenAI query when passed a record key."""
 
     assert record_key in open_ai_normal_anti_recommender._create_query(  # noqa: SLF001
-        record_key, record_type
+        record_key=record_key, record_type=record_type
     )
 
 
@@ -54,10 +54,10 @@ def test_generate_llm_response(
 
     assert (
         open_ai_normal_anti_recommender._generate_llm_response(  # noqa: SLF001
-            open_ai_normal_anti_recommender._create_query(  # noqa: SLF001
-                record_key, record_type
+            open_ai_query=open_ai_normal_anti_recommender._create_query(  # noqa: SLF001
+                record_key=record_key, record_type=record_type
             ),
-            open_ai_normal_anti_recommender._build_chain(),  # noqa: SLF001
+            open_ai_chain=open_ai_normal_anti_recommender._build_chain(),  # noqa: SLF001
         )
         == model_response
     )
@@ -102,7 +102,7 @@ def test_generate_anti_recommendations(  # noqa: PLR0913
         == next(
             iter(
                 open_ai_normal_anti_recommender.generate_anti_recommendations(
-                    record_key, record_type
+                    record_key=record_key, record_type=record_type
                 )
             )
         ).key
