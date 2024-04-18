@@ -20,7 +20,7 @@ class WikipediaReader(Reader):
     def read(self) -> Iterable[wikipedia.Article]:
         """Read in Wikipedia output data and yield Records."""
 
-        with self.__file_path.open(mode="r", encoding="utf-8") as json_file:
+        with self.__file_path.open(encoding="utf-8") as json_file:
 
             for json_line in json_file:
                 record_json = json.loads(json_line)
