@@ -54,7 +54,7 @@ class NormalOpenAiAntiRecommender(OpenAiAntiRecommender):
             if "wikipedia" in line_chunk[2]:
                 url = line_chunk[2].strip()
 
-            yield AntiRecommendation(title=title, url=url)
+            yield AntiRecommendation(key=title, url=url)
 
     def generate_anti_recommendations(
         self,

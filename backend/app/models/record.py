@@ -3,11 +3,11 @@ from pydantic import BaseModel, ConfigDict
 
 class Record(BaseModel):
     """Pydantic Model to hold a record.
-    `title` is the key of Record.
+    `key` is the name of Record.
+    `url` is the URL of the Record.
     """
 
-    title: str
+    key: str
     url: str
-    abstract: str | None = None
 
     model_config = ConfigDict(extra="allow")

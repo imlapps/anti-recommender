@@ -29,7 +29,15 @@ class WikipediaReader(Reader):
                     continue
 
                 json_obj = json.loads(
-                    unidecode(json.dumps(record_json["record"], ensure_ascii=False))
+                    unidecode(json.dumps(
+                        record_json["record"], ensure_ascii=False))
                 )
 
-                yield wikipedia.Article(**(json_obj["abstract_info"]), **(json_obj))
+                abstract_info_dict = json_obj["abstract_info"]
+
+                yield wikipedia.Article(
+                    key=abstract_info_dict["title"],
+                    url=abstract_info_dict["url"],
+                    abstract=abstract_info_dict["abstract"],
+                    ** (json_obj)
+                )

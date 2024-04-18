@@ -8,10 +8,11 @@ from app.models.wikipedia.external_link import ExternalLink
 class Article(Record):
     """Pydantic Model to hold the contents of a Wikipedia Article."""
 
+    abstract: str | None = None
     categories: tuple[Category, ...] | None = None
     external_links: tuple[ExternalLink, ...] | None = None
 
-    @field_validator("title", "url", "abstract")
+    @field_validator("key", "url", "abstract")
     @classmethod
     def field_must_not_contain_an_empty_string(
         cls, field: str, info: ValidationInfo

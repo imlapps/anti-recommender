@@ -26,7 +26,7 @@ class AntiRecommendationEngine:
 
     def __init__(self) -> None:
         self.__records_by_key: dict[str, Record] = {
-            record.title: record for record in AllSourceReader().read()
+            record.key: record for record in AllSourceReader().read()
         }
         self.__anti_recommender: AntiRecommender | None = (
             self.__select_anti_recommender()
@@ -61,11 +61,11 @@ class AntiRecommendationEngine:
 
             # Retrieve Records that have the same key as the generated AntiRecommendations.
             records_of_anti_recommendations = [
-                self.__records_by_key[anti_recommendation.title]
+                self.__records_by_key[anti_recommendation.key]
                 for anti_recommendation in self.__anti_recommender.generate_anti_recommendations(
                     record_key, record_type
                 )
-                if anti_recommendation.title in self.__records_by_key
+                if anti_recommendation.key in self.__records_by_key
             ]
 
         if records_of_anti_recommendations:

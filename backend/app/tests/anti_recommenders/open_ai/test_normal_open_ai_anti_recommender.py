@@ -98,12 +98,12 @@ def test_generate_anti_recommendations(  # noqa: PLR0913
         return_value=model_response,
     )
     assert (
-        anti_recommendations[0].title
+        anti_recommendations[0].key
         == next(
             iter(
                 open_ai_normal_anti_recommender.generate_anti_recommendations(
                     record_key, record_type
                 )
             )
-        ).title
+        ).key
     )

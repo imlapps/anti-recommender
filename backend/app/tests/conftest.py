@@ -53,7 +53,7 @@ def record_key() -> str:
 
 
 @pytest.fixture(scope="session")
-def record_type() -> str:
+def record_type() -> RecordType:
     """Return a sample record type."""
 
     return RecordType.WIKIPEDIA
@@ -73,11 +73,11 @@ def anti_recommendations() -> tuple[AntiRecommendation, ...]:
 
     return (
         AntiRecommendation(
-            title="Laplace's Demon",
+            key="Laplace's Demon",
             url="https://en.wikipedia.org/wiki/Laplace's_demon",
         ),
         AntiRecommendation(
-            title="Leonardo da Vinci",
+            key="Leonardo da Vinci",
             url="https://en.wikipedia.org/wiki/Leonardo_da_Vinci",
         ),
     )
@@ -199,8 +199,15 @@ def serialized_records() -> tuple[dict[str, Collection[Collection[str]]], ...]:
 @pytest.fixture(scope="session")
 def records(serialized_records: tuple[Any, ...]) -> tuple[Record, ...]:
     """Return a tuple of Records."""
+
     return tuple(
-        Article(**record["abstract_info"], **record) for record in serialized_records
+        Article(
+            key=record["abstract_info"]["title"],
+            url=record["abstract_info"]["url"],
+            abstract=record["abstract_info"]["abstract"],
+            **record
+        )
+        for record in serialized_records
     )
 
 
@@ -210,7 +217,7 @@ def records_by_key(records: tuple[Record, ...]) -> dict[str, Record]:
     _record_store = {}
 
     for record in records:
-        _record_store[record.title] = record
+        _record_store[record.key] = record
 
     return _record_store
 
