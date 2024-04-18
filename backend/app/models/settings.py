@@ -17,13 +17,11 @@ class Settings(BaseSettings):
     )
     anti_recommender_type: AntiRecommenderType = AntiRecommenderType.OPEN_AI
     openai_api_key: str | None = None
-    ci: bool = False
 
     model_config = SettingsConfigDict(
         env_file=(
             BACKEND_FOLDER_PATH / ".env.local",
             BACKEND_FOLDER_PATH / ".env.secret",
-            BACKEND_FOLDER_PATH / ".env.ci",
         ),
         extra="ignore",
         env_file_encoding="utf-8",

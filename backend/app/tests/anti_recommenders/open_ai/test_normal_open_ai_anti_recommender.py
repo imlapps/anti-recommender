@@ -1,3 +1,5 @@
+import os
+
 import pytest
 from langchain.schema.runnable import RunnableSequence, RunnableSerializable
 from pytest_mock import MockFixture
@@ -6,11 +8,10 @@ from app.anti_recommenders.open_ai.normal_open_ai_anti_recommender import (
     NormalOpenAiAntiRecommender,
 )
 from app.models.anti_recommendation import AntiRecommendation
-from app.models.settings import settings
 from app.models.types.record_type import RecordType
 
 
-@pytest.mark.skipif(settings.ci, reason="don't have OpenAI key in CI")
+@pytest.mark.skipif("CI" in os.environ, reason="don't have OpenAI key in CI")
 def test_build_chain(
     open_ai_normal_anti_recommender: NormalOpenAiAntiRecommender,
 ) -> None:
@@ -22,7 +23,7 @@ def test_build_chain(
     )
 
 
-@pytest.mark.skipif(settings.ci, reason="don't have OpenAI key in CI")
+@pytest.mark.skipif("CI" in os.environ, reason="don't have OpenAI key in CI")
 def test_create_query(
     open_ai_normal_anti_recommender: NormalOpenAiAntiRecommender,
     record_key: str,
@@ -35,7 +36,7 @@ def test_create_query(
     )
 
 
-@pytest.mark.skipif(settings.ci, reason="don't have OpenAI key in CI")
+@pytest.mark.skipif("CI" in os.environ, reason="don't have OpenAI key in CI")
 def test_generate_llm_response(
     session_mocker: MockFixture,
     open_ai_normal_anti_recommender: NormalOpenAiAntiRecommender,
@@ -63,7 +64,7 @@ def test_generate_llm_response(
     )
 
 
-@pytest.mark.skipif(settings.ci, reason="don't have OpenAI key in CI")
+@pytest.mark.skipif("CI" in os.environ, reason="don't have OpenAI key in CI")
 def test_parse_llm_response(
     open_ai_normal_anti_recommender: NormalOpenAiAntiRecommender,
     anti_recommendations: tuple[AntiRecommendation, ...],
@@ -81,7 +82,7 @@ def test_parse_llm_response(
     assert tuple(anti_recommendation_records) == anti_recommendations
 
 
-@pytest.mark.skipif(settings.ci, reason="don't have OpenAI key in CI")
+@pytest.mark.skipif("CI" in os.environ, reason="don't have OpenAI key in CI")
 def test_generate_anti_recommendations(  # noqa: PLR0913
     session_mocker: MockFixture,
     open_ai_normal_anti_recommender: NormalOpenAiAntiRecommender,
