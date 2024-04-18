@@ -11,9 +11,9 @@ from app.models.types import RecordType
 def test_get_previous_records_with_empty_stack(
     anti_recommendation_engine: AntiRecommendationEngine,
 ) -> None:
-    """Test that AntiRecommendationEngine.get_previous_records() returns a tuple of None when its stack is empty."""
+    """Test that AntiRecommendationEngine.get_previous_records() returns an empty tuple when its stack is empty."""
 
-    assert anti_recommendation_engine.get_previous_records()[0] is None
+    assert not anti_recommendation_engine.get_previous_records()
 
 
 @pytest.mark.skipif(settings.ci, reason="don't have OpenAI key in CI")
@@ -40,7 +40,8 @@ def test_get_initial_records(
     """Test that AntiRecommendationEngine.get_initial_records() returns a tuple of Records
     with keys that match the AntiRecommendations of the first Record in records."""
 
-    assert anti_recommendation_engine.get_initial_records(record_type) == records[1:]
+    assert anti_recommendation_engine.get_initial_records(
+        record_type) == records[1:]
 
 
 @pytest.mark.skipif(settings.ci, reason="don't have OpenAI key in CI")

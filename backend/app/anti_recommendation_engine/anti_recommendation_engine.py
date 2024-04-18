@@ -83,13 +83,13 @@ class AntiRecommendationEngine:
 
     def get_previous_records(
         self,
-    ) -> tuple[Record | None, ...]:
+    ) -> tuple[Record, ...]:
         """Return a tuple of Records that matched the previous AntiRecommendations.
-        Return a tuple of None if there were no such Records.
+        Return an empty tuple if there were no such Records.
         """
 
         if self.__stack:
 
             return tuple(self.__stack.pop())
 
-        return (None,)
+        return ()
