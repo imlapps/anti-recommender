@@ -14,5 +14,4 @@ class AntiRecommender(ABC):
     def generate_anti_recommendations(
         self, *, record_key: str, record_type: RecordType
     ) -> Iterable[AntiRecommendation]:
-
         pass
