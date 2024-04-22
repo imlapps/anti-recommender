@@ -5,7 +5,7 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 
 from app.models.types import AntiRecommenderType, RecordType
 
-BACKEND_FOLDER_PATH = Path(__file__).cwd()
+CONFIG_FILE_PATH = Path(__file__).parent.parent.parent.absolute()
 
 
 class Settings(BaseSettings):
@@ -20,8 +20,8 @@ class Settings(BaseSettings):
 
     model_config = SettingsConfigDict(
         env_file=(
-            BACKEND_FOLDER_PATH / ".env.local",
-            BACKEND_FOLDER_PATH / ".env.secret",
+            CONFIG_FILE_PATH / ".env.local",
+            CONFIG_FILE_PATH / ".env.secret",
         ),
         extra="ignore",
         env_file_encoding="utf-8",
@@ -36,7 +36,8 @@ class Settings(BaseSettings):
         """Convert the list of file names in the environment variables into a list of Path objects."""
         return frozenset(
             [
-                BACKEND_FOLDER_PATH / "app" / "data" / file_name
+                Path(__file__).parent.parent.absolute() /
+                "app" / "data" / file_name
                 for file_name in output_file_names
             ]
         )
