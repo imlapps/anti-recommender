@@ -12,7 +12,7 @@ def test_next_records(record_key: str, record_type: RecordType) -> None:
     """
     with TestClient(app) as client:
         response = client.get(
-            url="/api/v1/nerdswipe/next_records",
+            url="/api/v1/next_records",
             params={"record_key": record_key, "record_type": record_type.value},
         )
 
@@ -25,7 +25,7 @@ def test_previous_records() -> None:
     """
 
     with TestClient(app) as client:
-        response = client.get(url="/api/v1/nerdswipe/previous_records")
+        response = client.get(url="/api/v1/previous_records")
         assert response.status_code == OK_STATUS_CODE
 
 
@@ -36,7 +36,7 @@ def test_initial_records(record_type: RecordType) -> None:
 
     with TestClient(app) as client:
         response = client.get(
-            url="/api/v1/nerdswipe/initial_records",
+            url="/api/v1/initial_records",
             params={"record_type": record_type.value},
         )
         assert response.status_code == OK_STATUS_CODE

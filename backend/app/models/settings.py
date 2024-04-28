@@ -3,7 +3,7 @@ from pathlib import Path
 from pydantic import Field, field_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
-from app.models.types import AntiRecommenderType, RecordType
+from app.models.types import AntiRecommenderType, RecordType, ApiKey
 
 CONFIG_FILE_PATH = Path(__file__).parent.parent.parent.absolute()
 
@@ -16,7 +16,7 @@ class Settings(BaseSettings):
         default=frozenset(), validation_alias="output_file_names"
     )
     anti_recommender_type: AntiRecommenderType = AntiRecommenderType.OPEN_AI
-    openai_api_key: str | None = None
+    openai_api_key: ApiKey | None = None
 
     model_config = SettingsConfigDict(
         env_file=(
@@ -36,8 +36,7 @@ class Settings(BaseSettings):
         """Convert the list of file names in the environment variables into a list of Path objects."""
         return frozenset(
             [
-                Path(__file__).parent.parent.absolute() /
-                "app" / "data" / file_name
+                Path(__file__).parent.parent.absolute() / "data" / file_name
                 for file_name in output_file_names
             ]
         )

@@ -13,7 +13,7 @@ from app.anti_recommenders.open_ai.normal_open_ai_anti_recommender import (
 )
 from app.models.anti_recommendation import AntiRecommendation
 from app.models.record import Record
-from app.models.types import RecordType
+from app.models.types import RecordType, RecordKey, ModelResponse
 from app.models.wikipedia.article import Article
 from app.readers.all_source_reader import AllSourceReader
 from app.readers.reader.wikipedia_reader import WikipediaReader
@@ -46,7 +46,7 @@ def open_ai_normal_anti_recommender() -> NormalOpenAiAntiRecommender:
 
 
 @pytest.fixture(scope="session")
-def record_key() -> str:
+def record_key() -> RecordKey:
     """Return a sample record key."""
 
     return "Nikola Tesla"
@@ -60,7 +60,7 @@ def record_type() -> RecordType:
 
 
 @pytest.fixture(scope="session")
-def model_response() -> str:
+def model_response() -> ModelResponse:
     """Return a sample response from a large language model."""
 
     return "1 - Laplace's Demon - https://en.wikipedia.org/wiki/Laplace's_demon\n\
@@ -201,25 +201,19 @@ def records(serialized_records: tuple[Any, ...]) -> tuple[Record, ...]:
     """Return a tuple of Records."""
 
     return tuple(
-        Article(
-            key=record["abstract_info"]["title"],
-            url=record["abstract_info"]["url"],
-            abstract=record["abstract_info"]["abstract"],
-            **record
-        )
-        for record in serialized_records
+        Article(**record["abstract_info"], **record) for record in serialized_records
     )
 
 
 @pytest.fixture(scope="session")
-def records_by_key(records: tuple[Record, ...]) -> dict[str, Record]:
+def records_by_key(records: tuple[Record, ...]) -> dict[RecordKey, Record]:
     """Return a dictionary of Records."""
-    _record_store = {}
+    _records_by_key = {}
 
     for record in records:
-        _record_store[record.key] = record
+        _records_by_key[record.key] = record
 
-    return _record_store
+    return _records_by_key
 
 
 @pytest.fixture(scope="session")

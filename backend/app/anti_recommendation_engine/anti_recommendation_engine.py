@@ -4,7 +4,7 @@ from app.anti_recommenders.open_ai.normal_open_ai_anti_recommender import (
 )
 from app.models.record import Record
 from app.models.settings import settings
-from app.models.types.record_type import RecordType
+from app.models.types import RecordType, RecordKey
 from app.readers.all_source_reader import AllSourceReader
 
 
@@ -15,7 +15,7 @@ class AntiRecommendationEngine:
     record_type is the type of AntiRecommendations retrieved from the AntiRecommender.
 
     An AntiRecommendationEngine consists of:
-        - __records_by_key: A dictionary of type str: Record, that holds Records obtained from storage.
+        - __records_by_key: A dictionary of type RecordKey: Record, that holds Records obtained from storage.
         - __current_anti_recommendation_records: A list of Records that are currently used for anti-recommendations.
         - __stack: A stack that stores a list of Records that were previously used for anti-recommendations.
 
@@ -26,7 +26,7 @@ class AntiRecommendationEngine:
     """
 
     def __init__(self) -> None:
-        self.__records_by_key: dict[str, Record] = {
+        self.__records_by_key: dict[RecordKey, Record] = {
             record.key: record for record in AllSourceReader().read()
         }
         self.__anti_recommender: AntiRecommender | None = (
@@ -54,7 +54,7 @@ class AntiRecommendationEngine:
         )
 
     def get_next_records(
-        self, *, record_key: str, record_type: RecordType
+        self, *, record_key: RecordKey, record_type: RecordType
     ) -> tuple[Record, ...]:
         """Return a tuple of Records that have the same key as the AntiRecommendations of record_key."""
 

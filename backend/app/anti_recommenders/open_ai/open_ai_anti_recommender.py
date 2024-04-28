@@ -5,7 +5,7 @@ from langchain.schema.runnable import RunnableSerializable
 
 from app.anti_recommenders.anti_recommender import AntiRecommender
 from app.models.anti_recommendation import AntiRecommendation
-from app.models.types import RecordType
+from app.models.types import RecordType, RecordKey, ModelQuery, ModelResponse
 
 
 class OpenAiAntiRecommender(AntiRecommender):
@@ -23,7 +23,9 @@ class OpenAiAntiRecommender(AntiRecommender):
                 Helpful Answer:
                 """
 
-    def _create_query(self, record_key: str, record_type: RecordType) -> str:
+    def _create_query(
+        self, record_key: RecordKey, record_type: RecordType
+    ) -> ModelQuery:
         """Create a query for the large language model with the given record key."""
 
         if record_type == RecordType.WIKIPEDIA:
@@ -40,12 +42,14 @@ class OpenAiAntiRecommender(AntiRecommender):
     def _generate_anti_recommendendations(  # noqa: PLR0913
         self,
         *,
-        record_key: str,
+        record_key: RecordKey,
         record_type: RecordType,
         build_chain: Callable[[], RunnableSerializable],
-        create_query: Callable[[str, RecordType], str],
-        generate_llm_response: Callable[[str, RunnableSerializable], str],
-        parse_llm_response: Callable[[str], Iterable[AntiRecommendation]],
+        create_query: Callable[[RecordKey, RecordType], ModelQuery],
+        generate_llm_response: Callable[
+            [ModelQuery, RunnableSerializable], ModelResponse
+        ],
+        parse_llm_response: Callable[[ModelResponse], Iterable[AntiRecommendation]],
     ) -> Iterable[AntiRecommendation]:
         """Create a generalized workflow that yields AntiRecommendations."""
 
@@ -59,6 +63,6 @@ class OpenAiAntiRecommender(AntiRecommender):
 
     @abstractmethod
     def generate_anti_recommendations(
-        self, *, record_key: str, record_type: RecordType
+        self, *, record_key: RecordKey, record_type: RecordType
     ) -> Iterable[AntiRecommendation]:
         pass

@@ -1,6 +1,9 @@
-from pydantic import ValidationInfo, field_validator
+from pydantic import Field
+
+from typing import Annotated
 
 from app.models.record import Record
+from app.models.types import RecordKey
 from app.models.wikipedia.category import Category
 from app.models.wikipedia.external_link import ExternalLink
 
@@ -8,18 +11,10 @@ from app.models.wikipedia.external_link import ExternalLink
 class Article(Record):
     """Pydantic Model to hold the contents of a Wikipedia Article."""
 
-    abstract: str | None = None
+    key: RecordKey = Field(..., alias="title")
+
+    abstract: (
+        Annotated[str, Field(json_schema_extra={"strip_whitespace": "True"})] | None
+    ) = None
     categories: tuple[Category, ...] | None = None
     external_links: tuple[ExternalLink, ...] | None = None
-
-    @field_validator("key", "url", "abstract")
-    @classmethod
-    def field_must_not_contain_an_empty_string(
-        cls, field: str, info: ValidationInfo
-    ) -> str | None:
-        """Raise error if the field contains an empty string."""
-        if field.strip() == "":
-            if info.field_name == "abstract":
-                return None
-            raise ValueError(f"{info.field_name} cannot be an empty string.")
-        return field

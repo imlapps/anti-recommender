@@ -3,30 +3,31 @@ from typing import Annotated
 from fastapi import APIRouter, Depends, Request
 
 from app.models.record import Record
-from app.models.types.record_type import RecordType
-from app.routers.dependencies import next_records_parameters
+from app.models.query_params import NextRecordsQueryParams, CommonQueryParams
 
-router = APIRouter(prefix="/api/v1/nerdswipe", tags=["/api/v1/nerdswipe"])
+
+router = APIRouter(prefix="/api/v1", tags=["/api/v1"])
 
 
 @router.get("/next_records")
 async def next_records(
-    next_params: Annotated[dict, Depends(next_records_parameters)], request: Request
+    next_params: Annotated[NextRecordsQueryParams, Depends(NextRecordsQueryParams)],
+    request: Request,
 ) -> tuple[Record, ...]:
     """
-    This is the path operation function of the /next endpoint.
+    This is the path operation function of the /next_records endpoint.
     Returns a tuple of Records from the AntiRecommendationEngine.
     """
 
     return request.app.state.anti_recommendation_engine.get_next_records(
-        record_key=next_params["record_key"], record_type=next_params["record_type"]
+        record_key=next_params.record_key, record_type=next_params.record_type
     )
 
 
 @router.get("/previous_records")
 async def previous_records(request: Request) -> tuple[Record | None, ...]:
     """
-    The path operation function of the /previous endpoint.
+    The path operation function of the /previous_records endpoint.
     Returns a tuple of previous Records stored in the AntiRecommendationEngine.
     """
 
@@ -35,7 +36,8 @@ async def previous_records(request: Request) -> tuple[Record | None, ...]:
 
 @router.get("/initial_records")
 async def initial_records(
-    record_type: RecordType, request: Request
+    initial_records_params: Annotated[CommonQueryParams, Depends(CommonQueryParams)],
+    request: Request,
 ) -> tuple[Record, ...]:
     """
     A path operation function of the /initial_records endpoint.
@@ -43,5 +45,5 @@ async def initial_records(
     """
 
     return request.app.state.anti_recommendation_engine.get_initial_records(
-        record_type=record_type
+        record_type=initial_records_params.record_type
     )
