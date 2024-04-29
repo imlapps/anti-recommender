@@ -1,4 +1,5 @@
 from typing import Annotated
+
 from pydantic import Field
 
 # Tiny type for a Large Language Model's response.

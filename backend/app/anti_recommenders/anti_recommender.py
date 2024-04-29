@@ -2,7 +2,7 @@ from abc import ABC, abstractmethod
 from collections.abc import Iterable
 
 from app.models.anti_recommendation import AntiRecommendation
-from app.models.types import RecordType, RecordKey
+from app.models.types import RecordKey, RecordType
 
 
 class AntiRecommender(ABC):

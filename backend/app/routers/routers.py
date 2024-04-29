@@ -2,9 +2,8 @@ from typing import Annotated
 
 from fastapi import APIRouter, Depends, Request
 
+from app.models.query_params import CommonQueryParams, NextRecordsQueryParams
 from app.models.record import Record
-from app.models.query_params import NextRecordsQueryParams, CommonQueryParams
-
 
 router = APIRouter(prefix="/api/v1", tags=["/api/v1"])
 

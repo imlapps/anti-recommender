@@ -3,7 +3,7 @@ from pathlib import Path
 from pydantic import Field, field_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
-from app.models.types import AntiRecommenderType, RecordType, ApiKey
+from app.models.types import AntiRecommenderType, ApiKey, RecordType
 
 CONFIG_FILE_PATH = Path(__file__).parent.parent.parent.absolute()
 

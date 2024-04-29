@@ -4,7 +4,7 @@ from app.anti_recommenders.open_ai.normal_open_ai_anti_recommender import (
 )
 from app.models.record import Record
 from app.models.settings import settings
-from app.models.types import RecordType, RecordKey
+from app.models.types import RecordKey, RecordType
 from app.readers.all_source_reader import AllSourceReader
 
 

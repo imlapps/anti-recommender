@@ -13,7 +13,7 @@ from app.anti_recommenders.open_ai.normal_open_ai_anti_recommender import (
 )
 from app.models.anti_recommendation import AntiRecommendation
 from app.models.record import Record
-from app.models.types import RecordType, RecordKey, ModelResponse
+from app.models.types import ModelResponse, RecordKey, RecordType
 from app.models.wikipedia.article import Article
 from app.readers.all_source_reader import AllSourceReader
 from app.readers.reader.wikipedia_reader import WikipediaReader

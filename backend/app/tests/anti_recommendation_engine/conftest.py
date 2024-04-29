@@ -16,7 +16,8 @@ def _anti_recommender(
     session_mocker: MockFixture,
     model_response: str,
 ) -> None:
-    """Mock AntiRecommenders based on parameterized types and run before all tests in the module."""
+    """Run this fixture before all tests in the module, and mock AntiRecommenders based on parameterized types."""
+
     if request.param is AntiRecommenderType.OPEN_AI and settings.openai_api_key:
         session_mocker.patch.object(
             NormalOpenAiAntiRecommender,

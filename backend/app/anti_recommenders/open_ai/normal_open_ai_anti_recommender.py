@@ -7,7 +7,7 @@ from langchain_openai import OpenAI
 
 from app.anti_recommenders.open_ai.open_ai_anti_recommender import OpenAiAntiRecommender
 from app.models.anti_recommendation import AntiRecommendation
-from app.models.types import RecordType, RecordKey, ModelQuery, ModelResponse
+from app.models.types import ModelQuery, ModelResponse, RecordKey, RecordType
 
 
 class NormalOpenAiAntiRecommender(OpenAiAntiRecommender):

@@ -1,6 +1,6 @@
-from pydantic import Field
-
 from typing import Annotated
+
+from pydantic import Field
 
 from app.models.record import Record
 from app.models.types import RecordKey

@@ -1,5 +1,7 @@
 from typing import Annotated
+
 from pydantic import BaseModel, ConfigDict, Field
+
 from app.models.types import RecordKey
 
 
