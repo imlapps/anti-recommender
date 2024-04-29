@@ -8,5 +8,6 @@ poetry run black --check app
 poetry run mypy app
 poetry run ruff check app
 
-mkdir -p "$(dirname "$0")/../.."/test-results
-poetry run pytest --junitxml=../test-results/junit.xml
+cd "$(dirname "$0")/.."
+mkdir -p test-results
+poetry run pytest --junitxml=test-results/junit.xml
