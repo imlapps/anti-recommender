@@ -1,2 +1,5 @@
+*.pyc
 elm-stuff
 elm.js
+nerdswipe_venv
+backend/.env.secret

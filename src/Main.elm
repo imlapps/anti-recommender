@@ -1,11 +1,11 @@
 module Main exposing (..)
 
-import Http
-import Browser
-import Random
-import Array exposing (Array)
 
-import Monocle.Optional exposing (Optional)
+import Random
+import Browser
+import Array exposing (Array)
+import String exposing (split)
+
 import Monocle.Lens exposing (Lens)
 
 import Html.Styled exposing (..)
@@ -14,7 +14,8 @@ import Html.Styled.Events exposing (onClick)
 
 import Parser exposing (..)
 import WikipediaTypes exposing (..)
-import String exposing (split)
+import HammerEvents exposing (HammerEvent,onSwipe,onSwipeRight)
+
 
 import Css
 import Tailwind.Breakpoints as Breakpoints
@@ -25,14 +26,15 @@ import Tailwind.Theme as Tw
 -- MODEL
 type LoadDataStatus = Failure | Loading | Success (Array WikipediaRecord)
 type alias Model =  
-                  {  loadDataStatus: LoadDataStatus
+                  {  
+                    loadDataStatus: LoadDataStatus
                    , currentWikipediaIndex: Int
                    , randomWikipediaIndex: Int
                    , numberOfWikipediaRecords: Int
                   }
 
 -- MAIN
-main : Program () Model Msg
+main : Program String Model Msg
 main = Browser.element
     { init = init
     , update = update
@@ -41,25 +43,30 @@ main = Browser.element
     }
 
 -- INIT
-init : () -> (Model, Cmd Msg)
-init _ =
-  ( {loadDataStatus = Loading , currentWikipediaIndex = 0, randomWikipediaIndex = 13, numberOfWikipediaRecords = 0}
-  , getFile
-  )
+init : String -> (Model, Cmd Msg)
+init flags = (
+  let wikipediaRecordsArray = Array.fromList(buildWikipediaRecordsList(flags)) in
+           {loadDataStatus = (Success wikipediaRecordsArray), 
+             currentWikipediaIndex = 0, 
+             randomWikipediaIndex = 13, 
+             numberOfWikipediaRecords = (Array.length wikipediaRecordsArray)},
+  Cmd.none)
+
 
 -- UPDATE
 type Msg
-  = GotText (Result Http.Error String) 
+  = GotText (Result String String) 
     | Next 
     | Previous
     | RandomNumber Int
 
--- Read Wikipedia JSONL file
-getFile: Cmd Msg
-getFile = Http.get
-      { url = "/src/storage/mini-wikipedia.output.txt"
-      , expect = Http.expectString GotText
-      }
+
+-- -- Read Wikipedia JSONL file
+-- getFile: Cmd Msg
+-- getFile = Http.get
+--       { url = "/src/storage/mini-wikipedia.output.txt"
+--       , expect = Http.expectString GotText
+--       }
 
 
 
@@ -184,17 +191,22 @@ view model =
           ]]][
           
         -- previous wikipedia container
-          div[css[Tw.flex, 
+          div[
+            HammerEvents.onSwipeRight( \_ -> Previous),
+            css[Tw.flex, 
                   Tw.items_center,
                   Tw.justify_center]][
 
         -- previous button
-         div[css [Tw.z_10,
+         div[
+         
+          css [Tw.z_10,
                   Tw.absolute, 
                   Tw.transform,
                   Tw.translate_x_36,Tw.translate_y_0]][
 
             button [onClick Previous,
+                    
                     css[
                     Tw.bg_color Tw.custom_pink,
                     Tw.border,
@@ -307,18 +319,22 @@ view model =
         ],
                  
         -- next wikipedia container
-        div[css[
+        div[ 
+      HammerEvents.onSwipeLeft( \_ -> Next),
+        css[
                 Tw.flex, 
                 Tw.items_center,
                 Tw.justify_center
-            ]][
+            ]
+             ][
           -- next button
-          div[css [Tw.z_10,
+          div[  css [Tw.z_10,
                   Tw.absolute, 
                   Tw.transform,
                   Tw.translate_x_64,Tw.translate_y_0
               ]][
-              button[onClick Next,
+              button[onClick Next, 
+                     
                     css[
                       Tw.bg_color Tw.pink_400,
                       Tw.border,
@@ -359,7 +375,8 @@ view model =
               Tw.border,
               Tw.border_color Tw.gray_900, 
               Tw.rounded
-            ]][]],
+            ]
+            ][]],
             
            -- wikipedia title (next)
            div[
@@ -399,8 +416,12 @@ view model =
             Tw.pl_12
             ]
           ]
-        ][          
+        ][         
           div[
+            css [
+              Tw.pb_4
+          ]][
+             div[
             css [
               Tw.flex, 
               Tw.justify_center, 
@@ -409,17 +430,53 @@ view model =
             ]
           ][
             h1[
-              css[ Tw.py_2 ]
+              css[ Tw.py_2,
+                   Tw.pb_4]
             ][text("Abstract")]
           ],
           div[css [
-                  Tw.text_lg, 
+                  Tw.text_2xl, 
                   Tw.flex,
                   Tw.justify_center,
+                  Tw.self_center,
                   Tw.text_color Tw.gray_200
               ]][
                 p[] [extractWikipediaAbstractFromWikipediaRecord (Array.get model.currentWikipediaIndex wikipediaRecordsArray)]
-              ]], 
+              ]
+          ] ,
+              -- External Links
+          div[
+            css [ 
+              Tw.hidden,
+              Breakpoints.lg[
+              Tw.flex, 
+              Tw.justify_center, 
+              Tw.text_color Tw.pink_400, 
+              Tw.font_serif,
+              Tw.py_4]
+            ]
+          ][
+            h1[][text("External Links")]
+          ]
+          ,
+          div[
+            class "scrollbar",
+            css [ 
+              Tw.hidden,
+                Breakpoints.lg[
+                Tw.block,   
+                Tw.overflow_y_auto,
+                Tw.h_144,
+                Tw.flex_row,
+                Tw.justify_center,
+                Tw.border_4,
+                Tw.border_color Tw.black]
+            ]
+
+          ][
+              ul [] (extractExternalWikipediaLinksFromWikipediaRecord (Array.get model.currentWikipediaIndex wikipediaRecordsArray))
+          ]
+              ], 
 
         -- Ratings and Categories View       
         div[
@@ -460,19 +517,25 @@ view model =
             ]
           ][
             h1[
-              css[Tw.py_2]
+              css[Tw.py_4]
             ][text("Categories")]
           ],
-          div[
+        div[
+          css[
+          Tw.flex,
+          Tw.justify_center
+        ]
+      ][
+            div[
+          class "scrollbar",
             css [
-              Tw.flex,
-              Tw.justify_center
+              Tw.overflow_y_auto,        
+              Tw.h_144
           ]
           ][
-            div[][
                 ul [] (extractWikipediaCategoriesFromWikipediaRecord (Array.get model.currentWikipediaIndex wikipediaRecordsArray))
-            ]
           ]
+        ]
          ]
      ],
       -- Explore View
@@ -495,7 +558,7 @@ view model =
               Tw.font_serif
             ]][
           h1[
-            css[Tw.py_2]][text("Explore")]
+            css[Tw.pt_2, Tw.pb_4]][text("Explore")]
           ],
 
           -- Generate 5 random Wikipedia Articles
@@ -565,8 +628,8 @@ extractWikipediaAbstractFromWikipediaRecord record =
               Nothing ->
                 text("Nothing")
               Just abstract_info ->
-                 if ((List.length (split " " abstract_info.abstract)) >= 10) then
-                 text(abstract_info.abstract) else text(" ")
+                 if ((List.length (split " " abstract_info.abstract)) >= 20) then
+                 text(abstract_info.abstract) else text("Not Available")
 
 -- extract Wikipedia Image URL from Wikipedia Record
 extractWikipediaImageURLFromWikipediaRecord : Maybe WikipediaRecord -> String 
@@ -620,6 +683,45 @@ createSublinkItemElement sublink =
           ]
         ][ text (( sublink.anchor)) ]]
 
+
+-- extract external Wikipedia Links List from Wikipedia Record
+extractExternalWikipediaLinksFromWikipediaRecord: Maybe WikipediaRecord -> List(Html Msg)
+extractExternalWikipediaLinksFromWikipediaRecord record =
+        case record of 
+          Nothing ->
+            [li [] [a [][text("Nothing")]]]
+          Just wikiRecord ->
+            case wikiRecord.external_links of 
+              Nothing ->
+               [li [] [a [][text("Nothing")]]]
+              Just external_links ->
+                (List.map createExternalLinkItemElement external_links)
+
+-- extract ExternalLink Item from Sublink List and create HTML element
+createExternalLinkItemElement : ExternalLink -> Html msg
+createExternalLinkItemElement externallink = 
+        a [href externallink.link, target "_blank",
+                              css [
+                  Tw.no_underline,
+                  Tw.text_color Tw.gray_900
+            ]] [ li [
+        css[ 
+              Tw.block,
+              Tw.text_xl
+            , Tw.bg_color Tw.black
+            , Tw.text_color Tw.pink_400
+            , Tw.rounded
+            , Tw.px_2
+            , Tw.py_4
+            , Tw.my_0_dot_5
+            , Tw.font_serif
+            , Css.hover [ Tw.bg_color Tw.pink_400, Tw.text_color Tw.white ],
+            Tw.mr_1
+            , Css.lastChild
+                [ Tw.mr_0
+                ]
+          ]
+        ][ text (( externallink.title)) ]]
 
 -- extract Wikipedia Category List from Wikipedia Record
 extractWikipediaCategoriesFromWikipediaRecord: Maybe WikipediaRecord -> List(Html Msg)
