@@ -23,27 +23,21 @@ class OpenAiAntiRecommender(AntiRecommender):
                 Helpful Answer:
                 """
 
-    def _create_query(
-        self, record_key: RecordKey, record_type: RecordType
-    ) -> ModelQuery:
+    def _create_query(self, record_key: RecordKey) -> ModelQuery:
         """Create a query for the large language model with the given record key."""
 
-        if record_type == RecordType.WIKIPEDIA:
-            return (
-                "What are 10 Wikipedia articles on the featured list that are dissimilar but surprisingly similar to the \
+        return (
+            "What are 10 Wikipedia articles on the featured list that are dissimilar but surprisingly similar to the \
                     Wikipedia article "
-                + record_key
-                + "? \
+            + record_key
+            + "? \
                     Give each answer on a new line, and in the format: Number - Title - URL."
-            )
-
-        return ""
+        )
 
     def _generate_anti_recommendendations(  # noqa: PLR0913
         self,
         *,
         record_key: RecordKey,
-        record_type: RecordType,
         build_chain: Callable[[], RunnableSerializable],
         create_query: Callable[[RecordKey, RecordType], ModelQuery],
         generate_llm_response: Callable[
@@ -54,7 +48,7 @@ class OpenAiAntiRecommender(AntiRecommender):
         """Create a generalized workflow that yields AntiRecommendations."""
 
         open_ai_chain = build_chain()
-        open_ai_query = create_query(record_key, record_type)
+        open_ai_query = create_query(record_key)
         generate_open_ai_llm_response = generate_llm_response(
             open_ai_query, open_ai_chain
         )
@@ -63,6 +57,6 @@ class OpenAiAntiRecommender(AntiRecommender):
 
     @abstractmethod
     def generate_anti_recommendations(
-        self, *, record_key: RecordKey, record_type: RecordType
+        self, *, record_key: RecordKey
     ) -> Iterable[AntiRecommendation]:
         pass

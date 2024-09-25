@@ -1,2 +1,1 @@
-from .common_query_params import CommonQueryParams as CommonQueryParams
 from .next_records_query_params import NextRecordsQueryParams as NextRecordsQueryParams

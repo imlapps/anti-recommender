@@ -12,7 +12,6 @@ def create_readers(settings: Settings) -> tuple[Reader, ...]:
     readers = []
     for record_type in settings.record_types:
         if record_type == RecordType.WIKIPEDIA:
-
             readers.extend(
                 [
                     WikipediaReader(output_file_path)

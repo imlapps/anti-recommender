@@ -4,8 +4,7 @@ from pydantic import Field
 
 from app.models import Record
 from app.models.types import RecordKey
-from app.models.wikipedia import Category
-from app.models.wikipedia import ExternalLink
+from app.models.wikipedia import Category, ExternalLink
 
 
 class Article(Record):

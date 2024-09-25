@@ -4,7 +4,9 @@ from typing import Annotated
 from pydantic import Field, field_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 from pyoxigraph import NamedNode
-from app.models.types import AntiRecommenderType, ApiKey, RecordType, RdfMimeType
+
+from app.models.types import (AntiRecommenderType, ApiKey, RdfMimeType,
+                              RecordType)
 
 CONFIG_DIRECTORY_PATH = Path(__file__).parent.parent.parent.absolute()
 DATA_DIRECTORY_PATH = Path(__file__).parent.parent.absolute() / "data"
@@ -24,7 +26,7 @@ class Settings(BaseSettings):
     )
     wikipedia_arkg_file_path: Annotated[
         Path, Field(min_length=1, json_schema_extra={"strip_whitespace": "True"})
-    ] = (DATA_DIRECTORY_PATH / "wikipedia_arkg_file.ttl")
+    ] = DATA_DIRECTORY_PATH / "wikipedia_arkg_file.ttl"
     wikipedia_arkg_mime_type: RdfMimeType = RdfMimeType.TURTLE
 
     model_config = SettingsConfigDict(

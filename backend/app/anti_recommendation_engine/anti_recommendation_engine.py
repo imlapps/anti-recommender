@@ -1,7 +1,5 @@
 from app.anti_recommenders import AntiRecommender
-from app.anti_recommenders.open_ai import (
-    NormalOpenAiAntiRecommender,
-)
+from app.anti_recommenders.open_ai import NormalOpenAiAntiRecommender
 from app.models import Record, settings
 from app.models.types import RecordKey, RecordType
 from app.readers import AllSourceReader
@@ -45,35 +43,30 @@ class AntiRecommendationEngine:
 
         return None
 
-    def get_initial_records(self, record_type: RecordType) -> tuple[Record, ...]:
+    def get_initial_records(self) -> tuple[Record, ...]:
         """Return a tuple of Records that have the same key as AntiRecommendations of the first key in __records_by_key."""
 
         return self.get_next_records(
-            record_key=next(iter(self.__records_by_key.keys())), record_type=record_type
+            record_key=next(iter(self.__records_by_key.keys()))
         )
 
-    def get_next_records(
-        self, *, record_key: RecordKey, record_type: RecordType
-    ) -> tuple[Record, ...]:
+    def get_next_records(self, *, record_key: RecordKey) -> tuple[Record, ...]:
         """Return a tuple of Records that have the same key as the AntiRecommendations of record_key."""
 
         records_of_anti_recommendations: list[Record] = []
 
         if self.__anti_recommender:
-
             # Retrieve Records that have the same key as the generated AntiRecommendations.
             records_of_anti_recommendations = [
                 self.__records_by_key[anti_recommendation.key]
                 for anti_recommendation in self.__anti_recommender.generate_anti_recommendations(
-                    record_key=record_key, record_type=record_type
+                    record_key=record_key
                 )
                 if anti_recommendation.key in self.__records_by_key
             ]
 
         if records_of_anti_recommendations:
-
             if self.__current_anti_recommendation_records:
-
                 self.__stack.append(self.__current_anti_recommendation_records)
 
             self.__current_anti_recommendation_records = [
@@ -84,12 +77,13 @@ class AntiRecommendationEngine:
         return tuple(records_of_anti_recommendations)
 
     def get_previous_records(self) -> tuple[Record, ...]:
-        """Return a tuple of Records that matched the previous AntiRecommendations.
+        """
+        Return a tuple of Records that matched the previous AntiRecommendations.
+
         Return an empty tuple if there were no such Records.
         """
 
         if self.__stack:
-
             return tuple(self.__stack.pop())
 
         return ()

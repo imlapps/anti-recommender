@@ -1,4 +1,9 @@
-from .anti_recommendation import AntiRecommendation as AntiRecommendation
 from .record import Record as Record
-from .settings import settings as settings
 from .settings import Settings as Settings
+from .settings import settings as settings
+from .wikipedia_base_url import WIKIPEDIA_BASE_URL as WIKIPEDIA_BASE_URL
+
+from .anti_recommendation import AntiRecommendation as AntiRecommendation  # isort: skip
+from .anti_recommendation_graph import (  # isort: skip
+    AntiRecommendationGraph as AntiRecommendationGraph,
+)

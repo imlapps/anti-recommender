@@ -58,13 +58,12 @@ class NormalOpenAiAntiRecommender(OpenAiAntiRecommender):
             yield AntiRecommendation(key=title, url=url)
 
     def generate_anti_recommendations(
-        self, *, record_key: RecordKey, record_type: RecordType
+        self, *, record_key: RecordKey
     ) -> Iterable[AntiRecommendation]:
         """Yield AntiRecommendations of a given record key, and of type record_type."""
 
         yield from self._generate_anti_recommendendations(
             record_key=record_key,
-            record_type=record_type,
             build_chain=self._build_chain,
             create_query=self._create_query,
             generate_llm_response=self._generate_llm_response,

@@ -3,25 +3,22 @@ from pathlib import Path
 from typing import Any
 
 import pytest
+from pyoxigraph import NamedNode
 from pytest_mock import MockFixture
 
-from app.anti_recommendation_engine import (
-    AntiRecommendationEngine,
-)
-from app.anti_recommenders.open_ai import (
-    NormalOpenAiAntiRecommender,
-)
-from app.models import AntiRecommendation
-from app.models import Record, wikipedia
-from app.models.types import ModelResponse, RecordKey, RecordType
-
+from app.anti_recommendation_engine import AntiRecommendationEngine
+from app.anti_recommenders.arkg import ArkgAntiRecommender
+from app.anti_recommenders.open_ai import NormalOpenAiAntiRecommender
+from app.models import WIKIPEDIA_BASE_URL, AntiRecommendation, Record, wikipedia
+from app.models.types import ModelResponse, RdfMimeType, RecordKey, RecordType
 from app.readers import AllSourceReader
 from app.readers.reader import WikipediaReader
 
 
 @pytest.fixture(scope="session")
 def all_source_reader() -> AllSourceReader:
-    """Yield an AllSourceReader object."""
+    """Return an AllSourceReader object."""
+
     return AllSourceReader()
 
 
@@ -29,19 +26,21 @@ def all_source_reader() -> AllSourceReader:
 def wikipedia_output_path() -> Path:
     """Return the Path of the Wikipedia output file."""
 
-    return Path(__file__).parent.parent / "data" / "mini-wikipedia.output.txt"
+    return (
+        Path(__file__).parent.parent.absolute() / "data" / "mini-wikipedia.output.txt"
+    )
 
 
 @pytest.fixture(scope="session")
 def wikipedia_reader(wikipedia_output_path: Path) -> WikipediaReader:
-    """Yield a WikipediaReader object."""
+    """Return a WikipediaReader object."""
 
     return WikipediaReader(file_path=wikipedia_output_path)
 
 
 @pytest.fixture(scope="session")
 def open_ai_normal_anti_recommender() -> NormalOpenAiAntiRecommender:
-    """Yield an OpenAiNormalAntiRecommender object."""
+    """Return an OpenAiNormalAntiRecommender object."""
     return NormalOpenAiAntiRecommender()
 
 
@@ -221,8 +220,57 @@ def records_by_key(records: tuple[Record, ...]) -> dict[RecordKey, Record]:
 def anti_recommendation_engine(
     session_mocker: MockFixture, records: tuple[Record, ...]
 ) -> AntiRecommendationEngine:
-    """Yield an AntiRecommendationEngine object."""
+    """Return an AntiRecommendationEngine object."""
 
     session_mocker.patch.object(AllSourceReader, "read", return_value=records)
 
     return AntiRecommendationEngine()
+
+
+@pytest.fixture(scope="session")
+def arkg_file_path() -> Path:
+    """Return the file path of a Wikipedia ARKG."""
+
+    return Path(__file__).parent.parent.absolute() / "data" / "wikipedia_arkg.ttl"
+
+
+@pytest.fixture(scope="session")
+def arkg_mime_type() -> RdfMimeType:
+    """Return the MIME Type of a Wikipedia ARKG file."""
+
+    return RdfMimeType.TURTLE
+
+
+@pytest.fixture(scope="session")
+def arkg_base_iri() -> NamedNode:
+    """Return the base IRI of a Wikipedia ARKG."""
+
+    return NamedNode("http://imlapps.github.io/anti-recommender/anti-recommendation/")
+
+
+@pytest.fixture(scope="session")
+def arkg_record_keys() -> tuple[RecordKey, ...]:
+    return ("Sankoré_Madrasah",)
+
+
+@pytest.fixture(scope="session")
+def arkg_anti_recommendations() -> tuple[AntiRecommendation, ...]:
+    key = "Mouseion"
+    return (AntiRecommendation(key=key, url=WIKIPEDIA_BASE_URL + key),)
+
+
+@pytest.fixture(scope="session")
+def arkg_anti_recommender(
+    arkg_base_iri: NamedNode,
+    arkg_file_path: Path,
+    arkg_mime_type: RdfMimeType,
+    arkg_record_keys: tuple[RecordKey, ...],
+) -> ArkgAntiRecommender:
+    """Return an ArkgAntiRecommender object."""
+
+    return ArkgAntiRecommender(
+        arkg_base_iri=arkg_base_iri,
+        arkg_file_path=arkg_file_path,
+        arkg_mime_type=arkg_mime_type,
+        record_keys=arkg_record_keys,
+    )

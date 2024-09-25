@@ -12,6 +12,6 @@ class AntiRecommender(ABC):
 
     @abstractmethod
     def generate_anti_recommendations(
-        self, *, record_key: RecordKey, record_type: RecordType
+        self, *, record_key: RecordKey
     ) -> Iterable[AntiRecommendation]:
         pass

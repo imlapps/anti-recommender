@@ -2,8 +2,8 @@ from typing import Annotated
 
 from fastapi import APIRouter, Depends, Request
 
-from app.models.query_params import CommonQueryParams, NextRecordsQueryParams
 from app.models import Record
+from app.models.query_params import NextRecordsQueryParams
 
 router = APIRouter(prefix="/api/v1", tags=["/api/v1"])
 
@@ -19,7 +19,7 @@ async def next_records(
     """
 
     return request.app.state.anti_recommendation_engine.get_next_records(  # type: ignore[no-any-return]
-        record_key=next_params.record_key, record_type=next_params.record_type
+        record_key=next_params.record_key
     )
 
 
@@ -35,7 +35,6 @@ async def previous_records(request: Request) -> tuple[Record | None, ...]:
 
 @router.get("/initial_records")
 async def initial_records(
-    initial_records_params: Annotated[CommonQueryParams, Depends(CommonQueryParams)],
     request: Request,
 ) -> tuple[Record, ...]:
     """
@@ -43,6 +42,6 @@ async def initial_records(
     Returns the intial tuple of Records from the AntiRecommendationEngine.
     """
 
-    return request.app.state.anti_recommendation_engine.get_initial_records(  # type: ignore[no-any-return]
-        record_type=initial_records_params.record_type
+    return (
+        request.app.state.anti_recommendation_engine.get_initial_records()  # type: ignore[no-any-return]
     )

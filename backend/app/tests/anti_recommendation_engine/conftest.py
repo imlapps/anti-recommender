@@ -1,9 +1,7 @@
 import pytest
 from pytest_mock import MockFixture
 
-from app.anti_recommenders.open_ai import (
-    NormalOpenAiAntiRecommender,
-)
+from app.anti_recommenders.open_ai import NormalOpenAiAntiRecommender
 from app.models import settings
 from app.models.types import AntiRecommenderType
 
