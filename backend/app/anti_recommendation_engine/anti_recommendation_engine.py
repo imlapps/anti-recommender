@@ -1,11 +1,10 @@
-from app.anti_recommenders.anti_recommender import AntiRecommender
-from app.anti_recommenders.open_ai.normal_open_ai_anti_recommender import (
+from app.anti_recommenders import AntiRecommender
+from app.anti_recommenders.open_ai import (
     NormalOpenAiAntiRecommender,
 )
-from app.models.record import Record
-from app.models.settings import settings
+from app.models import Record, settings
 from app.models.types import RecordKey, RecordType
-from app.readers.all_source_reader import AllSourceReader
+from app.readers import AllSourceReader
 
 
 class AntiRecommendationEngine:

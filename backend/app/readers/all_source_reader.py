@@ -1,9 +1,8 @@
 from collections.abc import Iterable
 
-from app.models.record import Record
-from app.models.settings import settings
-from app.readers.create_readers import create_readers
-from app.readers.reader.reader import Reader
+from app.models import Record, settings
+from app.readers import create_readers
+from app.readers.reader import Reader
 
 
 class AllSourceReader(Reader):

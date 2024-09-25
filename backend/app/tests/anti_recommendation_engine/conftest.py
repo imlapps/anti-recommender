@@ -1,10 +1,10 @@
 import pytest
 from pytest_mock import MockFixture
 
-from app.anti_recommenders.open_ai.normal_open_ai_anti_recommender import (
+from app.anti_recommenders.open_ai import (
     NormalOpenAiAntiRecommender,
 )
-from app.models.settings import settings
+from app.models import settings
 from app.models.types import AntiRecommenderType
 
 ANTI_RECOMMENDER_TYPES = frozenset([AntiRecommenderType.OPEN_AI])

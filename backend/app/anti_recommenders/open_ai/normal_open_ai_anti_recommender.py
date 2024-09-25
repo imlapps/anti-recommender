@@ -5,8 +5,8 @@ from langchain.schema import StrOutputParser
 from langchain.schema.runnable import RunnablePassthrough, RunnableSerializable
 from langchain_openai import OpenAI
 
-from app.anti_recommenders.open_ai.open_ai_anti_recommender import OpenAiAntiRecommender
-from app.models.anti_recommendation import AntiRecommendation
+from app.anti_recommenders.open_ai import OpenAiAntiRecommender
+from app.models import AntiRecommendation
 from app.models.types import ModelQuery, ModelResponse, RecordKey, RecordType
 
 
@@ -32,7 +32,7 @@ class NormalOpenAiAntiRecommender(OpenAiAntiRecommender):
     ) -> ModelResponse:
         """Invoke the OpenAI large language model and generate a response."""
 
-        return open_ai_chain.invoke(open_ai_query)
+        return str(open_ai_chain.invoke(open_ai_query))
 
     def _parse_llm_response(
         self, open_ai_llm_response: ModelResponse

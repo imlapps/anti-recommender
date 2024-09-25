@@ -2,10 +2,10 @@ import os
 
 import pytest
 
-from app.anti_recommendation_engine.anti_recommendation_engine import (
+from app.anti_recommendation_engine import (
     AntiRecommendationEngine,
 )
-from app.models.record import Record
+from app.models import Record
 from app.models.types import RecordType
 
 

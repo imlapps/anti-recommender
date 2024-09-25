@@ -1,11 +1,11 @@
 from langchain.schema.runnable import RunnableSequence, RunnableSerializable
 from pytest_mock import MockFixture
 
-from app.anti_recommenders.open_ai.normal_open_ai_anti_recommender import (
+from app.anti_recommenders.open_ai import (
     NormalOpenAiAntiRecommender,
 )
-from app.models.anti_recommendation import AntiRecommendation
-from app.models.types.record_type import RecordType
+from app.models import AntiRecommendation
+from app.models.types import RecordType
 
 
 def test_build_chain(

@@ -4,7 +4,7 @@ from contextlib import asynccontextmanager
 from fastapi import FastAPI
 
 from app.anti_recommendation_engine import AntiRecommendationEngine
-from app.routers.routers import router
+from app.routers import router
 
 
 @asynccontextmanager

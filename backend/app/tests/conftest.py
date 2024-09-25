@@ -5,18 +5,18 @@ from typing import Any
 import pytest
 from pytest_mock import MockFixture
 
-from app.anti_recommendation_engine.anti_recommendation_engine import (
+from app.anti_recommendation_engine import (
     AntiRecommendationEngine,
 )
-from app.anti_recommenders.open_ai.normal_open_ai_anti_recommender import (
+from app.anti_recommenders.open_ai import (
     NormalOpenAiAntiRecommender,
 )
-from app.models.anti_recommendation import AntiRecommendation
-from app.models.record import Record
+from app.models import AntiRecommendation
+from app.models import Record, wikipedia
 from app.models.types import ModelResponse, RecordKey, RecordType
-from app.models.wikipedia.article import Article
-from app.readers.all_source_reader import AllSourceReader
-from app.readers.reader.wikipedia_reader import WikipediaReader
+
+from app.readers import AllSourceReader
+from app.readers.reader import WikipediaReader
 
 
 @pytest.fixture(scope="session")
@@ -201,7 +201,8 @@ def records(serialized_records: tuple[Any, ...]) -> tuple[Record, ...]:
     """Return a tuple of Records."""
 
     return tuple(
-        Article(**record["abstract_info"], **record) for record in serialized_records
+        wikipedia.Article(**record["abstract_info"], **record)
+        for record in serialized_records
     )
 
 

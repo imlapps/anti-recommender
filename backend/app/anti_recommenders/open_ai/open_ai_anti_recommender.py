@@ -4,7 +4,7 @@ from collections.abc import Callable, Iterable
 from langchain.schema.runnable import RunnableSerializable
 
 from app.anti_recommenders.anti_recommender import AntiRecommender
-from app.models.anti_recommendation import AntiRecommendation
+from app.models import AntiRecommendation
 from app.models.types import ModelQuery, ModelResponse, RecordKey, RecordType
 
 

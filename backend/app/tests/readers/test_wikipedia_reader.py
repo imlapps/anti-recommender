@@ -1,5 +1,5 @@
 from app.models import wikipedia
-from app.readers.reader.wikipedia_reader import WikipediaReader
+from app.readers.reader import WikipediaReader
 
 
 def test_read(wikipedia_reader: WikipediaReader) -> None:

@@ -1,1 +1,3 @@
-from .anti_recommendation_engine import AntiRecommendationEngine  # noqa: F401
+from .anti_recommendation_engine import (
+    AntiRecommendationEngine as AntiRecommendationEngine,
+)

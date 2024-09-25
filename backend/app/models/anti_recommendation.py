@@ -1,4 +1,4 @@
-from app.models.record import Record
+from app.models import Record
 
 
 class AntiRecommendation(Record):

@@ -1,7 +1,7 @@
 from fastapi.testclient import TestClient
 
 from app.main import app
-from app.models.types.record_type import RecordType
+from app.models.types import RecordType
 
 OK_STATUS_CODE = 200
 

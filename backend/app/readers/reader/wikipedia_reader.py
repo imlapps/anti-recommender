@@ -5,7 +5,7 @@ from pathlib import Path
 from unidecode import unidecode
 
 from app.models import wikipedia
-from app.readers.reader.reader import Reader
+from app.readers.reader import Reader
 
 
 class WikipediaReader(Reader):

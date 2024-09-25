@@ -1,7 +1,6 @@
-from app.models.settings import Settings
+from app.models import Settings
 from app.models.types import RecordType
-from app.readers.reader.reader import Reader
-from app.readers.reader.wikipedia_reader import WikipediaReader
+from app.readers.reader import Reader, WikipediaReader
 
 
 def create_readers(settings: Settings) -> tuple[Reader, ...]:

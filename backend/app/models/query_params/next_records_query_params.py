@@ -1,4 +1,4 @@
-from app.models.query_params.common_query_params import CommonQueryParams
+from app.models.query_params import CommonQueryParams
 from app.models.types import RecordKey
 
 
