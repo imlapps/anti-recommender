@@ -4,3 +4,4 @@ from .model_query import ModelQuery as ModelQuery
 from .model_response import ModelResponse as ModelResponse
 from .record_key import RecordKey as RecordKey
 from .record_type import RecordType as RecordType
+from .rdf_mime_type import RdfMimeType as RdfMimeType
