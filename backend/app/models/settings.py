@@ -3,8 +3,8 @@ from typing import Annotated
 
 from pydantic import Field, field_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
-
-from app.models.types import AntiRecommenderType, ApiKey, RecordType
+from pyoxigraph import NamedNode
+from app.models.types import AntiRecommenderType, ApiKey, RecordType, RdfMimeType
 
 CONFIG_DIRECTORY_PATH = Path(__file__).parent.parent.parent.absolute()
 DATA_DIRECTORY_PATH = Path(__file__).parent.parent.absolute() / "data"
@@ -13,15 +13,19 @@ DATA_DIRECTORY_PATH = Path(__file__).parent.parent.absolute() / "data"
 class Settings(BaseSettings):
     """A Pydantic BaseSetting to hold environment variables."""
 
-    record_types: frozenset[RecordType] = frozenset()
+    anti_recommender_type: AntiRecommenderType = AntiRecommenderType.OPEN_AI
+    openai_api_key: ApiKey | None = None
     output_file_paths: frozenset[Path] = Field(
         default=frozenset(), validation_alias="output_file_names"
     )
-    anti_recommender_type: AntiRecommenderType = AntiRecommenderType.OPEN_AI
+    record_types: frozenset[RecordType] = frozenset()
+    wikipedia_arkg_base_iri: NamedNode = NamedNode(
+        "http://imlapps.github.io/anti-recommender/anti-recommendation/"
+    )
     wikipedia_arkg_file_path: Annotated[
         Path, Field(min_length=1, json_schema_extra={"strip_whitespace": "True"})
     ] = (DATA_DIRECTORY_PATH / "wikipedia_arkg_file.ttl")
-    openai_api_key: ApiKey | None = None
+    wikipedia_arkg_mime_type: RdfMimeType = RdfMimeType.TURTLE
 
     model_config = SettingsConfigDict(
         env_file=(
