@@ -6,6 +6,7 @@ from app.readers.reader import Reader, WikipediaReader
 def create_readers(settings: Settings) -> tuple[Reader, ...]:
     """
     Return a tuple of Readers depending on the record type in settings.
+
     Readers are instantiated with Paths that contain the corresponding record types in the Path names.
     """
 

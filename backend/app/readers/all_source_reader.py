@@ -6,7 +6,8 @@ from app.readers.reader.reader import Reader
 
 
 class AllSourceReader(Reader):
-    """A multiplexer for different Readers.
+    """
+    A multiplexer for different Readers.
 
     Read in output data and yield them as Records.
     """

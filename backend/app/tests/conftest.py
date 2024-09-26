@@ -9,7 +9,7 @@ from pytest_mock import MockFixture
 
 from app.anti_recommendation_engine import AntiRecommendationEngine
 from app.anti_recommenders.arkg import ArkgAntiRecommender
-from app.anti_recommenders.open_ai import NormalOpenAiAntiRecommender
+from app.anti_recommenders.openai import NormalOpenaiAntiRecommender
 from app.models import (
     AntiRecommendation,
     Record,
@@ -50,11 +50,11 @@ def wikipedia_reader(wikipedia_output_path: Path) -> WikipediaReader:
 
 
 @pytest.fixture(scope="session")
-def open_ai_normal_anti_recommender(
+def openai_normal_anti_recommender(
     openai_api_key: None,  # noqa: ARG001
-) -> NormalOpenAiAntiRecommender:
-    """Return an OpenAiNormalAntiRecommender."""
-    return NormalOpenAiAntiRecommender()
+) -> NormalOpenaiAntiRecommender:
+    """Return an OpenaiNormalAntiRecommender."""
+    return NormalOpenaiAntiRecommender()
 
 
 @pytest.fixture(scope="session")

@@ -5,7 +5,7 @@ import pyoxigraph as ox
 
 from app.anti_recommenders import AntiRecommender
 from app.models import WIKIPEDIA_BASE_URL, AntiRecommendation, AntiRecommendationGraph
-from app.models.types import RdfMimeType, RecordKey
+from app.models.types import RdfMimeType, RecordKey, StoreQuery
 from app.namespaces import SCHEMA
 
 
@@ -29,31 +29,42 @@ class ArkgAntiRecommender(AntiRecommender):
         self.__arkg_mime_type = arkg_mime_type
         self.__record_keys: tuple[RecordKey, ...] = record_keys
         self.__store: ox.Store = ox.Store()
-
         self.__load_store()
 
-    def __arkg_query(self, record_key: RecordKey) -> str:
+    def __arkg_query(self, record_key: RecordKey) -> StoreQuery:
+        """
+        Return a SPARQL query that fetches anti-recommendations of `record_key` from an ARKG Store.
+        """
+
         return f"SELECT ?title WHERE {{ <{record_key}> <{SCHEMA.ITEM_REVIEWED.value}> ?resource {{?resource <{SCHEMA.TITLE.value}> ?title}} }}"
 
     def __build_anti_recommendation_path_graph(
-        self, initial_record_key: RecordKey
+        self, starting_record_key: RecordKey
     ) -> tuple[AntiRecommendationGraph, ...]:
-        """Extract an anti-recommendation path graph from an ARKG Store."""
+        """
+        Return an a tuple of `AntiRecommendationGraphs`.
 
-        head: RecordKey | None = initial_record_key
+        The tuple of `AntiRecommendationGraphs` represents a path graph that has been extracted from an ARKG Store.
+
+        The starting point of the path graph is `starting_record_key`.
+        """
+
+        graph_head: RecordKey | None = starting_record_key
         anti_recommendation_path_graph: list[AntiRecommendationGraph] = []
         anti_recommendation_path_graph_record_keys: list[RecordKey] = []
-        record_keys_queue = list(self.__record_keys)
-        record_keys_queue.sort()
+        record_keys_list = list(self.__record_keys)
 
-        while record_keys_queue:
-            anti_recommendation_path_graph_record_keys.append(str(head))
-            record_keys_queue.remove(str(head))
+        record_keys_list.sort()
+
+        while record_keys_list:
+
+            anti_recommendation_path_graph_record_keys.append(str(graph_head))
+            record_keys_list.remove(str(graph_head))
 
             anti_recommendation_keys = [
                 binding["title"].value
                 for binding in self.__store.query(  # type: ignore[union-attr]
-                    query=self.__arkg_query(str(head)),
+                    query=self.__arkg_query(str(graph_head)),
                     base_iri=self.__arkg_base_iri.value,
                 )
             ]
@@ -61,37 +72,39 @@ class ArkgAntiRecommender(AntiRecommender):
             if anti_recommendation_keys:
                 anti_recommendation_path_graph = list(
                     self.__populate_anti_recommendation_path_graph(
-                        record_key=str(head),
+                        record_key=str(graph_head),
                         anti_recommendation_path_graph=tuple(
                             anti_recommendation_path_graph
                         ),
                         anti_recommendation_keys=tuple(anti_recommendation_keys),
                     )
                 )
-                head = None
+                graph_head = None
 
+                # Set graph_head to the first record_key that is not in the path graph
                 for anti_recommendation_key in anti_recommendation_keys:
                     if (
                         anti_recommendation_key
                         not in anti_recommendation_path_graph_record_keys
                     ):
-                        head = anti_recommendation_key
+                        graph_head = anti_recommendation_key
                         break
             else:
-                anti_recommendation_key = record_keys_queue.pop(0)
+                # If no anti-recommendation keys are in the Store, use the first key in record_keys_list as the anti-recommendation key.
+                anti_recommendation_key = record_keys_list.pop(0)
                 anti_recommendation_path_graph = list(
                     self.__populate_anti_recommendation_path_graph(
-                        record_key=str(head),
+                        record_key=str(graph_head),
                         anti_recommendation_path_graph=tuple(
                             anti_recommendation_path_graph
                         ),
                         anti_recommendation_keys=(anti_recommendation_key,),
                     )
                 )
-                head = None
+                graph_head = None
 
-            if not head and record_keys_queue:
-                head = record_keys_queue.pop(0)
+            if not graph_head and record_keys_list:
+                graph_head = record_keys_list.pop(0)
 
         return tuple(anti_recommendation_path_graph)
 
@@ -111,7 +124,7 @@ class ArkgAntiRecommender(AntiRecommender):
         anti_recommendation_path_graph: tuple[AntiRecommendationGraph, ...],
         anti_recommendation_keys: tuple[RecordKey, ...],
     ) -> tuple[AntiRecommendationGraph, ...]:
-        """Add an anti-recommendation graph to an anti-recommendation path graph."""
+        """Add an `AntiRecommendationGraph` to an anti-recommendation path graph."""
 
         anti_recommendation_path_graph_list = list(anti_recommendation_path_graph)
         anti_recommendation_path_graph_list.append(
@@ -133,7 +146,7 @@ class ArkgAntiRecommender(AntiRecommender):
         self, *, record_key: RecordKey
     ) -> Iterable[AntiRecommendation]:
         """
-        Generate anti-recommendations of a record.
+        Generate anti-recommendations of a Record.
 
         Anti-recommendations are obtained from an ARKG.
         """

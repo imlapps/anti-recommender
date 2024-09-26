@@ -25,7 +25,7 @@ class Settings(BaseSettings):
     )
     arkg_file_path: Annotated[
         Path, Field(min_length=1, json_schema_extra={"strip_whitespace": "True"})
-    ] = DATA_DIRECTORY_PATH / "wikipedia_arkg_file.ttl"
+    ] = (DATA_DIRECTORY_PATH / "wikipedia_arkg_file.ttl")
     arkg_mime_type: RdfMimeType = RdfMimeType.TURTLE
 
     model_config = SettingsConfigDict(
@@ -43,7 +43,8 @@ class Settings(BaseSettings):
     def convert_to_list_of_file_paths(
         cls, output_file_names: frozenset[str]
     ) -> frozenset[Path]:
-        """Convert the list of file names in the environment variables into a list of Path objects."""
+        """Convert the list of file names in the environment variables into a list of Paths."""
+
         return frozenset(
             [DATA_DIRECTORY_PATH / file_name for file_name in output_file_names]
         )
@@ -51,7 +52,7 @@ class Settings(BaseSettings):
     @field_validator("arkg_file_path", mode="before")
     @classmethod
     def convert_to_file_path(cls, arkg_file_name: str) -> Path:
-        """Convert the file name of an ARKG into a data directory Path."""
+        """Convert the file name of an ARKG into a Path."""
 
         return DATA_DIRECTORY_PATH / arkg_file_name
 

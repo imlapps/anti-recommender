@@ -1,5 +1,5 @@
 from app.anti_recommenders import AntiRecommender
-from app.anti_recommenders.open_ai import NormalOpenAiAntiRecommender
+from app.anti_recommenders.openai import NormalOpenaiAntiRecommender
 from app.anti_recommenders.arkg import ArkgAntiRecommender
 from app.models import Record, settings
 from app.models.types import RecordKey, AntiRecommenderType
@@ -7,7 +7,8 @@ from app.readers import AllSourceReader
 
 
 class AntiRecommendationEngine:
-    """AntiRecommendationEngine for the NerdSwipe backend.
+    """
+    AntiRecommendationEngine for the NerdSwipe backend.
 
     An AntiRecommendationEngine reaches out to an AntiRecommender to retrieve AntiRecommendations of a record_key.
 
@@ -39,7 +40,7 @@ class AntiRecommendationEngine:
             settings.anti_recommender_type == AntiRecommenderType.OPEN_AI
             and settings.openai_api_key
         ):
-            return NormalOpenAiAntiRecommender()
+            return NormalOpenaiAntiRecommender()
 
         if settings.anti_recommender_type == AntiRecommenderType.ARKG:
             return ArkgAntiRecommender(

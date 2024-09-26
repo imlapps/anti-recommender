@@ -1,7 +1,7 @@
 import pytest
 from pytest_mock import MockFixture
 
-from app.anti_recommenders.open_ai import NormalOpenAiAntiRecommender
+from app.anti_recommenders.openai import NormalOpenaiAntiRecommender
 
 from app.models import settings
 from app.models.types import AntiRecommenderType, ModelResponse
@@ -22,7 +22,7 @@ def _anti_recommender(
 
     if request.param is AntiRecommenderType.OPEN_AI and settings.openai_api_key:
         session_mocker.patch.object(
-            NormalOpenAiAntiRecommender,
+            NormalOpenaiAntiRecommender,
             "_generate_llm_response",
             return_value=model_response,
         )

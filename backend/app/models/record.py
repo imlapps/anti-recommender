@@ -6,8 +6,11 @@ from app.models.types import RecordKey
 
 
 class Record(BaseModel):
-    """Pydantic Model to hold a record.
+    """
+    Pydantic Model to hold a record.
+
     `key` is the name of a Record.
+
     `url` is the URL of a Record.
     """
 

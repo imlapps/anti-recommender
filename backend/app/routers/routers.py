@@ -14,7 +14,8 @@ async def next_records(
     request: Request,
 ) -> tuple[Record, ...]:
     """
-    This is the path operation function of the /next_records endpoint.
+    The path operation function of the /next_records endpoint.
+
     Returns a tuple of Records from the AntiRecommendationEngine.
     """
 
@@ -27,6 +28,7 @@ async def next_records(
 async def previous_records(request: Request) -> tuple[Record | None, ...]:
     """
     The path operation function of the /previous_records endpoint.
+
     Returns a tuple of previous Records stored in the AntiRecommendationEngine.
     """
 
@@ -38,7 +40,8 @@ async def initial_records(
     request: Request,
 ) -> tuple[Record, ...]:
     """
-    A path operation function of the /initial_records endpoint.
+    The path operation function of the /initial_records endpoint.
+
     Returns the intial tuple of Records from the AntiRecommendationEngine.
     """
 
