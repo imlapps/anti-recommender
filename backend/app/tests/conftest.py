@@ -9,7 +9,13 @@ from pytest_mock import MockFixture
 from app.anti_recommendation_engine import AntiRecommendationEngine
 from app.anti_recommenders.arkg import ArkgAntiRecommender
 from app.anti_recommenders.open_ai import NormalOpenAiAntiRecommender
-from app.models import WIKIPEDIA_BASE_URL, AntiRecommendation, Record, wikipedia
+from app.models import (
+    WIKIPEDIA_BASE_URL,
+    AntiRecommendation,
+    Record,
+    wikipedia,
+    AntiRecommendationGraph,
+)
 from app.models.types import ModelResponse, RdfMimeType, RecordKey, RecordType
 from app.readers import AllSourceReader
 from app.readers.reader import WikipediaReader
@@ -48,7 +54,7 @@ def open_ai_normal_anti_recommender() -> NormalOpenAiAntiRecommender:
 def record_key() -> RecordKey:
     """Return a sample record key."""
 
-    return "Nikola Tesla"
+    return "Nikola_Tesla"
 
 
 @pytest.fixture(scope="session")
@@ -62,8 +68,8 @@ def record_type() -> RecordType:
 def model_response() -> ModelResponse:
     """Return a sample response from a large language model."""
 
-    return "1 - Laplace's Demon - https://en.wikipedia.org/wiki/Laplace's_demon\n\
-            2 - Leonardo da Vinci - https://en.wikipedia.org/wiki/Leonardo_da_Vinci"
+    return "1 - Laplace's_demon - https://en.wikipedia.org/wiki/Laplace's_demon\n\
+            2 - Leonardo_da_Vinci - https://en.wikipedia.org/wiki/Leonardo_da_Vinci"
 
 
 @pytest.fixture(scope="session")
@@ -72,11 +78,11 @@ def anti_recommendations() -> tuple[AntiRecommendation, ...]:
 
     return (
         AntiRecommendation(
-            key="Laplace's Demon",
+            key="Laplace's_demon",
             url="https://en.wikipedia.org/wiki/Laplace's_demon",
         ),
         AntiRecommendation(
-            key="Leonardo da Vinci",
+            key="Leonardo_da_Vinci",
             url="https://en.wikipedia.org/wiki/Leonardo_da_Vinci",
         ),
     )
@@ -89,7 +95,7 @@ def serialized_records() -> tuple[dict[str, Collection[Collection[str]]], ...]:
     return (
         {
             "abstract_info": {
-                "title": "Nikola Tesla",
+                "title": "Nikola_Tesla",
                 "abstract": "A Serbian-American inventor, best known for his contributions to the design of \
                              the modern alternating current (AC) electricity supply system.",
                 "url": "https://en.wikipedia.org/wiki/Nikola_Tesla",
@@ -125,7 +131,7 @@ def serialized_records() -> tuple[dict[str, Collection[Collection[str]]], ...]:
         },
         {
             "abstract_info": {
-                "title": "Laplace's Demon",
+                "title": "Laplace's_demon",
                 "abstract": "In the history of science, Laplace's demon was a notable published articulation \
                          of causal determinism on a scientific basis by Pierre-Simon Laplace in 1814.",
                 "url": "https://en.wikipedia.org/wiki/Laplace's_demon",
@@ -161,7 +167,7 @@ def serialized_records() -> tuple[dict[str, Collection[Collection[str]]], ...]:
         },
         {
             "abstract_info": {
-                "title": "Leonardo da Vinci",
+                "title": "Leonardo_da_Vinci",
                 "abstract": "An Italian polymath of the High Renaissance who was active as a painter, \
                                 draughtsman, engineer, scientist, theorist, sculptor, and architect.",
                 "url": "https://en.wikipedia.org/wiki/Leonardo_da_Vinci",
@@ -249,22 +255,11 @@ def arkg_base_iri() -> NamedNode:
 
 
 @pytest.fixture(scope="session")
-def arkg_record_keys() -> tuple[RecordKey, ...]:
-    return ("Sankoré_Madrasah",)
-
-
-@pytest.fixture(scope="session")
-def arkg_anti_recommendations() -> tuple[AntiRecommendation, ...]:
-    key = "Mouseion"
-    return (AntiRecommendation(key=key, url=WIKIPEDIA_BASE_URL + key),)
-
-
-@pytest.fixture(scope="session")
 def arkg_anti_recommender(
     arkg_base_iri: NamedNode,
     arkg_file_path: Path,
     arkg_mime_type: RdfMimeType,
-    arkg_record_keys: tuple[RecordKey, ...],
+    records_by_key: dict[RecordKey, Record],
 ) -> ArkgAntiRecommender:
     """Return an ArkgAntiRecommender object."""
 
@@ -272,5 +267,5 @@ def arkg_anti_recommender(
         arkg_base_iri=arkg_base_iri,
         arkg_file_path=arkg_file_path,
         arkg_mime_type=arkg_mime_type,
-        record_keys=arkg_record_keys,
+        record_keys=records_by_key.keys(),
     )

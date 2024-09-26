@@ -5,8 +5,7 @@ from pydantic import Field, field_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 from pyoxigraph import NamedNode
 
-from app.models.types import (AntiRecommenderType, ApiKey, RdfMimeType,
-                              RecordType)
+from app.models.types import AntiRecommenderType, ApiKey, RdfMimeType, RecordType
 
 CONFIG_DIRECTORY_PATH = Path(__file__).parent.parent.parent.absolute()
 DATA_DIRECTORY_PATH = Path(__file__).parent.parent.absolute() / "data"
@@ -21,13 +20,13 @@ class Settings(BaseSettings):
         default=frozenset(), validation_alias="output_file_names"
     )
     record_types: frozenset[RecordType] = frozenset()
-    wikipedia_arkg_base_iri: NamedNode = NamedNode(
+    arkg_base_iri: NamedNode = NamedNode(
         "http://imlapps.github.io/anti-recommender/anti-recommendation/"
     )
-    wikipedia_arkg_file_path: Annotated[
+    arkg_file_path: Annotated[
         Path, Field(min_length=1, json_schema_extra={"strip_whitespace": "True"})
-    ] = DATA_DIRECTORY_PATH / "wikipedia_arkg_file.ttl"
-    wikipedia_arkg_mime_type: RdfMimeType = RdfMimeType.TURTLE
+    ] = (DATA_DIRECTORY_PATH / "wikipedia_arkg_file.ttl")
+    arkg_mime_type: RdfMimeType = RdfMimeType.TURTLE
 
     model_config = SettingsConfigDict(
         env_file=(
@@ -49,12 +48,12 @@ class Settings(BaseSettings):
             [DATA_DIRECTORY_PATH / file_name for file_name in output_file_names]
         )
 
-    @field_validator("wikipedia_arkg_file_path", mode="before")
+    @field_validator("arkg_file_path", mode="before")
     @classmethod
-    def convert_to_file_path(cls, wikipedia_arkg_file_name: str) -> Path:
+    def convert_to_file_path(cls, arkg_file_name: str) -> Path:
         """Convert the file name of an ARKG into a data directory Path."""
 
-        return DATA_DIRECTORY_PATH / wikipedia_arkg_file_name
+        return DATA_DIRECTORY_PATH / arkg_file_name
 
 
 settings = Settings()

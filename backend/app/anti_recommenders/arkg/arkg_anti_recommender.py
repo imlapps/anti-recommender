@@ -94,7 +94,8 @@ class ArkgAntiRecommender(AntiRecommender):
         """Load an ARKG serialization into an RDF Store."""
 
         self.__store.load(
-            path=self.__arkg_file_path,
+            input=self.__arkg_file_path,
+            mime_type=self.__arkg_mime_type.value,
             base_iri=self.__arkg_base_iri.value,
         )
 
