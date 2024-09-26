@@ -34,3 +34,8 @@ jobs:
         if: always()
         with:
           files: backend/test-results/*.xml
+      - name: Pytest coverage comment
+        uses: MishaKav/pytest-coverage-comment@main
+        with:
+            junitxml-path: test-results/junit.xml
+            pytest-coverage-path: test-results/coverage.txt
