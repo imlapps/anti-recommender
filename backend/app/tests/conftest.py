@@ -30,19 +30,23 @@ def all_source_reader() -> AllSourceReader:
 
 
 @pytest.fixture(scope="session")
-def wikipedia_output_path() -> Path:
+def wikipedia_output_file_path() -> Path:
     """Return the Path of the Wikipedia output file."""
 
-    return (
+    wikipedia_output_file_path = (
         Path(__file__).parent.parent.absolute() / "data" / "mini-wikipedia.output.txt"
     )
+    if wikipedia_output_file_path.exists():
+        return wikipedia_output_file_path
+
+    pytest.skip(reason="don't have Wikipedia ARKG test file.")
 
 
 @pytest.fixture(scope="session")
-def wikipedia_reader(wikipedia_output_path: Path) -> WikipediaReader:
+def wikipedia_reader(wikipedia_output_file_path: Path) -> WikipediaReader:
     """Return a WikipediaReader."""
 
-    return WikipediaReader(file_path=wikipedia_output_path)
+    return WikipediaReader(file_path=wikipedia_output_file_path)
 
 
 @pytest.fixture(scope="session")
