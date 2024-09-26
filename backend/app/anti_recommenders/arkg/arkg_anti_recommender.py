@@ -5,7 +5,7 @@ import pyoxigraph as ox
 
 from app.anti_recommenders import AntiRecommender
 from app.models import WIKIPEDIA_BASE_URL, AntiRecommendation, AntiRecommendationGraph
-from app.models.types import RdfMimeType, RecordKey, RecordType
+from app.models.types import RdfMimeType, RecordKey
 from app.namespaces import SCHEMA
 
 
@@ -23,40 +23,45 @@ class ArkgAntiRecommender(AntiRecommender):
         arkg_mime_type: RdfMimeType,
         record_keys: tuple[RecordKey, ...],
     ) -> None:
+        self.__anti_recommendation_path_graph: list[AntiRecommendationGraph] = []
         self.__arkg_base_iri = arkg_base_iri
         self.__arkg_file_path = arkg_file_path
         self.__arkg_mime_type = arkg_mime_type
         self.__record_keys: tuple[RecordKey, ...] = record_keys
         self.__store: ox.Store = ox.Store()
-        self.__anti_recommendation_path_graph: list[AntiRecommendationGraph] = []
+
         self.__load_store()
 
-    def __build_anti_recommendation_path_graph(
-        self, head: RecordKey
-    ) -> tuple[AntiRecommendationGraph, ...]:
-        """Extract a anti-recommendation path graph from an ARKG Store."""
+    def __arkg_query(self, record_key: RecordKey) -> str:
+        return f"SELECT ?title WHERE {{ <{record_key}> <{SCHEMA.ITEM_REVIEWED.value}> ?resource {{?resource <{SCHEMA.TITLE.value}> ?title}} }}"
 
+    def __build_anti_recommendation_path_graph(
+        self, initial_record_key: RecordKey
+    ) -> tuple[AntiRecommendationGraph, ...]:
+        """Extract an anti-recommendation path graph from an ARKG Store."""
+
+        head: RecordKey | None = initial_record_key
         anti_recommendation_path_graph: list[AntiRecommendationGraph] = []
         anti_recommendation_path_graph_record_keys: list[RecordKey] = []
         record_keys_queue = list(self.__record_keys)
         record_keys_queue.sort()
 
         while record_keys_queue:
-            anti_recommendation_path_graph_record_keys.append(head)
-            record_keys_queue.remove(head)
+            anti_recommendation_path_graph_record_keys.append(str(head))
+            record_keys_queue.remove(str(head))
 
-            anti_recommendation_keys = list(
+            anti_recommendation_keys = [
                 binding["title"].value
-                for binding in self.__store.query(
-                    query=f"SELECT ?title WHERE {{ <{head}> <{SCHEMA.ITEM_REVIEWED.value}> ?resource {{?resource <{SCHEMA.TITLE.value}> ?title}} }}",
+                for binding in self.__store.query(  # type: ignore[union-attr]
+                    query=self.__arkg_query(str(head)),
                     base_iri=self.__arkg_base_iri.value,
                 )
-            )
+            ]
 
             if anti_recommendation_keys:
                 anti_recommendation_path_graph = list(
                     self.__populate_anti_recommendation_path_graph(
-                        record_key=head,
+                        record_key=str(head),
                         anti_recommendation_path_graph=tuple(
                             anti_recommendation_path_graph
                         ),
@@ -76,7 +81,7 @@ class ArkgAntiRecommender(AntiRecommender):
                 anti_recommendation_key = record_keys_queue.pop(0)
                 anti_recommendation_path_graph = list(
                     self.__populate_anti_recommendation_path_graph(
-                        record_key=head,
+                        record_key=str(head),
                         anti_recommendation_path_graph=tuple(
                             anti_recommendation_path_graph
                         ),
@@ -112,7 +117,7 @@ class ArkgAntiRecommender(AntiRecommender):
         anti_recommendation_path_graph_list.append(
             AntiRecommendationGraph(
                 record_key=record_key,
-                anti_recommendations=(
+                anti_recommendations=tuple(
                     AntiRecommendation(
                         key=anti_recommendation_key,
                         url=WIKIPEDIA_BASE_URL + anti_recommendation_key,

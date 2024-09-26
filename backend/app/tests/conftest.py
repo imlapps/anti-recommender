@@ -1,4 +1,5 @@
 from collections.abc import Collection
+import os
 from pathlib import Path
 from typing import Any
 
@@ -10,11 +11,9 @@ from app.anti_recommendation_engine import AntiRecommendationEngine
 from app.anti_recommenders.arkg import ArkgAntiRecommender
 from app.anti_recommenders.open_ai import NormalOpenAiAntiRecommender
 from app.models import (
-    WIKIPEDIA_BASE_URL,
     AntiRecommendation,
     Record,
     wikipedia,
-    AntiRecommendationGraph,
 )
 from app.models.types import ModelResponse, RdfMimeType, RecordKey, RecordType
 from app.readers import AllSourceReader
@@ -22,8 +21,14 @@ from app.readers.reader import WikipediaReader
 
 
 @pytest.fixture(scope="session")
+def openai_api_key() -> None:
+    if "OPENAI_API_KEY" not in os.environ:
+        pytest.skip(reason="don't have OPENAI_API_KEY")
+
+
+@pytest.fixture(scope="session")
 def all_source_reader() -> AllSourceReader:
-    """Return an AllSourceReader object."""
+    """Return an AllSourceReader."""
 
     return AllSourceReader()
 
@@ -39,14 +44,16 @@ def wikipedia_output_path() -> Path:
 
 @pytest.fixture(scope="session")
 def wikipedia_reader(wikipedia_output_path: Path) -> WikipediaReader:
-    """Return a WikipediaReader object."""
+    """Return a WikipediaReader."""
 
     return WikipediaReader(file_path=wikipedia_output_path)
 
 
 @pytest.fixture(scope="session")
-def open_ai_normal_anti_recommender() -> NormalOpenAiAntiRecommender:
-    """Return an OpenAiNormalAntiRecommender object."""
+def open_ai_normal_anti_recommender(
+    openai_api_key: None,  # noqa: ARG001
+) -> NormalOpenAiAntiRecommender:
+    """Return an OpenAiNormalAntiRecommender."""
     return NormalOpenAiAntiRecommender()
 
 
@@ -226,7 +233,7 @@ def records_by_key(records: tuple[Record, ...]) -> dict[RecordKey, Record]:
 def anti_recommendation_engine(
     session_mocker: MockFixture, records: tuple[Record, ...]
 ) -> AntiRecommendationEngine:
-    """Return an AntiRecommendationEngine object."""
+    """Return an AntiRecommendationEngine."""
 
     session_mocker.patch.object(AllSourceReader, "read", return_value=records)
 
@@ -237,7 +244,13 @@ def anti_recommendation_engine(
 def arkg_file_path() -> Path:
     """Return the file path of a Wikipedia ARKG."""
 
-    return Path(__file__).parent.parent.absolute() / "data" / "wikipedia_arkg.ttl"
+    wikipedia_arkg_file_path = (
+        Path(__file__).parent.parent.absolute() / "data" / "wikipedia_arkg.ttl"
+    )
+    if wikipedia_arkg_file_path.exists():
+        return wikipedia_arkg_file_path
+
+    pytest.skip(reason="don't have Wikipedia ARKG test file.")
 
 
 @pytest.fixture(scope="session")
@@ -261,11 +274,11 @@ def arkg_anti_recommender(
     arkg_mime_type: RdfMimeType,
     records_by_key: dict[RecordKey, Record],
 ) -> ArkgAntiRecommender:
-    """Return an ArkgAntiRecommender object."""
+    """Return an ArkgAntiRecommender."""
 
     return ArkgAntiRecommender(
         arkg_base_iri=arkg_base_iri,
         arkg_file_path=arkg_file_path,
         arkg_mime_type=arkg_mime_type,
-        record_keys=records_by_key.keys(),
+        record_keys=tuple(records_by_key.keys()),
     )

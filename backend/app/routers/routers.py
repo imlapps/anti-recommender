@@ -42,6 +42,4 @@ async def initial_records(
     Returns the intial tuple of Records from the AntiRecommendationEngine.
     """
 
-    return (
-        request.app.state.anti_recommendation_engine.get_initial_records()  # type: ignore[no-any-return]
-    )
+    return request.app.state.anti_recommendation_engine.get_initial_records()  # type: ignore[no-any-return]

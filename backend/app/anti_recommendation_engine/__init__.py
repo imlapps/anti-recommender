@@ -1,2 +1,3 @@
-from .anti_recommendation_engine import \
-    AntiRecommendationEngine as AntiRecommendationEngine
+from .anti_recommendation_engine import (
+    AntiRecommendationEngine as AntiRecommendationEngine,
+)

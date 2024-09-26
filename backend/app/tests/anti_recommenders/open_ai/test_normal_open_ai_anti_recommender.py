@@ -3,7 +3,7 @@ from pytest_mock import MockFixture
 
 from app.anti_recommenders.open_ai import NormalOpenAiAntiRecommender
 from app.models import AntiRecommendation
-from app.models.types import ModelResponse, RecordKey, RecordType
+from app.models.types import ModelResponse, RecordKey
 
 
 def test_build_chain(
@@ -71,7 +71,7 @@ def test_parse_llm_response(
     assert tuple(anti_recommendation_records) == anti_recommendations
 
 
-def test_generate_anti_recommendations(  # noqa: PLR0913
+def test_generate_anti_recommendations(
     session_mocker: MockFixture,
     open_ai_normal_anti_recommender: NormalOpenAiAntiRecommender,
     record_key: RecordKey,

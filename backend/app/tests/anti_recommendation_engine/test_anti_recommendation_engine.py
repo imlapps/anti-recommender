@@ -1,5 +1,3 @@
-import os
-
 import pytest
 
 from app.anti_recommendation_engine import AntiRecommendationEngine
@@ -16,7 +14,6 @@ def test_get_previous_records_with_empty_stack(
     assert not anti_recommendation_engine.get_previous_records()
 
 
-@pytest.mark.skipif("CI" in os.environ, reason="don't have OpenAI key in CI")
 @pytest.mark.order(2)
 def test_get_initial_records(
     records: tuple[Record, ...],
@@ -28,7 +25,6 @@ def test_get_initial_records(
     assert anti_recommendation_engine.get_initial_records() == records[1:]
 
 
-@pytest.mark.skipif("CI" in os.environ, reason="don't have OpenAI key in CI")
 @pytest.mark.order(3)
 def test_get_next_records(
     records: tuple[Record, ...],
@@ -45,7 +41,6 @@ def test_get_next_records(
     )
 
 
-@pytest.mark.skipif("CI" in os.environ, reason="don't have OpenAI key in CI")
 @pytest.mark.order(4)
 def test_get_previous_records(
     records: tuple[Record, ...],

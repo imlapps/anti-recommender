@@ -46,7 +46,7 @@ class AntiRecommendationEngine:
                 arkg_base_iri=settings.arkg_base_iri,
                 arkg_file_path=settings.arkg_file_path,
                 arkg_mime_type=settings.arkg_mime_type,
-                record_keys=self.__records_by_key.keys(),
+                record_keys=tuple(self.__records_by_key.keys()),
             )
 
         return None

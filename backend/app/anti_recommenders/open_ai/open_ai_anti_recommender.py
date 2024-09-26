@@ -5,7 +5,7 @@ from langchain.schema.runnable import RunnableSerializable
 
 from app.anti_recommenders.anti_recommender import AntiRecommender
 from app.models import AntiRecommendation
-from app.models.types import ModelQuery, ModelResponse, RecordKey, RecordType
+from app.models.types import ModelQuery, ModelResponse, RecordKey
 
 
 class OpenAiAntiRecommender(AntiRecommender):
@@ -34,12 +34,12 @@ class OpenAiAntiRecommender(AntiRecommender):
                     Give each answer on a new line, and in the format: Number - Title - URL."
         )
 
-    def _generate_anti_recommendendations(  # noqa: PLR0913
+    def _generate_anti_recommendendations(
         self,
         *,
         record_key: RecordKey,
         build_chain: Callable[[], RunnableSerializable],
-        create_query: Callable[[RecordKey, RecordType], ModelQuery],
+        create_query: Callable[[RecordKey], ModelQuery],
         generate_llm_response: Callable[
             [ModelQuery, RunnableSerializable], ModelResponse
         ],
