@@ -24,3 +24,11 @@ def _anti_recommender(
             "_generate_llm_response",
             return_value=model_response,
         )
+    else:
+        pytest.skip(reason="don't have OpenAI API Key.")
+
+    if (
+        request.param is AntiRecommenderType.ARKG
+        and not settings.arkg_file_path.exists()
+    ):
+        pytest.skip(reason="don't have Wikipedia ARKG test file.")

@@ -19,7 +19,7 @@ from app.readers.reader import WikipediaReader
 @pytest.fixture(scope="session")
 def openai_api_key() -> None:
     if "OPENAI_API_KEY" not in os.environ:
-        pytest.skip(reason="don't have OPENAI_API_KEY")
+        pytest.skip(reason="don't have OpenAI API Key.")
 
 
 @pytest.fixture(scope="session")
