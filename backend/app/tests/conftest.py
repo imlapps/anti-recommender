@@ -1,5 +1,5 @@
-from collections.abc import Collection
 import os
+from collections.abc import Collection
 from pathlib import Path
 from typing import Any
 
@@ -10,11 +10,7 @@ from pytest_mock import MockFixture
 from app.anti_recommendation_engine import AntiRecommendationEngine
 from app.anti_recommenders.arkg import ArkgAntiRecommender
 from app.anti_recommenders.openai import NormalOpenaiAntiRecommender
-from app.models import (
-    AntiRecommendation,
-    Record,
-    wikipedia,
-)
+from app.models import AntiRecommendation, Record, wikipedia
 from app.models.types import ModelResponse, RdfMimeType, RecordKey, RecordType
 from app.readers import AllSourceReader
 from app.readers.reader import WikipediaReader

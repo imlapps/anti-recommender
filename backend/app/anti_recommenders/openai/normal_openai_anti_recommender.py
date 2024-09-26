@@ -1,3 +1,4 @@
+import typing
 from collections.abc import Iterable
 
 from langchain.prompts import PromptTemplate
@@ -12,10 +13,9 @@ from app.models.types import ModelQuery, ModelResponse, RecordKey, RecordType
 
 class NormalOpenaiAntiRecommender(OpenaiAntiRecommender):
     """
-    A subclass of OpenAiAntiRecommender that relies solely on
-    the large language model's parametric knowledge to generate AntiRecommendations.
+    A subclass of OpenAiAntiRecommender.
 
-    record_type is the type of AntiRecommendations generated from the large language model.
+    NormalOpenaiAntiRecommender relies solely on the large language model's parametric knowledge to generate AntiRecommendations.
     """
 
     def _build_chain(self) -> RunnableSerializable:
@@ -57,6 +57,7 @@ class NormalOpenaiAntiRecommender(OpenaiAntiRecommender):
 
             yield AntiRecommendation(key=title, url=url)
 
+    @typing.override
     def generate_anti_recommendations(
         self, *, record_key: RecordKey
     ) -> Iterable[AntiRecommendation]:

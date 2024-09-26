@@ -1,8 +1,8 @@
 from app.anti_recommenders import AntiRecommender
-from app.anti_recommenders.openai import NormalOpenaiAntiRecommender
 from app.anti_recommenders.arkg import ArkgAntiRecommender
+from app.anti_recommenders.openai import NormalOpenaiAntiRecommender
 from app.models import Record, settings
-from app.models.types import RecordKey, AntiRecommenderType
+from app.models.types import AntiRecommenderType, RecordKey
 from app.readers import AllSourceReader
 
 

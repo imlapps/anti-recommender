@@ -25,7 +25,7 @@ class Settings(BaseSettings):
     )
     arkg_file_path: Annotated[
         Path, Field(min_length=1, json_schema_extra={"strip_whitespace": "True"})
-    ] = (DATA_DIRECTORY_PATH / "wikipedia_arkg_file.ttl")
+    ] = DATA_DIRECTORY_PATH / "wikipedia_arkg_file.ttl"
     arkg_mime_type: RdfMimeType = RdfMimeType.TURTLE
 
     model_config = SettingsConfigDict(

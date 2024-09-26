@@ -10,8 +10,9 @@ from app.models.types import ModelQuery, ModelResponse, RecordKey
 
 class OpenaiAntiRecommender(AntiRecommender):
     """
-    A concrete implementation of AntiRecommender that uses
-    OpenAI's large language model to generate AntiRecommendations.
+    A concrete implementation of AntiRecommender.
+
+    OpenaiAntiRecommender uses OpenAI's large language model to generate AntiRecommendations.
     """
 
     def __init__(self) -> None:

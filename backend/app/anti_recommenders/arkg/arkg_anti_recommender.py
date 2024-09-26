@@ -1,3 +1,4 @@
+import typing
 from collections.abc import Iterable
 from pathlib import Path
 
@@ -11,8 +12,9 @@ from app.namespaces import SCHEMA
 
 class ArkgAntiRecommender(AntiRecommender):
     """
-    A concrete implementation of AntiRecommender that uses an
-    Anti-Recommendation Knowledge Graph (ARKG) to generate anti-recommendations.
+    A concrete implementation of AntiRecommender.
+
+    ArkgAntiRecommender uses information stored in an Anti-Recommendation Knowledge Graph to generate AntiRecommendations.
     """
 
     def __init__(
@@ -31,7 +33,7 @@ class ArkgAntiRecommender(AntiRecommender):
         self.__store: ox.Store = ox.Store()
         self.__load_store()
 
-    def __arkg_query(self, record_key: RecordKey) -> StoreQuery:
+    def __create_query(self, record_key: RecordKey) -> StoreQuery:
         """
         Return a SPARQL query that fetches anti-recommendations of `record_key` from an ARKG Store.
         """
@@ -57,14 +59,13 @@ class ArkgAntiRecommender(AntiRecommender):
         record_keys_list.sort()
 
         while record_keys_list:
-
             anti_recommendation_path_graph_record_keys.append(str(graph_head))
             record_keys_list.remove(str(graph_head))
 
             anti_recommendation_keys = [
                 binding["title"].value
                 for binding in self.__store.query(  # type: ignore[union-attr]
-                    query=self.__arkg_query(str(graph_head)),
+                    query=self.__create_query(str(graph_head)),
                     base_iri=self.__arkg_base_iri.value,
                 )
             ]
@@ -142,6 +143,7 @@ class ArkgAntiRecommender(AntiRecommender):
 
         return tuple(anti_recommendation_path_graph_list)
 
+    @typing.override
     def generate_anti_recommendations(
         self, *, record_key: RecordKey
     ) -> Iterable[AntiRecommendation]:
