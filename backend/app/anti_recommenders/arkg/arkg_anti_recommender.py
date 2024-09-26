@@ -5,7 +5,8 @@ from pathlib import Path
 import pyoxigraph as ox
 
 from app.anti_recommenders import AntiRecommender
-from app.models import WIKIPEDIA_BASE_URL, AntiRecommendation, AntiRecommendationGraph
+from app.constants import WIKIPEDIA_BASE_URL
+from app.models import AntiRecommendation, AntiRecommendationGraph
 from app.models.types import RdfMimeType, RecordKey, StoreQuery
 from app.namespaces import SCHEMA
 

@@ -13,7 +13,7 @@ from app.models.types import ModelQuery, ModelResponse, RecordKey, RecordType
 
 class NormalOpenaiAntiRecommender(OpenaiAntiRecommender):
     """
-    A subclass of OpenAiAntiRecommender.
+    A subclass of OpenaiAntiRecommender.
 
     NormalOpenaiAntiRecommender relies solely on the large language model's parametric knowledge to generate AntiRecommendations.
     """
