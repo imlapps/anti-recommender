@@ -19,7 +19,7 @@ class Settings(BaseSettings):
     )
     arkg_file_path: Annotated[
         Path, Field(min_length=1, json_schema_extra={"strip_whitespace": "True"})
-    ] = DATA_DIRECTORY_PATH / "wikipedia_arkg_file.ttl"
+    ] = (DATA_DIRECTORY_PATH / "wikipedia_arkg_file.ttl")
     arkg_mime_type: RdfMimeType = RdfMimeType.TURTLE
 
     anti_recommender_type: AntiRecommenderType = AntiRecommenderType.ARKG
@@ -28,7 +28,8 @@ class Settings(BaseSettings):
         default=frozenset(), validation_alias="output_file_names"
     )
     record_types: frozenset[RecordType] = frozenset()
-
+    supabase_url: str | None = None
+    supabase_key: ApiKey | None = None
     model_config = SettingsConfigDict(
         env_file=(
             CONFIG_DIRECTORY_PATH / ".env.local",
