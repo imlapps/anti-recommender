@@ -42,24 +42,26 @@ class AntiRecommendationEngine:
         ):
             return NormalOpenaiAntiRecommender()
 
-        if settings.anti_recommender_type == AntiRecommenderType.ARKG:
-            return ArkgAntiRecommender(
-                arkg_base_iri=settings.arkg_base_iri,
-                arkg_file_path=settings.arkg_file_path,
-                arkg_mime_type=settings.arkg_mime_type,
-                record_keys=tuple(self.__records_by_key.keys()),
-            )
+        # if settings.anti_recommender_type == AntiRecommenderType.ARKG:
+        #     record_keys_list = list(self.__records_by_key.keys())
+        #     record_keys_list.sort()
+
+        #     return ArkgAntiRecommender(
+        #         base_iri=settings.arkg_base_iri,
+        #         file_path=settings.arkg_file_path,
+        #         mime_type=settings.arkg_mime_type,
+        #         record_keys=tuple(record_keys_list),
+        #         user=self.__user,
+        #     )
 
         return None
 
-    def get_initial_records(self) -> tuple[Record, ...]:
+    def initial_records(self) -> tuple[Record, ...]:
         """Return a tuple of Records that have the same key as AntiRecommendations of the first key in __records_by_key."""
 
-        return self.get_next_records(
-            record_key=next(iter(self.__records_by_key.keys()))
-        )
+        return self.next_records(record_key=next(iter(self.__records_by_key.keys())))
 
-    def get_next_records(self, *, record_key: RecordKey) -> tuple[Record, ...]:
+    def next_records(self, *, record_key: RecordKey) -> tuple[Record, ...]:
         """Return a tuple of Records that have the same key as the AntiRecommendations of record_key."""
 
         records_of_anti_recommendations: list[Record] = []
@@ -85,7 +87,7 @@ class AntiRecommendationEngine:
 
         return tuple(records_of_anti_recommendations)
 
-    def get_previous_records(self) -> tuple[Record, ...]:
+    def previous_records(self) -> tuple[Record, ...]:
         """
         Return a tuple of Records that matched the previous AntiRecommendations.
 
