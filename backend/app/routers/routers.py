@@ -19,7 +19,7 @@ async def next_records(
     Returns a tuple of Records from the AntiRecommendationEngine.
     """
 
-    return request.app.state.anti_recommendation_engine.get_next_records(  # type: ignore[no-any-return]
+    return request.app.state.anti_recommendation_engine.next_records(  # type: ignore[no-any-return]
         record_key=next_params.record_key
     )
 
@@ -32,7 +32,7 @@ async def previous_records(request: Request) -> tuple[Record | None, ...]:
     Returns a tuple of previous Records stored in the AntiRecommendationEngine.
     """
 
-    return request.app.state.anti_recommendation_engine.get_previous_records()  # type: ignore[no-any-return]
+    return request.app.state.anti_recommendation_engine.previous_records()  # type: ignore[no-any-return]
 
 
 @router.get("/initial_records")
@@ -45,4 +45,4 @@ async def initial_records(
     Returns the intial tuple of Records from the AntiRecommendationEngine.
     """
 
-    return request.app.state.anti_recommendation_engine.get_initial_records()  # type: ignore[no-any-return]
+    return request.app.state.anti_recommendation_engine.initial_records()  # type: ignore[no-any-return]

@@ -1,17 +1,21 @@
 import os
+import uuid
 from collections.abc import Collection
 from pathlib import Path
 from typing import Any
 
 import pytest
+from postgrest import APIResponse
 from pyoxigraph import NamedNode
 from pytest_mock import MockFixture
 
 from app.anti_recommendation_engine import AntiRecommendationEngine
 from app.anti_recommenders.arkg import ArkgAntiRecommender
 from app.anti_recommenders.openai import NormalOpenaiAntiRecommender
+from app.database.client import DatabaseClient
 from app.models import AntiRecommendation, Record, wikipedia
 from app.models.types import ModelResponse, RdfMimeType, RecordKey, RecordType
+from app.models.user import User
 from app.readers import AllSourceReader
 from app.readers.reader import WikipediaReader
 
@@ -241,7 +245,7 @@ def anti_recommendation_engine(
 
 
 @pytest.fixture(scope="session")
-def arkg_file_path() -> Path:
+def file_path() -> Path:
     """Return the file path of a Wikipedia ARKG."""
 
     wikipedia_arkg_file_path = (
@@ -254,31 +258,43 @@ def arkg_file_path() -> Path:
 
 
 @pytest.fixture(scope="session")
-def arkg_mime_type() -> RdfMimeType:
+def mime_type() -> RdfMimeType:
     """Return the MIME Type of a Wikipedia ARKG file."""
 
     return RdfMimeType.TURTLE
 
 
 @pytest.fixture(scope="session")
-def arkg_base_iri() -> NamedNode:
+def base_iri() -> NamedNode:
     """Return the base IRI of a Wikipedia ARKG."""
 
     return NamedNode("http://imlapps.github.io/anti-recommender/anti-recommendation/")
 
 
 @pytest.fixture(scope="session")
-def arkg_anti_recommender(
-    arkg_base_iri: NamedNode,
-    arkg_file_path: Path,
-    arkg_mime_type: RdfMimeType,
+def user() -> User:
+    return User(user_id=uuid.uuid4())
+
+
+@pytest.fixture(scope="session")
+def arkg_anti_recommender(  # noqa: PLR0913
+    session_mocker: MockFixture,
+    base_iri: NamedNode,
+    file_path: Path,
+    mime_type: RdfMimeType,
     records_by_key: dict[RecordKey, Record],
+    user: User,
 ) -> ArkgAntiRecommender:
     """Return an ArkgAntiRecommender."""
 
+    session_mocker.patch.object(
+        DatabaseClient, "fetch", return_value=APIResponse(data=[])
+    )
+
     return ArkgAntiRecommender(
-        arkg_base_iri=arkg_base_iri,
-        arkg_file_path=arkg_file_path,
-        arkg_mime_type=arkg_mime_type,
+        base_iri=base_iri,
+        file_path=file_path,
+        mime_type=mime_type,
         record_keys=tuple(records_by_key.keys()),
+        user=user,
     )
