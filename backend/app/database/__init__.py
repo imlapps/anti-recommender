@@ -1,1 +1,1 @@
-from .client import DatabaseClient as DatabaseClient
+from .client import databaseClient as databaseClient

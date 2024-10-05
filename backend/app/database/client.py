@@ -12,16 +12,16 @@ class DatabaseClient:
     def __init__(self) -> None:
         self.__database_client: Client = self.__select_database_client()
 
-    def delete(self, *, table_name: str, eq: str) -> None:
+    def delete(self, *, table_name: str, eq: dict) -> None:
         return cast(
             SyncFilterRequestBuilder,
-            self.__database_client.table(table_name).delete().eq(str(eq)),
+            self.__database_client.table(table_name).delete().eq(**dict(eq)),
         ).execute()
 
-    def fetch(self, *, table_name: str, query: str, eq: str | None) -> APIResponse:
+    def fetch(self, *, table_name: str, query: str, eq: dict | None) -> APIResponse:
         return cast(
             SyncSelectRequestBuilder,
-            self.__database_client.table(table_name).select(query).eq(str(eq)),
+            self.__database_client.table(table_name).select(query).eq(**dict(eq)),
         ).execute()
 
     def insert(self, *, table_name: str, query: dict | list) -> APIResponse:
@@ -33,10 +33,10 @@ class DatabaseClient:
 
         return None
 
-    def update(self, *, table_name: str, query: dict, eq: str | None) -> APIResponse:
+    def update(self, *, table_name: str, query: dict, eq: dict | None) -> APIResponse:
         return cast(
             SyncFilterRequestBuilder,
-            self.__database_client.table(table_name).update(query).eq(str(eq)),
+            self.__database_client.table(table_name).update(query).eq(**dict(eq)),
         ).execute()
 
     def upsert(self, table_name: str, query: str, constraint: str = "") -> None:
@@ -45,3 +45,6 @@ class DatabaseClient:
                 query, on_conflict=constraint
             )
         )
+
+
+databaseClient = DatabaseClient()
