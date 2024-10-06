@@ -118,6 +118,30 @@ class ArkgAntiRecommender(AntiRecommender):
                 )
                 return
 
+    def __select_primary_anti_recommendation_key(
+        self, anti_recommendation_keys: tuple[RecordKey, ...]
+    ) -> RecordKey | None:
+        if self.__user_state:
+            primary_anti_recommendation_keys = [
+                unseen_anti_recommendation_key
+                for unseen_anti_recommendation_key in anti_recommendation_keys
+                if unseen_anti_recommendation_key
+                not in self.__user_state.anti_recommendations_history.values()
+            ]
+
+            if not primary_anti_recommendation_keys:
+                primary_anti_recommendation_keys = [
+                    unseen_anti_recommendation_key
+                    for unseen_anti_recommendation_key in self.__record_keys
+                    if unseen_anti_recommendation_key
+                    not in self.__user_state.anti_recommendations_history.values()
+                ]
+
+            if primary_anti_recommendation_keys:
+                return primary_anti_recommendation_keys[0]
+
+        return None
+
     @override
     def generate_anti_recommendations(
         self, *, record_key: RecordKey
@@ -127,36 +151,42 @@ class ArkgAntiRecommender(AntiRecommender):
 
         Anti-recommendations are obtained from an ARKG.
         """
-        anti_recommendation_key = ""
 
         if self.__user_state:
-            anti_recommendation_keys = [
-                unseen_anti_recommendation_key
-                for unseen_anti_recommendation_key in self.__retrieve_anti_recommendations_from_store(
-                    record_key
-                )
-                if unseen_anti_recommendation_key
-                not in self.__user_state.anti_recommendations_history.values()
-            ]
-
-            if not anti_recommendation_keys:
-                anti_recommendation_keys = [
-                    unseen_anti_recommendation_key
-                    for unseen_anti_recommendation_key in self.__record_keys
-                    if unseen_anti_recommendation_key
-                    not in self.__user_state.anti_recommendations_history.values()
-                ]
-
-            anti_recommendation_key = anti_recommendation_keys[0]
-            self.__user_state.anti_recommendations_history.update(
-                {"anti_recommendation_key": anti_recommendation_key}
+            anti_recommendation_keys = list(
+                self.__retrieve_anti_recommendations_from_store(record_key)
             )
 
-            self.__upsert_user_state_into_database()
+            primary_anti_recommendation_key = (
+                self.__select_primary_anti_recommendation_key(
+                    tuple(anti_recommendation_keys)
+                )
+            )
 
-        return (
-            AntiRecommendation(
-                key=anti_recommendation_key,
-                url=WIKIPEDIA_BASE_URL + anti_recommendation_key,
-            ),
-        )
+            if primary_anti_recommendation_key:
+                if primary_anti_recommendation_key in anti_recommendation_keys:
+                    anti_recommendation_keys.remove(primary_anti_recommendation_key)
+
+                anti_recommendation_keys.insert(0, primary_anti_recommendation_key)
+
+                self.__user_state.anti_recommendations_history.update(
+                    {"anti_recommendation_key": primary_anti_recommendation_key}
+                )
+
+                try:
+                    self.__upsert_user_state_into_database()
+
+                    return (
+                        AntiRecommendation(
+                            key=anti_recommendation_key,
+                            url=WIKIPEDIA_BASE_URL + anti_recommendation_key,
+                        )
+                        for anti_recommendation_key in anti_recommendation_keys
+                    )
+                except APIError as exception:
+                    self.__logger.warning(
+                        f"Could not generate valid anti-recommendations because of error in ArkgAntiRecommender.__upsert_user_state_into_database.\
+                        Error message: {exception.json().get("message")}"
+                    )
+
+        return ()
