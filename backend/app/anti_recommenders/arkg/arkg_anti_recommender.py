@@ -56,6 +56,7 @@ class ArkgAntiRecommender(AntiRecommender):
 
         Return a new `UserState` if none is present in the database.
         """
+
         try:
             api_response = database_client.fetch(
                 table_name=ARKG_ANTI_RECOMMENDER_USER_STATE_TABLE_NAME,
@@ -79,6 +80,7 @@ class ArkgAntiRecommender(AntiRecommender):
         base_iri: ox.NamedNode, file_path: Path, mime_type: RdfMimeType
     ) -> ox.Store:
         """Load an `ARKG` serialization into an `RDF Store`."""
+
         store = ox.Store()
         store.load(
             input=file_path,
@@ -102,6 +104,7 @@ class ArkgAntiRecommender(AntiRecommender):
 
     def __upsert_user_state_into_database(self) -> None:
         """Upsert a `UserState` into a database."""
+
         if self.__user_state:
             try:
                 database_client.upsert(
@@ -121,6 +124,16 @@ class ArkgAntiRecommender(AntiRecommender):
     def __select_primary_anti_recommendation_key(
         self, anti_recommendation_keys: tuple[RecordKey, ...]
     ) -> RecordKey | None:
+        """
+        Select and return a primary anti-recommendation key.
+
+        A primary anti-recommendation key is a `Recordkey` that has not yet been visited by a `User`.
+
+        A primary anti-recommendation key is first looked for in `anti_recommendation_keys`
+
+        If no unseen key is found in anti_recommendation_keys, the first unseen key in `__record_keys` is returned.
+        """
+
         if self.__user_state:
             primary_anti_recommendation_keys = [
                 unseen_anti_recommendation_key
@@ -147,9 +160,13 @@ class ArkgAntiRecommender(AntiRecommender):
         self, *, record_key: RecordKey
     ) -> Iterable[AntiRecommendation]:
         """
-        Generate anti-recommendations of a Record.
+        Generate anti-recommendations of a `Record`.
 
-        Anti-recommendations are obtained from an ARKG.
+        Anti-recommendations are obtained from an `ARKG`.
+
+        The first anti-recommendation generated is an anti-recommendation that has not yet been seen by a `User`.
+
+        All other anti-recommendations may or may not have been seen by a User.
         """
 
         if self.__user_state:

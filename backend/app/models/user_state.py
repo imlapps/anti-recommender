@@ -1,12 +1,10 @@
-from datetime import UTC, datetime
-
 from app.models import User
 from app.models.types import RecordKey
 
 
 class UserState(User):
     """
-    Pydantic model to hold the state of a User.
+    Pydantic model to hold the state of a `User`.
 
     `anti_recommendations_history` is the history of all anti-recommendations a user has seen.
     """

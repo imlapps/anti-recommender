@@ -5,6 +5,3 @@ from .user import User as User
 from .user_state import UserState as UserState
 
 from .anti_recommendation import AntiRecommendation as AntiRecommendation  # isort: skip
-from .anti_recommendation_graph import (  # isort: skip
-    AntiRecommendationGraph as AntiRecommendationGraph,
-)

@@ -7,7 +7,7 @@ from app.models.types import RecordKey
 
 class Record(BaseModel):
     """
-    Pydantic Model to hold a record.
+    Pydantic model to hold a record.
 
     `key` is the name of a Record.
 

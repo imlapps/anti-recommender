@@ -8,7 +8,7 @@ from app.models.wikipedia import Category, ExternalLink
 
 
 class Article(Record):
-    """Pydantic Model to hold the contents of a Wikipedia Article."""
+    """Pydantic model to hold the contents of a Wikipedia Article."""
 
     key: RecordKey = Field(..., alias="title")
 
