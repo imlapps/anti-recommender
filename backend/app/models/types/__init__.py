@@ -6,3 +6,4 @@ from .rdf_mime_type import RdfMimeType as RdfMimeType
 from .record_key import RecordKey as RecordKey
 from .record_type import RecordType as RecordType
 from .store_query import StoreQuery as StoreQuery
+from .non_blank_string import NonBlankString as NonBlankString

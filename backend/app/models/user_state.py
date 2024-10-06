@@ -1,5 +1,5 @@
 from app.models import User
-from app.models.types import RecordKey
+from app.models.types import RecordKey, NonBlankString
 
 
 class UserState(User):
@@ -9,4 +9,4 @@ class UserState(User):
     `anti_recommendations_history` is the history of all anti-recommendations a user has seen.
     """
 
-    anti_recommendations_history: dict[str, RecordKey]
+    anti_recommendations_history: dict[NonBlankString, RecordKey]
