@@ -1,5 +1,5 @@
 from app.models import User
-from app.models.types import RecordKey, NonBlankString
+from app.models.types import NonBlankString, RecordKey
 
 
 class UserState(User):

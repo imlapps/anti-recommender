@@ -1,13 +1,15 @@
+from typing import cast
+
 import supabase
-from app.models import settings
 from gotrue.types import (
-    UserResponse,
     AuthResponse,
     SignInWithEmailAndPasswordCredentials,
     SignUpWithEmailAndPasswordCredentials,
+    UserResponse,
 )
-from supabase import SupabaseAuthClient, Client
-from typing import cast
+from supabase import Client, SupabaseAuthClient
+
+from app.models import settings
 
 
 class AuthClient:

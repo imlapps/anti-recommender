@@ -1,11 +1,23 @@
 import pytest
 
 from app.anti_recommendation_engine import AntiRecommendationEngine
-from app.models import Record
+from app.anti_recommenders.anti_recommender import AntiRecommender
+from app.models import Record, UserState
 from app.models.types import RecordKey
 
 
 @pytest.mark.order(1)
+def test_initialize_anti_recommender(
+    anti_recommendation_engine: AntiRecommendationEngine, user_state: UserState
+) -> None:
+    """Test that AntiRecommendationEngine.initialize_anti_recommender instantiates an AntiRecommender internally."""
+
+    anti_recommendation_engine.initialize_anti_recommender(user_state=user_state)
+
+    assert isinstance(anti_recommendation_engine.anti_recommender, AntiRecommender)
+
+
+@pytest.mark.order(2)
 def test_get_previous_records_with_empty_stack(
     anti_recommendation_engine: AntiRecommendationEngine,
 ) -> None:
@@ -14,7 +26,7 @@ def test_get_previous_records_with_empty_stack(
     assert not anti_recommendation_engine.previous_records()
 
 
-@pytest.mark.order(2)
+@pytest.mark.order(3)
 def test_get_initial_records(
     records: tuple[Record, ...],
     anti_recommendation_engine: AntiRecommendationEngine,
@@ -25,7 +37,7 @@ def test_get_initial_records(
     assert anti_recommendation_engine.initial_records() == records[1:]
 
 
-@pytest.mark.order(3)
+@pytest.mark.order(4)
 def test_get_next_records(
     records: tuple[Record, ...],
     record_key: RecordKey,
@@ -38,7 +50,7 @@ def test_get_next_records(
     assert anti_recommendation_engine.next_records(record_key=record_key) == records[1:]
 
 
-@pytest.mark.order(4)
+@pytest.mark.order(5)
 def test_get_previous_records(
     records: tuple[Record, ...],
     anti_recommendation_engine: AntiRecommendationEngine,

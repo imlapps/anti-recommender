@@ -19,6 +19,7 @@ ignore = [
     "N815",   # Mixed-case variables
     "PLC0414", # Import alias does not rename original package
     "S101",   # Use of assert
+    "S106",   # Possible hardcoded password
     "TRY003", # Avoid specifying long messages outside the exception class
 
 ]

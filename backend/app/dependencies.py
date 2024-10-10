@@ -1,12 +1,12 @@
-from typing import Annotated, TYPE_CHECKING
+from typing import TYPE_CHECKING, Annotated
 
 from fastapi import Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer
-
-from app.models import CredentialsError, User
-from app.auth import auth_client
-
 from postgrest import APIError
+
+from app.auth import auth_client
+from app.models import CredentialsError, User, UserState
+from app.utils import fetch_user_state_from_database
 
 if TYPE_CHECKING:
     from gotrue.types import AuthResponse
@@ -15,8 +15,8 @@ oauth2_scheme = OAuth2PasswordBearer(tokenUrl="login")
 
 
 async def check_user_authentication(
-    access_token: Annotated[str, Depends(oauth2_scheme)]
-) -> User:
+    access_token: Annotated[str, Depends(oauth2_scheme)],
+) -> UserState:
     """
     Check if `access_token` corresponds to an authenticated `User`.
 
@@ -34,4 +34,4 @@ async def check_user_authentication(
     if not user_response:
         raise CredentialsError(detail="Could not validate credentials")
 
-    return User(user_id=user_response.user.id)
+    return fetch_user_state_from_database(user=User(user_id=user_response.user.id))

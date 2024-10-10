@@ -1,4 +1,5 @@
 from typing import cast
+
 import supabase
 from postgrest import APIResponse, SyncFilterRequestBuilder, SyncSelectRequestBuilder
 from supabase import Client

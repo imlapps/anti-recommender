@@ -1,6 +1,7 @@
 from app.anti_recommenders import AntiRecommender
+from app.anti_recommenders.arkg.arkg_anti_recommender import ArkgAntiRecommender
 from app.anti_recommenders.openai import NormalOpenaiAntiRecommender
-from app.models import Record, settings
+from app.models import Record, UserState, settings
 from app.models.types import AntiRecommenderType, RecordKey
 from app.readers import AllSourceReader
 
@@ -23,17 +24,21 @@ class AntiRecommendationEngine:
     """
 
     def __init__(self) -> None:
+        self.__anti_recommender: AntiRecommender | None = None
+        self.__current_anti_recommendation_records: list[Record] = []
         self.__records_by_key: dict[RecordKey, Record] = {
             record.key: record for record in AllSourceReader().read()
         }
-        self.__anti_recommender: AntiRecommender | None = (
-            self.__select_anti_recommender()
-        )
         self.__stack: list[list[Record]] = []
-        self.__current_anti_recommendation_records: list[Record] = []
 
-    def __select_anti_recommender(self) -> AntiRecommender | None:
-        """Select and return an AntiRecommender based on values stored in settings."""
+    @property
+    def anti_recommender(self) -> AntiRecommender | None:
+        return self.__anti_recommender
+
+    def __select_anti_recommender(
+        self, user_state: UserState
+    ) -> AntiRecommender | None:
+        """Select and return an `AntiRecommender` based on values stored in `settings`."""
 
         if (
             settings.anti_recommender_type == AntiRecommenderType.OPEN_AI
@@ -41,22 +46,30 @@ class AntiRecommendationEngine:
         ):
             return NormalOpenaiAntiRecommender()
 
-        # if settings.anti_recommender_type == AntiRecommenderType.ARKG:
-        #     record_keys_list = list(self.__records_by_key.keys())
-        #     record_keys_list.sort()
+        if settings.anti_recommender_type == AntiRecommenderType.ARKG:
+            record_keys_list = list(self.__records_by_key.keys())
+            record_keys_list.sort()
 
-        #     return ArkgAntiRecommender(
-        #         base_iri=settings.arkg_base_iri,
-        #         file_path=settings.arkg_file_path,
-        #         mime_type=settings.arkg_mime_type,
-        #         record_keys=tuple(record_keys_list),
-        #         user=self.__user,
-        #     )
+            return ArkgAntiRecommender(
+                base_iri=settings.arkg_base_iri,
+                file_path=settings.arkg_file_path,
+                mime_type=settings.arkg_mime_type,
+                record_keys=tuple(record_keys_list),
+                user_state=user_state,
+            )
 
         return None
 
-    def initial_records(self) -> tuple[Record, ...]:
+    def initialize_anti_recommender(self, user_state: UserState) -> None:
+        self.__anti_recommender = self.__select_anti_recommender(user_state=user_state)
+
+    def initial_records(
+        self, *, record_key: RecordKey | None = None
+    ) -> tuple[Record, ...]:
         """Return a tuple of Records that have the same key as AntiRecommendations of the first key in __records_by_key."""
+
+        if record_key:
+            return self.next_records(record_key=record_key)
 
         return self.next_records(record_key=next(iter(self.__records_by_key.keys())))
 

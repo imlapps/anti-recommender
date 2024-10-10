@@ -7,14 +7,11 @@ import pyoxigraph as ox
 from postgrest import APIError
 
 from app.anti_recommenders import AntiRecommender
-from app.constants import (
-    ARKG_ANTI_RECOMMENDER_USER_STATE_TABLE_NAME,
-    WIKIPEDIA_BASE_URL,
-)
-from app.database import database_client
-from app.models import AntiRecommendation, User, UserState
+from app.constants import WIKIPEDIA_BASE_URL
+from app.models import AntiRecommendation, UserState
 from app.models.types import RdfMimeType, RecordKey, StoreQuery
 from app.namespaces import SCHEMA
+from app.utils import upsert_user_state_into_database
 
 
 class ArkgAntiRecommender(AntiRecommender):
@@ -31,7 +28,7 @@ class ArkgAntiRecommender(AntiRecommender):
         file_path: Path,
         mime_type: RdfMimeType,
         record_keys: tuple[RecordKey, ...],
-        user: User,
+        user_state: UserState,
     ) -> None:
         self.__base_iri = base_iri
         self.__logger = logging.getLogger(__name__)
@@ -39,9 +36,7 @@ class ArkgAntiRecommender(AntiRecommender):
         self.__store: ox.Store = self.__load_store(
             file_path=file_path, mime_type=mime_type, base_iri=base_iri
         )
-        self.__user_state: UserState | None = self.__fetch_user_state_from_database(
-            user
-        )
+        self.__user_state = user_state
 
     def __fetch_anti_recommendations_query(self, record_key: RecordKey) -> StoreQuery:
         """
@@ -49,31 +44,6 @@ class ArkgAntiRecommender(AntiRecommender):
         """
 
         return f"SELECT ?title WHERE {{ <{record_key}> <{SCHEMA.ITEM_REVIEWED.value}> ?resource {{?resource <{SCHEMA.TITLE.value}> ?title}} }}"
-
-    def __fetch_user_state_from_database(self, user: User) -> UserState | None:
-        """
-        Fetch and return the state of a `User` from a database.
-
-        Return a new `UserState` if none is present in the database.
-        """
-
-        try:
-            api_response = database_client.fetch(
-                table_name=ARKG_ANTI_RECOMMENDER_USER_STATE_TABLE_NAME,
-                query="*",
-                eq={"column": "user_id", "value": str(user.id)},
-            )
-        except APIError as exception:
-            self.__logger.warning(
-                f"Error fetching user state from database.\
-                    Error message: {exception.json().get("message")}"
-            )
-            return None
-
-        if api_response and api_response.data:
-            return UserState(**api_response.data[0])
-
-        return UserState(user_id=user.id, anti_recommendations_history={})
 
     @staticmethod
     def __load_store(
@@ -101,25 +71,6 @@ class ArkgAntiRecommender(AntiRecommender):
                 base_iri=self.__base_iri.value,
             )
         )
-
-    def __upsert_user_state_into_database(self) -> None:
-        """Upsert a `UserState` into a database."""
-
-        if self.__user_state:
-            try:
-                database_client.upsert(
-                    table_name=ARKG_ANTI_RECOMMENDER_USER_STATE_TABLE_NAME,
-                    query=self.__user_state.model_dump(
-                        by_alias=True, exclude={"created_at", "last_updated"}
-                    ),
-                    constraint=str(self.__user_state.id),
-                )
-            except APIError as exception:
-                self.__logger.warning(
-                    f"Error upserting user state into database.\
-                        Error message: {exception.json().get("message")}"
-                )
-                return
 
     def __select_primary_anti_recommendation_key(
         self, anti_recommendation_keys: tuple[RecordKey, ...]
@@ -191,7 +142,7 @@ class ArkgAntiRecommender(AntiRecommender):
                 )
 
                 try:
-                    self.__upsert_user_state_into_database()
+                    upsert_user_state_into_database(self.__user_state)
 
                     return (
                         AntiRecommendation(

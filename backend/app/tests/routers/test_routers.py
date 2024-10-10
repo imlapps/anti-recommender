@@ -1,68 +1,23 @@
-from datetime import datetime
-from fastapi.testclient import TestClient
-from fastapi.security import OAuth2PasswordRequestForm
+import gotrue.types as gotrue
 import pytest
-import jwt
+from fastapi import HTTPException
+from fastapi.security import OAuth2PasswordRequestForm
+from fastapi.testclient import TestClient
+from pytest_mock import MockFixture
+from supabase import SupabaseAuthClient
+
 from app.main import app
 from app.models import Token
 from app.models.types import RecordKey
-from pytest_mock import MockFixture
-
-from app.models.user import User
 
 OK_STATUS_CODE = 200
-
-from fastapi import HTTPException
-from supabase import SupabaseAuthClient
-import gotrue.types as gotrue
 
 
 def get_auth_header(access_token: str | None) -> dict[str, str]:
     if not access_token:
         raise HTTPException(status_code=401, detail="No access token")
+
     return {"Authorization": f"Bearer {access_token}"}
-
-
-@pytest.fixture(scope="session")
-def form_data() -> OAuth2PasswordRequestForm:
-    return OAuth2PasswordRequestForm(username="Imlapps", password="Imlapps@2024!")
-
-
-@pytest.fixture(scope="session")
-def gotrue_user(user: User) -> gotrue.User:
-    return gotrue.User(
-        id=str(user.id),
-        app_metadata={"app_metadata": ""},
-        user_metadata={"user_metadata": ""},
-        aud="",
-        created_at=datetime.now(),
-    )
-
-
-@pytest.fixture(scope="session")
-def session(gotrue_user: gotrue.User) -> gotrue.Session:
-    return gotrue.Session(
-        access_token=jwt.encode({"some": "payload"}, "secret", algorithm="HS256"),
-        refresh_token="random_refresh_token",
-        user=gotrue_user,
-        token_type="Bearer",
-        expires_in=1000,
-    )
-
-
-@pytest.fixture(scope="session")
-def auth_response(
-    gotrue_user: gotrue.User, session: gotrue.Session
-) -> gotrue.AuthResponse:
-    return gotrue.AuthResponse(
-        user=gotrue_user,
-        session=session,
-    )
-
-
-@pytest.fixture(scope="session")
-def token(session: gotrue.Session) -> Token:
-    return Token(**session.model_dump())
 
 
 def test_login(
@@ -73,8 +28,6 @@ def test_login(
     """
     Test the /login endpoint.
     """
-
-    # headers = get_auth_header(access_token=token.access_token)
 
     session_mocker.patch.object(
         SupabaseAuthClient, "sign_in_with_password", return_value=auth_response
@@ -136,7 +89,11 @@ def mock_get_user(session_mocker: MockFixture, gotrue_user: gotrue.User) -> None
     )
 
 
-def test_next_records(mock_get_user: None, token: Token, record_key: RecordKey) -> None:
+def test_next_records(
+    mock_get_user: None,  # noqa: ARG001
+    record_key: RecordKey,
+    token: Token,
+) -> None:
     """
     Test the /next_records endpoint.
     """
@@ -152,7 +109,10 @@ def test_next_records(mock_get_user: None, token: Token, record_key: RecordKey) 
         assert response.status_code == OK_STATUS_CODE
 
 
-def test_previous_records(mock_get_user: None, token: Token) -> None:
+def test_previous_records(
+    mock_get_user: None,  # noqa: ARG001
+    token: Token,
+) -> None:
     """
     Test the /previous_records endpoint.
     """
@@ -165,7 +125,10 @@ def test_previous_records(mock_get_user: None, token: Token) -> None:
         assert response.status_code == OK_STATUS_CODE
 
 
-def test_initial_records(mock_get_user: None, token: Token) -> None:
+def test_initial_records(
+    mock_get_user: None,  # noqa: ARG001
+    token: Token,
+) -> None:
     """
     Test the /initial_records endpoint.
     """
@@ -175,3 +138,19 @@ def test_initial_records(mock_get_user: None, token: Token) -> None:
     with TestClient(app) as client:
         response = client.get(url="/api/v1/initial_records", headers=headers)
         assert response.status_code == OK_STATUS_CODE
+
+
+# def test_initial_records_with_parameters(
+#     mock_get_user: None, record_key: RecordKey, token: Token
+# ) -> None:
+#     """
+#     Test the /initial_records/{record_key} endpoint.
+#     """
+
+#     headers = get_auth_header(access_token=token.access_token)
+
+#     with TestClient(app) as client:
+#         response = client.get(
+#             url="/api/v1/initial_records/{record_key}", headers=headers
+#         )
+#         assert response.status_code == OK_STATUS_CODE

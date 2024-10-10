@@ -1,6 +1,7 @@
 from uuid import UUID
 
 from pydantic import BaseModel, Field
+
 from app.models.types import RecordKey
 
 

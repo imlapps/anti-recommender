@@ -1,10 +1,14 @@
+import datetime
 import os
 import uuid
 from collections.abc import Collection
 from pathlib import Path
 from typing import Any
 
+import gotrue.types as gotrue
+import jwt
 import pytest
+from fastapi.security import OAuth2PasswordRequestForm
 from postgrest import APIResponse
 from pyoxigraph import NamedNode
 from pytest_mock import MockFixture
@@ -13,9 +17,10 @@ from app.anti_recommendation_engine import AntiRecommendationEngine
 from app.anti_recommenders.arkg import ArkgAntiRecommender
 from app.anti_recommenders.openai import NormalOpenaiAntiRecommender
 from app.database.client import DatabaseClient
-from app.models import AntiRecommendation, Record, wikipedia
+from app.models import AntiRecommendation, Record, Token, wikipedia
 from app.models.types import ModelResponse, RdfMimeType, RecordKey, RecordType
 from app.models.user import User
+from app.models.user_state import UserState
 from app.readers import AllSourceReader
 from app.readers.reader import WikipediaReader
 
@@ -272,8 +277,11 @@ def base_iri() -> NamedNode:
 
 
 @pytest.fixture(scope="session")
-def user() -> User:
-    return User(user_id=uuid.uuid4())
+def user_state(record_key: RecordKey) -> UserState:
+    return UserState(
+        user_id=uuid.uuid4(),
+        anti_recommendations_history={"anti_recommendations_key": record_key},
+    )
 
 
 @pytest.fixture(scope="session")
@@ -283,7 +291,7 @@ def arkg_anti_recommender(  # noqa: PLR0913
     file_path: Path,
     mime_type: RdfMimeType,
     records_by_key: dict[RecordKey, Record],
-    user: User,
+    user_state: UserState,
 ) -> ArkgAntiRecommender:
     """Return an ArkgAntiRecommender."""
 
@@ -296,5 +304,47 @@ def arkg_anti_recommender(  # noqa: PLR0913
         file_path=file_path,
         mime_type=mime_type,
         record_keys=tuple(records_by_key.keys()),
-        user=user,
+        user_state=user_state,
     )
+
+
+@pytest.fixture(scope="session")
+def form_data() -> OAuth2PasswordRequestForm:
+    return OAuth2PasswordRequestForm(username="Imlapps", password="Imlapps@2024!")
+
+
+@pytest.fixture(scope="session")
+def gotrue_user(user_state: User) -> gotrue.User:
+    return gotrue.User(
+        id=str(user_state.id),
+        app_metadata={"app_metadata": ""},
+        user_metadata={"user_metadata": ""},
+        aud="",
+        created_at=datetime.datetime.now(tz=datetime.UTC),
+    )
+
+
+@pytest.fixture(scope="session")
+def session(gotrue_user: gotrue.User) -> gotrue.Session:
+    return gotrue.Session(
+        access_token=jwt.encode({"some": "payload"}, "secret", algorithm="HS256"),
+        refresh_token="",
+        user=gotrue_user,
+        token_type="Bearer",
+        expires_in=1000,
+    )
+
+
+@pytest.fixture(scope="session")
+def auth_response(
+    gotrue_user: gotrue.User, session: gotrue.Session
+) -> gotrue.AuthResponse:
+    return gotrue.AuthResponse(
+        user=gotrue_user,
+        session=session,
+    )
+
+
+@pytest.fixture(scope="session")
+def token(session: gotrue.Session) -> Token:
+    return Token(**session.model_dump())

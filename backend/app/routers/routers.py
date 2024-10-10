@@ -2,19 +2,17 @@ from typing import Annotated
 
 from fastapi import APIRouter, Depends, HTTPException, Request, status
 from fastapi.security import OAuth2PasswordRequestForm
-
-from app.models import Record, User, Token
-from app.models.types import RecordKey
-from app.auth import auth_client as auth_client
 from gotrue.types import (
+    AuthResponse,
     SignInWithEmailAndPasswordCredentials,
     SignUpWithEmailAndPasswordCredentials,
 )
 from postgrest import APIError
-from gotrue.types import AuthResponse
 
+from app.auth import auth_client as auth_client
 from app.dependencies import check_user_authentication
-
+from app.models import Record, Token, UserState
+from app.models.types import RecordKey
 
 router = APIRouter(prefix="/api/v1", tags=["/api/v1"])
 
@@ -84,7 +82,9 @@ async def sign_out() -> None:
 @router.get("/next_records/{record_key}")
 async def next_records(
     record_key: RecordKey,
-    authorized_user: Annotated[User, Depends(check_user_authentication)],
+    user_state: Annotated[  # noqa: ARG001
+        UserState, Depends(check_user_authentication)
+    ],
     request: Request,
 ) -> tuple[Record, ...]:
     """
@@ -100,9 +100,9 @@ async def next_records(
 
 @router.get("/previous_records")
 async def previous_records(
-    authorized_user: Annotated[
-        User, Depends(check_user_authentication)
-    ],  # noqa: ARG001
+    user_state: Annotated[  # noqa: ARG001
+        UserState, Depends(check_user_authentication)
+    ],
     request: Request,
 ) -> tuple[Record | None, ...]:
     """
@@ -116,9 +116,7 @@ async def previous_records(
 
 @router.get("/initial_records")
 async def initial_records(
-    authorized_user: Annotated[
-        User, Depends(check_user_authentication)
-    ],  # noqa: ARG001
+    user_state: Annotated[UserState, Depends(check_user_authentication)],
     request: Request,
 ) -> tuple[Record, ...]:
     """
@@ -126,5 +124,14 @@ async def initial_records(
 
     Returns the intial tuple of Records from the AntiRecommendationEngine.
     """
+    request.app.state.anti_recommendation_engine.initialize_anti_recommender(
+        user_state=user_state
+    )
 
-    return request.app.state.anti_recommendation_engine.initial_records()  # type: ignore[no-any-return]
+    if not user_state.anti_recommendations_history:
+        last_seen_record_key = None
+    else:
+        last_seen_record_key = list(user_state.anti_recommendations_history).pop()
+    return request.app.state.anti_recommendation_engine.initial_records(
+        record_key=last_seen_record_key
+    )  # type: ignore[no-any-return]
