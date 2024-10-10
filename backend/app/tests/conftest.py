@@ -250,7 +250,7 @@ def anti_recommendation_engine(
 
 
 @pytest.fixture(scope="session")
-def file_path() -> Path:
+def arkg_file_path() -> Path:
     """Return the file path of a Wikipedia ARKG."""
 
     wikipedia_arkg_file_path = (
@@ -288,7 +288,7 @@ def user_state(record_key: RecordKey) -> UserState:
 def arkg_anti_recommender(  # noqa: PLR0913
     session_mocker: MockFixture,
     base_iri: NamedNode,
-    file_path: Path,
+    arkg_file_path: Path,
     mime_type: RdfMimeType,
     records_by_key: dict[RecordKey, Record],
     user_state: UserState,
@@ -301,7 +301,7 @@ def arkg_anti_recommender(  # noqa: PLR0913
 
     return ArkgAntiRecommender(
         base_iri=base_iri,
-        file_path=file_path,
+        file_path=arkg_file_path,
         mime_type=mime_type,
         record_keys=tuple(records_by_key.keys()),
         user_state=user_state,
