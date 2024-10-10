@@ -1,6 +1,7 @@
 from uuid import UUID
 
 from pydantic import BaseModel, Field
+from app.models.types import RecordKey
 
 
 class User(BaseModel):
@@ -11,3 +12,4 @@ class User(BaseModel):
     """
 
     id: UUID = Field(..., alias="user_id")
+    record_key: RecordKey | None = None
