@@ -31,12 +31,9 @@ class AntiRecommendationEngine:
         }
         self.__stack: list[list[Record]] = []
 
-    @property
-    def anti_recommender(self) -> AntiRecommender | None:
-        return self.__anti_recommender
-
-    def __select_anti_recommender(
-        self, user_state: UserState
+    @staticmethod
+    def select_anti_recommender(
+        *, user_state: UserState, record_keys: tuple[Record, ...]
     ) -> AntiRecommender | None:
         """Select and return an `AntiRecommender` based on values stored in `settings`."""
 
@@ -47,7 +44,7 @@ class AntiRecommendationEngine:
             return NormalOpenaiAntiRecommender()
 
         if settings.anti_recommender_type == AntiRecommenderType.ARKG:
-            record_keys_list = list(self.__records_by_key.keys())
+            record_keys_list = list(record_keys)
             record_keys_list.sort()
 
             return ArkgAntiRecommender(
@@ -61,7 +58,11 @@ class AntiRecommendationEngine:
         return None
 
     def initialize_anti_recommender(self, user_state: UserState) -> None:
-        self.__anti_recommender = self.__select_anti_recommender(user_state=user_state)
+        """Initialize an anti-recommender in the `AntiRecommendationEngine`."""
+
+        self.__anti_recommender = self.select_anti_recommender(
+            user_state=user_state, record_keys=self.__records_by_key.keys()
+        )
 
     def initial_records(
         self, *, record_key: RecordKey | None = None
