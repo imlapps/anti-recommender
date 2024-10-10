@@ -26,6 +26,7 @@ app.include_router(router)
 
 @app.exception_handler(CredentialsError)
 async def credentials_exception_handler(
-    request: Request, exc: CredentialsError  # noqa: ARG001
+    request: Request,  # noqa: ARG001
+    exc: CredentialsError,  # noqa: ARG001
 ) -> RedirectResponse:
     return RedirectResponse("/login")

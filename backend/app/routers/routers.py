@@ -128,10 +128,11 @@ async def initial_records(
         user_state=user_state
     )
 
-    if not user_state.anti_recommendations_history:
-        last_seen_record_key = None
-    else:
+    last_seen_record_key = None
+
+    if user_state.anti_recommendations_history:
         last_seen_record_key = list(user_state.anti_recommendations_history).pop()
-    return request.app.state.anti_recommendation_engine.initial_records(
+
+    return request.app.state.anti_recommendation_engine.initial_records(  # type: ignore[no-any-return]
         record_key=last_seen_record_key
-    )  # type: ignore[no-any-return]
+    )

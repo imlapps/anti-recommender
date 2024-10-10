@@ -33,7 +33,7 @@ class AntiRecommendationEngine:
 
     @staticmethod
     def select_anti_recommender(
-        *, user_state: UserState, record_keys: tuple[Record, ...]
+        *, user_state: UserState, record_keys: tuple[RecordKey, ...]
     ) -> AntiRecommender | None:
         """Select and return an `AntiRecommender` based on values stored in `settings`."""
 
@@ -61,7 +61,7 @@ class AntiRecommendationEngine:
         """Initialize an anti-recommender in the `AntiRecommendationEngine`."""
 
         self.__anti_recommender = self.select_anti_recommender(
-            user_state=user_state, record_keys=self.__records_by_key.keys()
+            user_state=user_state, record_keys=tuple(self.__records_by_key)
         )
 
     def initial_records(

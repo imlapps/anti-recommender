@@ -1,7 +1,7 @@
 import pytest
 from pytest_mock import MockFixture
+
 from app.anti_recommendation_engine import AntiRecommendationEngine
-from app.anti_recommenders.anti_recommender import AntiRecommender
 from app.models import Record, UserState
 from app.models.types import RecordKey
 
