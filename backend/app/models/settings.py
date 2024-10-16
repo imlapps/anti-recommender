@@ -28,8 +28,8 @@ class Settings(BaseSettings):
         default=frozenset(), validation_alias="output_file_names"
     )
     record_types: frozenset[RecordType] = frozenset()
-    supabase_url: str | None = None
-    supabase_key: ApiKey | None = None
+    supabase_url: str = ""
+    supabase_key: str = ""
     model_config = SettingsConfigDict(
         env_file=(
             CONFIG_DIRECTORY_PATH / ".env.local",

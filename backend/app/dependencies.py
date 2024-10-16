@@ -1,15 +1,13 @@
-from typing import TYPE_CHECKING, Annotated
+from typing import Annotated
+from uuid import UUID
 
-from fastapi import Depends, HTTPException, status
+from fastapi import Depends
 from fastapi.security import OAuth2PasswordBearer
-from postgrest import APIError
 
-from app.auth import auth_client
-from app.models import CredentialsError, User, UserState
+from app.auth import UserException, UserResult
+from app.auth.supabase import supabase_auth_service as auth_service
+from app.models import CredentialsError, Token, User, UserState
 from app.utils import fetch_user_state_from_database
-
-if TYPE_CHECKING:
-    from gotrue.types import AuthResponse
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="login")
 
@@ -23,15 +21,10 @@ async def check_user_authentication(
     Return a `User` with an authenticated `UUID`.
     """
     try:
-        user_response: AuthResponse | None = auth_client.get_user(jwt=str(access_token))
-    except APIError as exception:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail=f"Unable to check user authentication. Encountered APIError with exception: {exception}",
-            headers={"WWW-Authenticate": "Bearer"},
-        ) from exception
+        user_result: UserResult = auth_service.get_user(
+            authentication_token=Token(access_token=access_token)
+        )
+    except UserException:
+        raise CredentialsError(detail="Could not validate credentials") from None
 
-    if not user_response:
-        raise CredentialsError(detail="Could not validate credentials")
-
-    return fetch_user_state_from_database(user=User(user_id=user_response.user.id))
+    return fetch_user_state_from_database(user=User(user_id=UUID(user_result.user_id)))

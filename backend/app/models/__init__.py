@@ -1,3 +1,4 @@
+from .credentials import Credentials as Credentials
 from .credentials_error import CredentialsError as CredentialsError
 from .record import Record as Record
 from .settings import Settings as Settings

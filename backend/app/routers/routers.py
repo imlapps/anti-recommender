@@ -2,16 +2,11 @@ from typing import Annotated
 
 from fastapi import APIRouter, Depends, HTTPException, Request, status
 from fastapi.security import OAuth2PasswordRequestForm
-from gotrue.types import (
-    AuthResponse,
-    SignInWithEmailAndPasswordCredentials,
-    SignUpWithEmailAndPasswordCredentials,
-)
-from postgrest import APIError
 
-from app.auth import auth_client as auth_client
+from app.auth import AuthInvalidCredentialsException, AuthResult
+from app.auth.supabase import supabase_auth_service as auth_service
 from app.dependencies import check_user_authentication
-from app.models import Record, Token, UserState
+from app.models import Credentials, Record, Token, UserState
 from app.models.types import RecordKey
 
 router = APIRouter(prefix="/api/v1", tags=["/api/v1"])
@@ -20,63 +15,58 @@ router = APIRouter(prefix="/api/v1", tags=["/api/v1"])
 @router.post("/login")
 async def login(form_data: Annotated[OAuth2PasswordRequestForm, Depends()]) -> Token:
     try:
-        auth_response: AuthResponse | None = auth_client.sign_in(
-            SignInWithEmailAndPasswordCredentials(
-                email=form_data.username, password=form_data.password
-            )
+        sign_in_result: AuthResult = auth_service.sign_in(
+            Credentials(email=form_data.username, password=form_data.password)
         )
-    except APIError as exception:
+    except AuthInvalidCredentialsException as exception:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail=f"Unable to login. Encountered APIError with exception: {exception}",
+            detail=f"Unable to login. Encountered exception with the message: {exception.message}",
             headers={"WWW-Authenticate": "Bearer"},
         ) from exception
 
-    if not auth_response:
+    if not sign_in_result.succeeded:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Unable to login. Check username or password",
             headers={"WWW-Authenticate": "Bearer"},
         )
-
-    return Token(**auth_response.session.model_dump())
+    return sign_in_result.authentication_token
 
 
 @router.post("/sign_up")
 async def sign_up(form_data: Annotated[OAuth2PasswordRequestForm, Depends()]) -> Token:
     try:
-        auth_response: AuthResponse | None = auth_client.sign_up(
-            SignUpWithEmailAndPasswordCredentials(
-                email=form_data.username, password=form_data.password
-            )
+        sign_up_result: AuthResult = auth_service.sign_up(
+            Credentials(email=form_data.username, password=form_data.password)
         )
-    except APIError as exception:
+    except AuthInvalidCredentialsException as exception:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail=f"Unable to signup. Encountered APIError with exception: {exception}",
+            detail=f"Unable to signup. Encountered APIError with exception: {exception.message}",
             headers={"WWW-Authenticate": "Bearer"},
         ) from exception
 
-    if not auth_response:
+    if not sign_up_result.succeeded:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Unable to signup. Check username or password",
             headers={"WWW-Authenticate": "Bearer"},
         )
 
-    return Token(**auth_response.session.model_dump())
+    return sign_up_result.authentication_token
 
 
 @router.get("/sign_out")
 async def sign_out() -> None:
-    try:
-        auth_client.sign_out()
-    except APIError as exception:
+    sign_out_result: AuthResult = auth_service.sign_out()
+
+    if not sign_out_result.succeeded:
         raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail=f"Unable to signout. Encountered APIError with exception: {exception}",
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Unable to signout. Encountered APIError with exception: {exception.message}",
             headers={"WWW-Authenticate": "Bearer"},
-        ) from exception
+        )
 
 
 @router.get("/next_records/{record_key}")
