@@ -16,7 +16,7 @@ from pytest_mock import MockFixture
 from app.anti_recommendation_engine import AntiRecommendationEngine
 from app.anti_recommenders.arkg import ArkgAntiRecommender
 from app.anti_recommenders.openai import NormalOpenaiAntiRecommender
-from app.database.client import DatabaseClient
+from app.database.supabase import SupabaseDatabaseService, SupabaseFetchQueryResult
 from app.models import AntiRecommendation, Record, Token, wikipedia
 from app.models.types import ModelResponse, RdfMimeType, RecordKey, RecordType
 from app.models.user import User
@@ -296,7 +296,11 @@ def arkg_anti_recommender(  # noqa: PLR0913
     """Return an ArkgAntiRecommender."""
 
     session_mocker.patch.object(
-        DatabaseClient, "fetch", return_value=APIResponse(data=[])
+        SupabaseDatabaseService,
+        "query",
+        return_value=SupabaseFetchQueryResult(
+            APIResponse(data=[user_state.model_dump(by_alias=True)])
+        ),
     )
 
     return ArkgAntiRecommender(

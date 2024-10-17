@@ -1,10 +1,11 @@
+from uuid import UUID
+
 from fastapi import HTTPException, status
-from postgrest import APIError
 
 from app.constants import ARKG_ANTI_RECOMMENDER_USER_STATE_TABLE_NAME
-from app.database import database_client
-from app.models.user import User
-from app.models.user_state import UserState
+from app.database import DatabaseException
+from app.database.supabase import supabase_database_service as database_service
+from app.models import TableQuery, User, UserState
 
 
 def fetch_user_state_from_database(user: User) -> UserState:
@@ -15,18 +16,24 @@ def fetch_user_state_from_database(user: User) -> UserState:
     """
 
     try:
-        api_response = database_client.fetch(
-            table_name=ARKG_ANTI_RECOMMENDER_USER_STATE_TABLE_NAME,
-            query="*",
-            eq={"column": "user_id", "value": str(user.id)},
+        database_service_result = database_service.query(
+            TableQuery(
+                table_name=ARKG_ANTI_RECOMMENDER_USER_STATE_TABLE_NAME,
+                columns="*",
+                eq={"column": "user_id", "value": str(user.id)},
+            )
         )
-    except APIError as exception:
+    except DatabaseException as exception:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail=f"Unable to fetch UserState from database. Encountered APIError with exception: {exception}",
+            detail=f"Unable to fetch UserState from database. Encountered DatabaseException: {exception}",
         ) from exception
 
-    if api_response and api_response.data:
-        return UserState(**api_response.data[0])
+    if database_service_result.succeeded:
+        response = database_service_result.data[0]
+        return UserState(
+            user_id=UUID(str(response["user_id"])),
+            anti_recommendations_history=response["anti_recommendations_history"],
+        )
 
     return UserState(user_id=user.id, anti_recommendations_history={})

@@ -1,7 +1,8 @@
+from postgrest import APIResponse
 from pytest_mock import MockFixture
 
 from app.anti_recommenders.arkg import ArkgAntiRecommender
-from app.database.client import DatabaseClient
+from app.database.supabase import SupabaseDatabaseService, SupabaseUpsertQueryResult
 from app.models import Record
 
 
@@ -12,7 +13,11 @@ def test_generate_anti_recommendations(
 ) -> None:
     """Test that ArkgAntiRecommender.generate_anti_recommendations() yields AntiRecommendations of a given record key."""
 
-    session_mocker.patch.object(DatabaseClient, "upsert", return_value=None)
+    session_mocker.patch.object(
+        SupabaseDatabaseService,
+        "command",
+        return_value=SupabaseUpsertQueryResult(APIResponse(data=[{"name": "N/A"}])),
+    )
 
     assert (
         records[1].key
