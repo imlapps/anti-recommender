@@ -14,6 +14,10 @@ class AuthService(ABC):
         pass
 
     @abstractmethod
+    def sign_in_anonymously(self) -> AuthResult:
+        pass
+
+    @abstractmethod
     def sign_out(self) -> AuthResult:
         pass
 

@@ -18,5 +18,10 @@ class AuthResult(ABC):
 class UserResult(ABC):
     @property
     @abstractmethod
+    def succeeded(self) -> bool:
+        pass
+
+    @property
+    @abstractmethod
     def user_id(self) -> str:
         pass

@@ -10,6 +10,7 @@ from app.auth.supabase import (
     SupabaseSignInResult,
     SupabaseSignOutResult,
     SupabaseSignUpResult,
+    SupabaseSignInAnonymouslyResult,
     SupabaseUserException,
     SupabaseUserResult,
 )
@@ -44,6 +45,19 @@ class SupabaseAuthService(AuthService):
             raise SupabaseAuthInvalidCredentialsException(exception) from exception
 
         return SupabaseSignInResult(supabase_sign_in_result)
+
+    @override
+    def sign_in_anonymously(
+        self,
+    ) -> AuthResult:
+        try:
+            supabase_sign_in_anonymously_result = (
+                self.__auth_client.sign_in_anonymously()
+            )
+        except AuthInvalidCredentialsError as exception:
+            raise SupabaseAuthInvalidCredentialsException(exception) from exception
+
+        return SupabaseSignInAnonymouslyResult(supabase_sign_in_anonymously_result)
 
     @override
     def sign_up(self, authentication_credentials: Credentials) -> AuthResult:

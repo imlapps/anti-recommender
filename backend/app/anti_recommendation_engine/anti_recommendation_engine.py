@@ -1,9 +1,10 @@
 from app.anti_recommenders import AntiRecommender
 from app.anti_recommenders.arkg.arkg_anti_recommender import ArkgAntiRecommender
 from app.anti_recommenders.openai import NormalOpenaiAntiRecommender
-from app.models import Record, UserState, settings
+from app.models import Record, settings
 from app.models.types import AntiRecommenderType, RecordKey
 from app.readers import AllSourceReader
+from app.user import User
 
 
 class AntiRecommendationEngine:
@@ -23,18 +24,17 @@ class AntiRecommendationEngine:
         - Returns a tuple of Records that matched the previous AntiRecommendations.
     """
 
-    def __init__(self) -> None:
-        self.__anti_recommender: AntiRecommender | None = None
+    def __init__(self, user: User) -> None:
+
         self.__current_anti_recommendation_records: list[Record] = []
         self.__records_by_key: dict[RecordKey, Record] = {
             record.key: record for record in AllSourceReader().read()
         }
         self.__stack: list[list[Record]] = []
+        self.__user = user
+        self.__anti_recommender: AntiRecommender = self.__select_anti_recommender()
 
-    @staticmethod
-    def select_anti_recommender(
-        *, user_state: UserState, record_keys: tuple[RecordKey, ...]
-    ) -> AntiRecommender | None:
+    def __select_anti_recommender(self) -> AntiRecommender:
         """Select and return an `AntiRecommender` based on values stored in `settings`."""
 
         if (
@@ -43,25 +43,15 @@ class AntiRecommendationEngine:
         ):
             return NormalOpenaiAntiRecommender()
 
-        if settings.anti_recommender_type == AntiRecommenderType.ARKG:
-            record_keys_list = list(record_keys)
-            record_keys_list.sort()
+        record_keys_list = list(self.__records_by_key.keys())
+        record_keys_list.sort()
 
-            return ArkgAntiRecommender(
-                base_iri=settings.arkg_base_iri,
-                file_path=settings.arkg_file_path,
-                mime_type=settings.arkg_mime_type,
-                record_keys=tuple(record_keys_list),
-                user_state=user_state,
-            )
-
-        return None
-
-    def initialize_anti_recommender(self, user_state: UserState) -> None:
-        """Initialize an anti-recommender in the `AntiRecommendationEngine`."""
-
-        self.__anti_recommender = self.select_anti_recommender(
-            user_state=user_state, record_keys=tuple(self.__records_by_key)
+        return ArkgAntiRecommender(
+            base_iri=settings.arkg_base_iri,
+            file_path=settings.arkg_file_path,
+            mime_type=settings.arkg_mime_type,
+            record_keys=tuple(record_keys_list),
+            user=self.__user,
         )
 
     def initial_records(

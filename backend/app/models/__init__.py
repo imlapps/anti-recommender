@@ -5,7 +5,6 @@ from .settings import Settings as Settings
 from .settings import settings as settings
 from .table_query import TableQuery as TableQuery
 from .token import Token as Token
-from .user import User as User
-from .user_state import UserState as UserState
+
 
 from .anti_recommendation import AntiRecommendation as AntiRecommendation  # isort: skip

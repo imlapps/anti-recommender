@@ -1,17 +1,16 @@
-import logging
 from collections.abc import Iterable
 from pathlib import Path
 from typing import override
 
 import pyoxigraph as ox
-from postgrest import APIError
 
 from app.anti_recommenders import AntiRecommender
 from app.constants import WIKIPEDIA_BASE_URL
-from app.models import AntiRecommendation, UserState
+from app.models import AntiRecommendation
 from app.models.types import RdfMimeType, RecordKey, StoreQuery
 from app.namespaces import SCHEMA
-from app.utils import upsert_user_state_into_database
+
+from app.user import User
 
 
 class ArkgAntiRecommender(AntiRecommender):
@@ -28,15 +27,14 @@ class ArkgAntiRecommender(AntiRecommender):
         file_path: Path,
         mime_type: RdfMimeType,
         record_keys: tuple[RecordKey, ...],
-        user_state: UserState,
+        user: User,
     ) -> None:
         self.__base_iri = base_iri
-        self.__logger = logging.getLogger(__name__)
         self.__record_keys: tuple[RecordKey, ...] = record_keys
         self.__store: ox.Store = self.__load_store(
             file_path=file_path, mime_type=mime_type, base_iri=base_iri
         )
-        self.__user_state = user_state
+        self.__user = user
 
     def __fetch_anti_recommendations_query(self, record_key: RecordKey) -> StoreQuery:
         """
@@ -74,7 +72,7 @@ class ArkgAntiRecommender(AntiRecommender):
 
     def __select_primary_anti_recommendation_key(
         self, anti_recommendation_keys: tuple[RecordKey, ...]
-    ) -> RecordKey | None:
+    ) -> RecordKey:
         """
         Select and return a primary anti-recommendation key.
 
@@ -85,26 +83,22 @@ class ArkgAntiRecommender(AntiRecommender):
         If no unseen key is found in anti_recommendation_keys, the first unseen key in `__record_keys` is returned.
         """
 
-        if self.__user_state:
+        anti_recommendations_history = list(self.__user.anti_recommendations_history())
+        primary_anti_recommendation_keys = [
+            unseen_anti_recommendation_key
+            for unseen_anti_recommendation_key in anti_recommendation_keys
+            if unseen_anti_recommendation_key not in anti_recommendations_history
+        ]
+
+        if not primary_anti_recommendation_keys:
             primary_anti_recommendation_keys = [
                 unseen_anti_recommendation_key
-                for unseen_anti_recommendation_key in anti_recommendation_keys
-                if unseen_anti_recommendation_key
-                not in self.__user_state.anti_recommendations_history.values()
+                for unseen_anti_recommendation_key in self.__record_keys
+                if unseen_anti_recommendation_key not in anti_recommendations_history
             ]
 
-            if not primary_anti_recommendation_keys:
-                primary_anti_recommendation_keys = [
-                    unseen_anti_recommendation_key
-                    for unseen_anti_recommendation_key in self.__record_keys
-                    if unseen_anti_recommendation_key
-                    not in self.__user_state.anti_recommendations_history.values()
-                ]
-
-            if primary_anti_recommendation_keys:
-                return primary_anti_recommendation_keys[0]
-
-        return None
+        if primary_anti_recommendation_keys:
+            return primary_anti_recommendation_keys[0]
 
     @override
     def generate_anti_recommendations(
@@ -120,41 +114,30 @@ class ArkgAntiRecommender(AntiRecommender):
         All other anti-recommendations may or may not have been seen by a User.
         """
 
-        if self.__user_state:
-            anti_recommendation_keys = list(
-                self.__retrieve_anti_recommendations_from_store(record_key)
+        anti_recommendation_keys = list(
+            self.__retrieve_anti_recommendations_from_store(record_key)
+        )
+
+        primary_anti_recommendation_key = self.__select_primary_anti_recommendation_key(
+            tuple(anti_recommendation_keys)
+        )
+
+        if primary_anti_recommendation_key:
+            if primary_anti_recommendation_key in anti_recommendation_keys:
+                anti_recommendation_keys.remove(primary_anti_recommendation_key)
+
+            anti_recommendation_keys.insert(0, primary_anti_recommendation_key)
+
+            self.__user.update_anti_recommendations_history(
+                primary_anti_recommendation_key
             )
 
-            primary_anti_recommendation_key = (
-                self.__select_primary_anti_recommendation_key(
-                    tuple(anti_recommendation_keys)
+            return (
+                AntiRecommendation(
+                    key=anti_recommendation_key,
+                    url=WIKIPEDIA_BASE_URL + anti_recommendation_key,
                 )
+                for anti_recommendation_key in anti_recommendation_keys
             )
-
-            if primary_anti_recommendation_key:
-                if primary_anti_recommendation_key in anti_recommendation_keys:
-                    anti_recommendation_keys.remove(primary_anti_recommendation_key)
-
-                anti_recommendation_keys.insert(0, primary_anti_recommendation_key)
-
-                self.__user_state.anti_recommendations_history.update(
-                    {"anti_recommendation_key": primary_anti_recommendation_key}
-                )
-
-                try:
-                    upsert_user_state_into_database(self.__user_state)
-
-                    return (
-                        AntiRecommendation(
-                            key=anti_recommendation_key,
-                            url=WIKIPEDIA_BASE_URL + anti_recommendation_key,
-                        )
-                        for anti_recommendation_key in anti_recommendation_keys
-                    )
-                except APIError as exception:
-                    self.__logger.warning(
-                        f"Could not generate valid anti-recommendations because of error in ArkgAntiRecommender.__upsert_user_state_into_database.\
-                        Error message: {exception.json().get("message")}"
-                    )
 
         return ()

@@ -42,6 +42,19 @@ def test_login(
         assert response.status_code == OK_STATUS_CODE
 
 
+def test_sign_in_anonymously() -> None:
+    """
+    Test the /sign_in_anonymously endpoint.
+    """
+
+    with TestClient(app) as client:
+        response = client.get(
+            url="/api/v1/sign_in_anonymously",
+        )
+
+        assert response.status_code == OK_STATUS_CODE
+
+
 def test_sign_up(
     session_mocker: MockFixture,
     form_data: OAuth2PasswordRequestForm,
@@ -70,7 +83,7 @@ def test_sign_out(
     """
     Test the /sign_out endpoint.
     """
-    session_mocker.patch.object(SupabaseAuthClient, "sign_out", return_value=None)
+    # session_mocker.patch.object(SupabaseAuthClient, "sign_out", return_value=None)
 
     with TestClient(app) as client:
         response = client.get(
@@ -138,19 +151,3 @@ def test_initial_records(
     with TestClient(app) as client:
         response = client.get(url="/api/v1/initial_records", headers=headers)
         assert response.status_code == OK_STATUS_CODE
-
-
-# def test_initial_records_with_parameters(
-#     mock_get_user: None, record_key: RecordKey, token: Token
-# ) -> None:
-#     """
-#     Test the /initial_records/{record_key} endpoint.
-#     """
-
-#     headers = get_auth_header(access_token=token.access_token)
-
-#     with TestClient(app) as client:
-#         response = client.get(
-#             url="/api/v1/initial_records/{record_key}", headers=headers
-#         )
-#         assert response.status_code == OK_STATUS_CODE

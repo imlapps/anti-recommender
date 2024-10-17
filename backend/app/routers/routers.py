@@ -6,7 +6,8 @@ from fastapi.security import OAuth2PasswordRequestForm
 from app.auth import AuthInvalidCredentialsException, AuthResult
 from app.auth.supabase import supabase_auth_service as auth_service
 from app.dependencies import check_user_authentication
-from app.models import Credentials, Record, Token, UserState
+from app.models import Credentials, Record, Token
+from app.user import User
 from app.models.types import RecordKey
 
 router = APIRouter(prefix="/api/v1", tags=["/api/v1"])
@@ -32,6 +33,20 @@ async def login(form_data: Annotated[OAuth2PasswordRequestForm, Depends()]) -> T
             headers={"WWW-Authenticate": "Bearer"},
         )
     return sign_in_result.authentication_token
+
+
+@router.get("/sign_in_anonymously")
+async def sign_in_anonymously() -> Token:
+
+    sign_in_anonymously_result: AuthResult = auth_service.sign_in_anonymously()
+
+    if not sign_in_anonymously_result.succeeded:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Unable TO sign_in_anonymously.",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
+    return sign_in_anonymously_result.authentication_token
 
 
 @router.post("/sign_up")
@@ -63,7 +78,7 @@ async def sign_out() -> None:
 
     if not sign_out_result.succeeded:
         raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
+            status_code=status.HTTP_400_BAD_REQUEST,
             detail="Unable to signout. Encountered APIError with exception: {exception.message}",
             headers={"WWW-Authenticate": "Bearer"},
         )
@@ -72,9 +87,7 @@ async def sign_out() -> None:
 @router.get("/next_records/{record_key}")
 async def next_records(
     record_key: RecordKey,
-    user_state: Annotated[  # noqa: ARG001
-        UserState, Depends(check_user_authentication)
-    ],
+    user_state: Annotated[User, Depends(check_user_authentication)],  # noqa: ARG001
     request: Request,
 ) -> tuple[Record, ...]:
     """
@@ -90,9 +103,7 @@ async def next_records(
 
 @router.get("/previous_records")
 async def previous_records(
-    user_state: Annotated[  # noqa: ARG001
-        UserState, Depends(check_user_authentication)
-    ],
+    user_state: Annotated[User, Depends(check_user_authentication)],  # noqa: ARG001
     request: Request,
 ) -> tuple[Record | None, ...]:
     """
@@ -106,7 +117,7 @@ async def previous_records(
 
 @router.get("/initial_records")
 async def initial_records(
-    user_state: Annotated[UserState, Depends(check_user_authentication)],
+    user_state: Annotated[User, Depends(check_user_authentication)],
     request: Request,
 ) -> tuple[Record, ...]:
     """
@@ -114,15 +125,7 @@ async def initial_records(
 
     Returns the intial tuple of Records from the AntiRecommendationEngine.
     """
-    request.app.state.anti_recommendation_engine.initialize_anti_recommender(
-        user_state=user_state
-    )
 
-    last_seen_record_key = None
-
-    if user_state.anti_recommendations_history:
-        last_seen_record_key = list(user_state.anti_recommendations_history).pop()
-
-    return request.app.state.anti_recommendation_engine.initial_records(  # type: ignore[no-any-return]
-        record_key=last_seen_record_key
+    return (
+        request.app.state.anti_recommendation_engine.initial_records()  # type: ignore[no-any-return]
     )

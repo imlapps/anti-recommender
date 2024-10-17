@@ -7,6 +7,7 @@ from typing import Any
 
 import gotrue.types as gotrue
 import jwt
+from pydantic import TypeAdapter
 import pytest
 from fastapi.security import OAuth2PasswordRequestForm
 from postgrest import APIResponse
@@ -19,8 +20,7 @@ from app.anti_recommenders.openai import NormalOpenaiAntiRecommender
 from app.database.supabase import SupabaseDatabaseService, SupabaseFetchQueryResult
 from app.models import AntiRecommendation, Record, Token, wikipedia
 from app.models.types import ModelResponse, RdfMimeType, RecordKey, RecordType
-from app.models.user import User
-from app.models.user_state import UserState
+from app.user import User, SupabaseUserService
 from app.readers import AllSourceReader
 from app.readers.reader import WikipediaReader
 
@@ -239,17 +239,6 @@ def records_by_key(records: tuple[Record, ...]) -> dict[RecordKey, Record]:
 
 
 @pytest.fixture(scope="session")
-def anti_recommendation_engine(
-    session_mocker: MockFixture, records: tuple[Record, ...]
-) -> AntiRecommendationEngine:
-    """Return an AntiRecommendationEngine."""
-
-    session_mocker.patch.object(AllSourceReader, "read", return_value=records)
-
-    return AntiRecommendationEngine()
-
-
-@pytest.fixture(scope="session")
 def arkg_file_path() -> Path:
     """Return the file path of a Wikipedia ARKG."""
 
@@ -277,21 +266,32 @@ def base_iri() -> NamedNode:
 
 
 @pytest.fixture(scope="session")
-def user_state(record_key: RecordKey) -> UserState:
-    return UserState(
-        user_id=uuid.uuid4(),
-        anti_recommendations_history={"anti_recommendations_key": record_key},
-    )
+def user(record_key: RecordKey) -> User:
+    supabase_user_service = SupabaseUserService()
+
+    return supabase_user_service.get_user(uuid.uuid4())
+
+
+@pytest.fixture(scope="session")
+def anti_recommendation_engine(
+    session_mocker: MockFixture, records: tuple[Record, ...], user: User
+) -> AntiRecommendationEngine:
+    """Return an AntiRecommendationEngine."""
+
+    session_mocker.patch.object(AllSourceReader, "read", return_value=records)
+
+    return AntiRecommendationEngine(user=user)
 
 
 @pytest.fixture(scope="session")
 def arkg_anti_recommender(  # noqa: PLR0913
-    session_mocker: MockFixture,
-    base_iri: NamedNode,
     arkg_file_path: Path,
+    base_iri: NamedNode,
     mime_type: RdfMimeType,
+    record_key: RecordKey,
     records_by_key: dict[RecordKey, Record],
-    user_state: UserState,
+    session_mocker: MockFixture,
+    user: User,
 ) -> ArkgAntiRecommender:
     """Return an ArkgAntiRecommender."""
 
@@ -299,7 +299,11 @@ def arkg_anti_recommender(  # noqa: PLR0913
         SupabaseDatabaseService,
         "query",
         return_value=SupabaseFetchQueryResult(
-            APIResponse(data=[user_state.model_dump(by_alias=True)])
+            APIResponse(
+                data=[
+                    {"user_id": user.id, "anti_recommendations_history": [record_key]}
+                ]
+            )
         ),
     )
 
@@ -308,7 +312,7 @@ def arkg_anti_recommender(  # noqa: PLR0913
         file_path=arkg_file_path,
         mime_type=mime_type,
         record_keys=tuple(records_by_key.keys()),
-        user_state=user_state,
+        user=user,
     )
 
 
@@ -318,9 +322,9 @@ def form_data() -> OAuth2PasswordRequestForm:
 
 
 @pytest.fixture(scope="session")
-def gotrue_user(user_state: User) -> gotrue.User:
+def gotrue_user(user: User) -> gotrue.User:
     return gotrue.User(
-        id=str(user_state.id),
+        id=str(user.id),
         app_metadata={"app_metadata": ""},
         user_metadata={"user_metadata": ""},
         aud="",

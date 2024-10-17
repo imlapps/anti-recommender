@@ -1,6 +1,6 @@
 from dataclasses import dataclass
 
-from gotrue.types import AuthResponse, UserResponse
+from gotrue.types import AuthResponse, UserResponse, User
 
 from app.auth import AuthResult, UserResult
 from app.models import Token
@@ -39,6 +39,26 @@ class SupabaseSignInResult(AuthResult):
 
 
 @dataclass(frozen=True)
+class SupabaseSignInAnonymouslyResult(AuthResult):
+    supabase_sign_in_anonymously_result: AuthResponse
+
+    @property
+    def succeeded(self) -> bool:
+        return (
+            self.supabase_sign_in_anonymously_result.user is not None
+            and self.supabase_sign_in_anonymously_result.session is not None
+        )
+
+    @property
+    def authentication_token(self) -> Token:
+        return Token(**self.supabase_sign_in_anonymously_result.session.model_dump())
+
+    @property
+    def user(self) -> User:
+        return self.supabase_sign_in_anonymously_result.user
+
+
+@dataclass(frozen=True)
 class SupabaseSignOutResult(AuthResult):
     supabase_sign_out_result: AuthResponse
 
@@ -56,7 +76,11 @@ class SupabaseSignOutResult(AuthResult):
 
 @dataclass(frozen=True)
 class SupabaseUserResult(UserResult):
-    supabase_user_result: UserResponse
+    supabase_user_result: UserResponse | None
+
+    @property
+    def succeeded(self) -> bool:
+        return self.supabase_user_result and self.supabase_user_result.user is not None
 
     @property
     def user_id(self) -> str:
