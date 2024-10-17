@@ -7,9 +7,8 @@ import pyoxigraph as ox
 from app.anti_recommenders import AntiRecommender
 from app.constants import WIKIPEDIA_BASE_URL
 from app.models import AntiRecommendation
-from app.models.types import RdfMimeType, RecordKey, StoreQuery
+from app.models.types import RdfMimeType, RecordKey
 from app.namespaces import SCHEMA
-
 from app.user import User
 
 
@@ -36,13 +35,6 @@ class ArkgAntiRecommender(AntiRecommender):
         )
         self.__user = user
 
-    def __fetch_anti_recommendations_query(self, record_key: RecordKey) -> StoreQuery:
-        """
-        Return a `SPARQL` query that fetches anti-recommendations of `record_key` from an `ARKG Store`.
-        """
-
-        return f"SELECT ?title WHERE {{ <{record_key}> <{SCHEMA.ITEM_REVIEWED.value}> ?resource {{?resource <{SCHEMA.TITLE.value}> ?title}} }}"
-
     @staticmethod
     def __load_store(
         base_iri: ox.NamedNode, file_path: Path, mime_type: RdfMimeType
@@ -65,7 +57,7 @@ class ArkgAntiRecommender(AntiRecommender):
         return tuple(
             binding["title"].value
             for binding in self.__store.query(  # type: ignore[union-attr]
-                query=self.__fetch_anti_recommendations_query(record_key),
+                query=f"SELECT ?title WHERE {{ <{record_key}> <{SCHEMA.ITEM_REVIEWED.value}> ?resource {{?resource <{SCHEMA.TITLE.value}> ?title}} }}",
                 base_iri=self.__base_iri.value,
             )
         )
@@ -83,7 +75,7 @@ class ArkgAntiRecommender(AntiRecommender):
         If no unseen key is found in anti_recommendation_keys, the first unseen key in `__record_keys` is returned.
         """
 
-        anti_recommendations_history = list(self.__user.anti_recommendations_history())
+        anti_recommendations_history = list(self.__user.anti_recommendations_history)
         primary_anti_recommendation_keys = [
             unseen_anti_recommendation_key
             for unseen_anti_recommendation_key in anti_recommendation_keys
@@ -97,8 +89,7 @@ class ArkgAntiRecommender(AntiRecommender):
                 if unseen_anti_recommendation_key not in anti_recommendations_history
             ]
 
-        if primary_anti_recommendation_keys:
-            return primary_anti_recommendation_keys[0]
+        return primary_anti_recommendation_keys[0]
 
     @override
     def generate_anti_recommendations(
@@ -128,7 +119,7 @@ class ArkgAntiRecommender(AntiRecommender):
 
             anti_recommendation_keys.insert(0, primary_anti_recommendation_key)
 
-            self.__user.update_anti_recommendations_history(
+            self.__user.add_anti_recommendation_to_history(
                 primary_anti_recommendation_key
             )
 

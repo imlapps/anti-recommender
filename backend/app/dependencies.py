@@ -18,17 +18,21 @@ async def check_user_authentication(
     """
     Check if `access_token` corresponds to an authenticated `User`.
 
-    Return a `User` with an authenticated `UUID`.
+    Return a `User` with an authenticated `user_id`.
     """
     try:
         user_result: UserResult = auth_service.get_user(
             authentication_token=Token(access_token=access_token)
         )
-    except UserException:
-        raise CredentialsError(detail="Could not validate credentials") from None
+    except UserException as exception:
+        raise CredentialsError(
+            detail=f"Could not validate credentials. Encountered exception: {exception.message}"
+        ) from exception
 
     if not user_result.succeeded:
-        raise CredentialsError(detail="Could not validate credentials") from None
+        raise CredentialsError(
+            detail="Could not validate credentials. Check access token."
+        ) from None
 
     supabase_user_service = SupabaseUserService()
 

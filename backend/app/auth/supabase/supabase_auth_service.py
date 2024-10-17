@@ -7,10 +7,10 @@ from supabase import AuthError, AuthInvalidCredentialsError, SupabaseAuthClient
 from app.auth import AuthResult, AuthService, UserResult
 from app.auth.supabase import (
     SupabaseAuthInvalidCredentialsException,
+    SupabaseSignInAnonymouslyResult,
     SupabaseSignInResult,
     SupabaseSignOutResult,
     SupabaseSignUpResult,
-    SupabaseSignInAnonymouslyResult,
     SupabaseUserException,
     SupabaseUserResult,
 )

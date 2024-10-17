@@ -1,6 +1,6 @@
 from dataclasses import dataclass
 
-from gotrue.types import AuthResponse, UserResponse, User
+from gotrue.types import AuthResponse, User, UserResponse
 
 from app.auth import AuthResult, UserResult
 from app.models import Token
@@ -80,8 +80,11 @@ class SupabaseUserResult(UserResult):
 
     @property
     def succeeded(self) -> bool:
-        return self.supabase_user_result and self.supabase_user_result.user is not None
+        return self.supabase_user_result is not None
 
     @property
     def user_id(self) -> str:
-        return str(self.supabase_user_result.user.id)
+        if self.supabase_user_result:
+            return str(self.supabase_user_result.user.id)
+
+        return ""

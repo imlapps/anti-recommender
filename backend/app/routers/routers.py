@@ -7,8 +7,8 @@ from app.auth import AuthInvalidCredentialsException, AuthResult
 from app.auth.supabase import supabase_auth_service as auth_service
 from app.dependencies import check_user_authentication
 from app.models import Credentials, Record, Token
-from app.user import User
 from app.models.types import RecordKey
+from app.user import User
 
 router = APIRouter(prefix="/api/v1", tags=["/api/v1"])
 
@@ -37,7 +37,6 @@ async def login(form_data: Annotated[OAuth2PasswordRequestForm, Depends()]) -> T
 
 @router.get("/sign_in_anonymously")
 async def sign_in_anonymously() -> Token:
-
     sign_in_anonymously_result: AuthResult = auth_service.sign_in_anonymously()
 
     if not sign_in_anonymously_result.succeeded:
@@ -79,7 +78,7 @@ async def sign_out() -> None:
     if not sign_out_result.succeeded:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Unable to signout. Encountered APIError with exception: {exception.message}",
+            detail="Unable to signout.",
             headers={"WWW-Authenticate": "Bearer"},
         )
 
@@ -117,7 +116,7 @@ async def previous_records(
 
 @router.get("/initial_records")
 async def initial_records(
-    user_state: Annotated[User, Depends(check_user_authentication)],
+    user_state: Annotated[User, Depends(check_user_authentication)],  # noqa: ARG001
     request: Request,
 ) -> tuple[Record, ...]:
     """
@@ -126,6 +125,4 @@ async def initial_records(
     Returns the intial tuple of Records from the AntiRecommendationEngine.
     """
 
-    return (
-        request.app.state.anti_recommendation_engine.initial_records()  # type: ignore[no-any-return]
-    )
+    return request.app.state.anti_recommendation_engine.initial_records()  # type: ignore[no-any-return]

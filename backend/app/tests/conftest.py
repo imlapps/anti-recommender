@@ -7,7 +7,6 @@ from typing import Any
 
 import gotrue.types as gotrue
 import jwt
-from pydantic import TypeAdapter
 import pytest
 from fastapi.security import OAuth2PasswordRequestForm
 from postgrest import APIResponse
@@ -20,9 +19,9 @@ from app.anti_recommenders.openai import NormalOpenaiAntiRecommender
 from app.database.supabase import SupabaseDatabaseService, SupabaseFetchQueryResult
 from app.models import AntiRecommendation, Record, Token, wikipedia
 from app.models.types import ModelResponse, RdfMimeType, RecordKey, RecordType
-from app.user import User, SupabaseUserService
 from app.readers import AllSourceReader
 from app.readers.reader import WikipediaReader
+from app.user import SupabaseUserService, User
 
 
 @pytest.fixture(scope="session")
@@ -266,7 +265,7 @@ def base_iri() -> NamedNode:
 
 
 @pytest.fixture(scope="session")
-def user(record_key: RecordKey) -> User:
+def user() -> User:
     supabase_user_service = SupabaseUserService()
 
     return supabase_user_service.get_user(uuid.uuid4())

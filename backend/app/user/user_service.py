@@ -1,7 +1,7 @@
 from abc import ABC, abstractmethod
 from uuid import UUID
 
-from app.models.types import NonBlankString, RecordKey
+from app.models.types import RecordKey
 
 
 class UserService(ABC):
@@ -20,7 +20,7 @@ class UserService(ABC):
         pass
 
     @abstractmethod
-    def update_user_anti_recommendations_history(
+    def add_to_user_anti_recommendations_history(
         self, *, user_id: UUID, anti_recommendation_key: RecordKey
     ) -> None:
         pass

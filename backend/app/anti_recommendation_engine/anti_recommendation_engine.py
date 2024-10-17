@@ -14,9 +14,11 @@ class AntiRecommendationEngine:
     An AntiRecommendationEngine reaches out to an AntiRecommender to retrieve AntiRecommendations of a record_key.
 
     An AntiRecommendationEngine consists of:
-        - __records_by_key: A dictionary of type RecordKey: Record, that holds Records obtained from storage.
+        - __anti_recommender: An AntiRecommnder for the AntiRecommedationEngine.
         - __current_anti_recommendation_records: A list of Records that are currently used for anti-recommendations.
+        - __records_by_key: A dictionary of type RecordKey: Record, that holds Records obtained from storage.
         - __stack: A stack that stores a list of Records that were previously used for anti-recommendations.
+        - __user: The User of the current session.
 
     An AntiRecommendationEngine also:
         - Returns a tuple of Records that match the AntiRecommendations of the first key in __records_by_key.
@@ -25,17 +27,20 @@ class AntiRecommendationEngine:
     """
 
     def __init__(self, user: User) -> None:
-
+        self.__anti_recommender: AntiRecommender = self.__select_anti_recommender()
         self.__current_anti_recommendation_records: list[Record] = []
         self.__records_by_key: dict[RecordKey, Record] = {
             record.key: record for record in AllSourceReader().read()
         }
         self.__stack: list[list[Record]] = []
         self.__user = user
-        self.__anti_recommender: AntiRecommender = self.__select_anti_recommender()
 
     def __select_anti_recommender(self) -> AntiRecommender:
-        """Select and return an `AntiRecommender` based on values stored in `settings`."""
+        """
+        Select and return an `AntiRecommender` based on values stored in `settings`.
+
+        An `ArkgAntiRecommender` is the default AntiRecommender selection.
+        """
 
         if (
             settings.anti_recommender_type == AntiRecommenderType.OPEN_AI
@@ -54,13 +59,16 @@ class AntiRecommendationEngine:
             user=self.__user,
         )
 
-    def initial_records(
-        self, *, record_key: RecordKey | None = None
-    ) -> tuple[Record, ...]:
-        """Return a tuple of Records that have the same key as AntiRecommendations of the first key in __records_by_key."""
+    def initial_records(self) -> tuple[Record, ...]:
+        """Return an initial tuple of Records."""
 
-        if record_key:
-            return self.next_records(record_key=record_key)
+        if isinstance(self.__anti_recommender, ArkgAntiRecommender):
+            last_seen_anti_recommendation_key = (
+                self.__user.last_seen_anti_recommendation_key
+            )
+
+            if last_seen_anti_recommendation_key != "":
+                return self.next_records(record_key=last_seen_anti_recommendation_key)
 
         return self.next_records(record_key=next(iter(self.__records_by_key.keys())))
 

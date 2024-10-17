@@ -1,15 +1,13 @@
 import pytest
-from pytest_mock import MockFixture
 
 from app.anti_recommendation_engine import AntiRecommendationEngine
 from app.models import Record
 from app.models.types import RecordKey
-from app.user import User
 
 
 @pytest.mark.order(1)
 def test_get_previous_records_with_empty_stack(
-    anti_recommendation_engine: AntiRecommendationEngine, user: User
+    anti_recommendation_engine: AntiRecommendationEngine,
 ) -> None:
     """Test that AntiRecommendationEngine.get_previous_records returns an empty tuple when its stack is empty."""
 

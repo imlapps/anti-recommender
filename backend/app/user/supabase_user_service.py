@@ -1,17 +1,19 @@
-from uuid import UUID
 from typing import override
+from uuid import UUID
+
 from fastapi import HTTPException, status
-from app.user import UserService, User
+
+from app.constants import ARKG_ANTI_RECOMMENDER_USER_STATE_TABLE_NAME
+from app.database.exceptions import DatabaseException
 from app.database.supabase import supabase_database_service
 from app.models import TableQuery
 from app.models.types import RecordKey
-from app.database.exceptions import DatabaseException
-from app.constants import ARKG_ANTI_RECOMMENDER_USER_STATE_TABLE_NAME
+from app.user import User, UserService
 
 
 class SupabaseUserService(UserService):
     @override
-    def delete_user(self, user_id: UUID):
+    def delete_user(self, user_id: UUID) -> None:
         try:
             database_command_result = supabase_database_service.command(
                 TableQuery(
@@ -23,7 +25,7 @@ class SupabaseUserService(UserService):
         except DatabaseException as exception:
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
-                detail=f"Unable to delete user from database. Encountered database exception: {exception}",
+                detail=f"Unable to delete user from database. Encountered database exception: {exception.message}",
             ) from exception
 
         if not database_command_result.succeeded:
@@ -47,13 +49,13 @@ class SupabaseUserService(UserService):
         except DatabaseException as exception:
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
-                detail=f"Unable to fetch anti_recommendations_history from database. Encountered database exception: {exception}",
+                detail=f"Unable to fetch anti_recommendations_history from database. Encountered database exception: {exception.message}",
             ) from exception
 
         if not database_service_result.succeeded:
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
-                detail=f"Unable to fetch anti_recommendations_history from database. Check database query parameters",
+                detail="Unable to fetch anti_recommendations_history from database. Check database query parameters",
             ) from None
 
         return tuple(database_service_result.data[0]["anti_recommendations_history"])
@@ -70,7 +72,7 @@ class SupabaseUserService(UserService):
         return ""
 
     @override
-    def update_user_anti_recommendations_history(
+    def add_to_user_anti_recommendations_history(
         self, *, user_id: UUID, anti_recommendation_key: RecordKey
     ) -> None:
         try:
@@ -84,7 +86,6 @@ class SupabaseUserService(UserService):
                 TableQuery(
                     table_name=ARKG_ANTI_RECOMMENDER_USER_STATE_TABLE_NAME,
                     upsert_json={
-                        "last_seen_anti_recommendation": anti_recommendation_key,
                         "anti_recommendations_history": anti_recommendations_history,
                     },
                     constraint=str(user_id),
@@ -94,7 +95,7 @@ class SupabaseUserService(UserService):
         except DatabaseException as exception:
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
-                detail=f"Unable to upsert anti-recommendation into database. Encountered database exception: {exception}",
+                detail=f"Unable to upsert anti-recommendation into database. Encountered database exception: {exception.message}",
             ) from exception
 
         if not database_service_result.succeeded:
@@ -104,5 +105,4 @@ class SupabaseUserService(UserService):
             ) from None
 
     def get_user(self, user_id: UUID) -> User:
-
         return User(id=user_id, _service=self)
