@@ -12,14 +12,14 @@ DATA_DIRECTORY_PATH = Path(__file__).parent.parent.absolute() / "data"
 
 
 class Settings(BaseSettings):
-    """A Pydantic BaseSetting to hold environment variables."""
+    """Pydantic BaseSettings to hold environment variables."""
 
     arkg_base_iri: NamedNode = NamedNode(
         "http://imlapps.github.io/anti-recommender/anti-recommendation/"
     )
     arkg_file_path: Annotated[
         Path, Field(min_length=1, json_schema_extra={"strip_whitespace": "True"})
-    ] = DATA_DIRECTORY_PATH / "wikipedia_arkg_file.ttl"
+    ] = (DATA_DIRECTORY_PATH / "wikipedia_arkg_file.ttl")
     arkg_mime_type: RdfMimeType = RdfMimeType.TURTLE
 
     anti_recommender_type: AntiRecommenderType = AntiRecommenderType.ARKG

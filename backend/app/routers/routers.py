@@ -83,10 +83,11 @@ async def sign_out() -> None:
         )
 
 
-@router.get("/next_records/{record_key}")
+@router.get(
+    "/next_records/{record_key}", dependencies=[Depends(check_user_authentication)]
+)
 async def next_records(
     record_key: RecordKey,
-    user_state: Annotated[User, Depends(check_user_authentication)],  # noqa: ARG001
     request: Request,
 ) -> tuple[Record, ...]:
     """
@@ -100,11 +101,8 @@ async def next_records(
     )
 
 
-@router.get("/previous_records")
-async def previous_records(
-    user_state: Annotated[User, Depends(check_user_authentication)],  # noqa: ARG001
-    request: Request,
-) -> tuple[Record | None, ...]:
+@router.get("/previous_records", dependencies=[Depends(check_user_authentication)])
+async def previous_records(request: Request) -> tuple[Record | None, ...]:
     """
     The path operation function of the /previous_records endpoint.
 
@@ -114,11 +112,8 @@ async def previous_records(
     return request.app.state.anti_recommendation_engine.previous_records()  # type: ignore[no-any-return]
 
 
-@router.get("/initial_records")
-async def initial_records(
-    user_state: Annotated[User, Depends(check_user_authentication)],  # noqa: ARG001
-    request: Request,
-) -> tuple[Record, ...]:
+@router.get("/initial_records", dependencies=[Depends(check_user_authentication)])
+async def initial_records(request: Request) -> tuple[Record, ...]:
     """
     The path operation function of the /initial_records endpoint.
 
