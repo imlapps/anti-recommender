@@ -12,27 +12,6 @@ from app.user import User, UserService
 
 
 class SupabaseUserService(UserService):
-    @override
-    def delete_user(self, user_id: UUID) -> None:
-        try:
-            database_command_result = supabase_database_service.command(
-                TableQuery(
-                    table_name=ARKG_ANTI_RECOMMENDER_USER_STATE_TABLE_NAME,
-                    eq={"column": "user_id", "value": str(user_id)},
-                )
-            )
-
-        except DatabaseException as exception:
-            raise HTTPException(
-                status_code=status.HTTP_400_BAD_REQUEST,
-                detail=f"Unable to delete user from database. Encountered database exception: {exception.message}",
-            ) from exception
-
-        if not database_command_result.succeeded:
-            raise HTTPException(
-                status_code=status.HTTP_400_BAD_REQUEST,
-                detail="Unable to delete user from database. Check database query parameters.",
-            ) from None
 
     @override
     def get_user_anti_recommendations_history(
@@ -49,13 +28,13 @@ class SupabaseUserService(UserService):
         except DatabaseException as exception:
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
-                detail=f"Unable to fetch anti_recommendations_history from database. Encountered database exception: {exception.message}",
+                detail=f"Unable to get anti-recommendation history of User with id: {str(user_id)} from database. Encountered database exception: {exception.message}",
             ) from exception
 
         if not database_service_result.succeeded:
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
-                detail="Unable to fetch anti_recommendations_history from database. Check database query parameters",
+                detail=f"Unable to get anti-recommendation history of User with id {str(user_id)} from database. Check Supabase fetch query parameters",
             ) from None
 
         return tuple(database_service_result.data[0]["anti_recommendations_history"])
@@ -95,13 +74,46 @@ class SupabaseUserService(UserService):
         except DatabaseException as exception:
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
-                detail=f"Unable to upsert anti-recommendation into database. Encountered database exception: {exception.message}",
+                detail=f"Unable to add anti-recommendation to history of User with id {str(user_id)} into database. Encountered database exception: {exception.message}",
             ) from exception
 
         if not database_service_result.succeeded:
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
-                detail="Unable to upsert anti-recommendation into database. Check upsert query parameters.",
+                detail=f"Unable to add anti-recommendation to history of User with id {str(user_id)} into database. Check Supabase upsert query parameters.",
+            ) from None
+
+    @override
+    def remove_slice_from_user_anti_recommendations_history(
+        self, *, user_id: UUID, start_index: int
+    ) -> None:
+        try:
+            anti_recommendations_history = list(
+                self.get_user_anti_recommendations_history(user_id)
+            )
+
+            del anti_recommendations_history[-2:]
+
+            database_service_result = supabase_database_service.command(
+                TableQuery(
+                    table_name=ARKG_ANTI_RECOMMENDER_USER_STATE_TABLE_NAME,
+                    upsert_json={
+                        "anti_recommendations_history": anti_recommendations_history,
+                    },
+                    constraint=str(user_id),
+                )
+            )
+
+        except DatabaseException as exception:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail=f"Unable to remove anti-recommendation from history of User with id {str(user_id)} in database. Encountered database exception: {exception.message}",
+            ) from exception
+
+        if not database_service_result.succeeded:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail=f"Unable to remove anti-recommendation from history of User with id {str(user_id)} in database. Check Supabase upsert query parameters.",
             ) from None
 
     def get_user(self, user_id: UUID) -> User:

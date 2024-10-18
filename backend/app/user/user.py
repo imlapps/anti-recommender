@@ -32,11 +32,6 @@ class User:
 
         return self._service.get_user_last_seen_anti_recommendation(self.id)
 
-    def delete_user(self) -> None:
-        """Delete a `User` from the `UserService`."""
-
-        self._service.delete_user(user_id=self.id)
-
     def add_anti_recommendation_to_history(
         self, anti_recommendation_key: RecordKey
     ) -> None:
@@ -44,4 +39,13 @@ class User:
 
         self._service.add_to_user_anti_recommendations_history(
             user_id=self.id, anti_recommendation_key=anti_recommendation_key
+        )
+
+    def remove_anti_recommendations_slice_from_history(
+        self, *, start_index: int, end_index: int | None = None
+    ) -> None:
+        """Remove a slice of anti-recommendations from a `User` history."""
+
+        self._service.remove_slice_from_user_anti_recommendations_history(
+            user_id=self.id, start_index=start_index
         )

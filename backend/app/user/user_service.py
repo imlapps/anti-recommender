@@ -5,9 +5,6 @@ from app.models.types import RecordKey
 
 
 class UserService(ABC):
-    @abstractmethod
-    def delete_user(self, user_id: UUID) -> None:
-        pass
 
     @abstractmethod
     def get_user_anti_recommendations_history(
@@ -22,5 +19,11 @@ class UserService(ABC):
     @abstractmethod
     def add_to_user_anti_recommendations_history(
         self, *, user_id: UUID, anti_recommendation_key: RecordKey
+    ) -> None:
+        pass
+
+    @abstractmethod
+    def remove_slice_from_user_anti_recommendations_history(
+        self, *, user_id: UUID, start_index: int
     ) -> None:
         pass

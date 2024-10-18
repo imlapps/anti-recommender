@@ -119,10 +119,6 @@ class ArkgAntiRecommender(AntiRecommender):
 
             anti_recommendation_keys.insert(0, primary_anti_recommendation_key)
 
-            self.__user.add_anti_recommendation_to_history(
-                primary_anti_recommendation_key
-            )
-
             return (
                 AntiRecommendation(
                     key=anti_recommendation_key,
