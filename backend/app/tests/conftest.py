@@ -274,7 +274,7 @@ def base_iri() -> NamedNode:
 def user() -> User:
     supabase_user_service = SupabaseUserService()
 
-    return supabase_user_service.get_user(uuid.uuid4())
+    return supabase_user_service.create_user_from_id(uuid.uuid4())
 
 
 @pytest.fixture(scope="session")

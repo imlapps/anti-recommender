@@ -1,12 +1,14 @@
-from typing import override
+from typing import cast, override
 from uuid import UUID
 
 from fastapi import HTTPException, status
 
+from app.auth.supabase import SupabaseSignInAnonymouslyResult, SupabaseUserResult
+from app.auth.supabase import supabase_auth_service as auth_service
 from app.constants import ARKG_ANTI_RECOMMENDER_USER_STATE_TABLE_NAME
 from app.database.exceptions import DatabaseException
 from app.database.supabase import supabase_database_service
-from app.models import TableQuery
+from app.models import TableQuery, Token
 from app.models.types import RecordKey
 from app.user import User, UserService
 
@@ -115,5 +117,17 @@ class SupabaseUserService(UserService):
                 detail=f"Unable to remove anti-recommendation from history of User with id {user_id!s} in database. Check Supabase upsert query parameters.",
             ) from None
 
-    def get_user(self, user_id: UUID) -> User:
+    def create_user_from_id(self, user_id: UUID) -> User:
         return User(id=user_id, _service=self)
+
+    def create_user_from_token(self, token: Token) -> User:
+        user_result = cast(SupabaseUserResult, auth_service.get_user(token))
+
+        if not user_result.succeeded:
+            user_id = cast(
+                SupabaseSignInAnonymouslyResult, auth_service.sign_in_anonymously()
+            ).user.id
+        else:
+            user_id = user_result.user_id
+
+        return self.create_user_from_id(user_id)

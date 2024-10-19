@@ -8,7 +8,7 @@ from app.auth.supabase import supabase_auth_service as auth_service
 from app.dependencies import check_user_authentication
 from app.models import Credentials, Record, Token
 from app.models.types import RecordKey
-from app.user import create_new_user
+from app.user import SupabaseUserService
 
 router = APIRouter(prefix="/api/v1", tags=["/api/v1"])
 
@@ -35,8 +35,12 @@ async def login(
             headers={"WWW-Authenticate": "Bearer"},
         )
 
+    supabase_user_service = SupabaseUserService()
+
     request.app.state.anti_recommendation_engine.reset_anti_recommendation_engine_with_new_user(  # type: ignore[no-any-return]
-        user=create_new_user(sign_in_result.authentication_token)
+        user=supabase_user_service.create_user_from_token(
+            sign_in_result.authentication_token
+        )
     )
 
     return sign_in_result.authentication_token
@@ -77,8 +81,12 @@ async def sign_up(
             headers={"WWW-Authenticate": "Bearer"},
         )
 
+    supabase_user_service = SupabaseUserService()
+
     request.app.state.anti_recommendation_engine.reset_anti_recommendation_engine_with_new_user(  # type: ignore[no-any-return]
-        user=create_new_user(sign_up_result.authentication_token)
+        user=supabase_user_service.create_user_from_token(
+            sign_up_result.authentication_token
+        )
     )
 
     return sign_up_result.authentication_token
