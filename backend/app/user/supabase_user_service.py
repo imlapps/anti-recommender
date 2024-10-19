@@ -91,7 +91,7 @@ class SupabaseUserService(UserService):
                 self.get_user_anti_recommendations_history(user_id)
             )
 
-            del anti_recommendations_history[-2:]
+            del anti_recommendations_history[start_index:end_index]
 
             database_service_result = supabase_database_service.command(
                 TableQuery(
