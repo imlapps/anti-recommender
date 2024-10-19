@@ -108,7 +108,7 @@ class AntiRecommendationEngine:
         """
         Return a tuple of Records that matched the previous AntiRecommendations.
 
-        If the __anti_recommender is an ArkgAntiRecommender instance, the last 2 anti-recommendations are removed from __user's history.
+        If __anti_recommender is an ArkgAntiRecommender instance, the last 2 anti-recommendations are removed from __user's history.
 
         Return an empty tuple if there were no such Records.
         """

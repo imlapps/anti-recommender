@@ -14,10 +14,18 @@ from app.user import User, UserService
 
 
 class SupabaseUserService(UserService):
+    """
+    A concrete implementation of `UserService`.
+
+    A `SupabaseUserService` uses a Supabase database service to manage the state of a `User`.
+    """
+
     @override
     def get_user_anti_recommendations_history(
         self, user_id: UUID
     ) -> tuple[RecordKey, ...]:
+        """Return a tuple containing Record keys in a User's anti-recommendation history."""
+
         try:
             database_service_result = supabase_database_service.query(
                 TableQuery(
@@ -42,6 +50,8 @@ class SupabaseUserService(UserService):
 
     @override
     def get_user_last_seen_anti_recommendation(self, user_id: UUID) -> str:
+        """Return the last Record key in a User's anti-recommendation history."""
+
         anti_recommendations_history = self.get_user_anti_recommendations_history(
             user_id
         )
@@ -55,6 +65,8 @@ class SupabaseUserService(UserService):
     def add_to_user_anti_recommendations_history(
         self, *, user_id: UUID, anti_recommendation_key: RecordKey
     ) -> None:
+        """Append `anti_recommendation_key` to a User's anti-recommendation history."""
+
         try:
             anti_recommendations_history = list(
                 self.get_user_anti_recommendations_history(user_id)
@@ -88,6 +100,11 @@ class SupabaseUserService(UserService):
     def remove_slice_from_user_anti_recommendations_history(
         self, *, user_id: UUID, start_index: int, end_index: int
     ) -> None:
+        """
+        Remove a slice of anti-recommendations from a User's anti-recommendation history.
+
+        The slice is within the range [`start_index`,`end_index`-1].
+        """
         try:
             anti_recommendations_history = list(
                 self.get_user_anti_recommendations_history(user_id)
@@ -118,9 +135,17 @@ class SupabaseUserService(UserService):
             ) from None
 
     def create_user_from_id(self, user_id: UUID) -> User:
+        """Return a new User, with an id matching `user_id`."""
+
         return User(id=user_id, _service=self)
 
     def create_user_from_token(self, token: Token) -> User:
+        """
+        Return a new `User` with an id that corresponds to an authentication `token`.
+
+        If no such User is found, return a new User with an anonymous id.
+        """
+
         user_result = cast(SupabaseUserResult, auth_service.get_user(token))
 
         if not user_result.succeeded:
