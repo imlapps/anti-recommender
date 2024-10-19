@@ -9,7 +9,7 @@ ExternalLinkStringType = Annotated[
 
 
 class ExternalLink(BaseModel):
-    """Pydantic Model to hold an external link of a Wikipedia Article."""
+    """Pydantic model to hold an external link of a Wikipedia Article."""
 
     title: ExternalLinkStringType | None = None
     link: ExternalLinkStringType | None = None

@@ -4,9 +4,9 @@ set -e
 
 cd "$(dirname "$0")/.."
 
-poetry run black --check app
+poetry run ruff format --check app
 poetry run mypy app
 poetry run ruff check app
 
 mkdir -p test-results
-poetry run pytest --junitxml=test-results/junit.xml
+poetry run pytest --cov=app --cov-report=term-missing:skip-covered --junitxml=test-results/junit.xml -p no:warnings app/tests| tee test-results/coverage.txt

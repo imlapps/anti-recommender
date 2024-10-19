@@ -1,5 +1,5 @@
-from app.models.record import Record
-from app.readers.all_source_reader import AllSourceReader
+from app.models import Record
+from app.readers import AllSourceReader
 
 
 def test_read(all_source_reader: AllSourceReader) -> None:

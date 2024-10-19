@@ -1,5 +1,5 @@
-from app.models.record import Record
+from app.models import Record
 
 
 class AntiRecommendation(Record):
-    """Pydantic Model to hold an anti-recommendation."""
+    """Pydantic model to hold an anti-recommendation."""
