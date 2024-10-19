@@ -5,7 +5,6 @@ from app.models.types import RecordKey
 
 
 class UserService(ABC):
-
     @abstractmethod
     def get_user_anti_recommendations_history(
         self, user_id: UUID

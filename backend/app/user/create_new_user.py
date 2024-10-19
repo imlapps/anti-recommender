@@ -7,10 +7,8 @@ from app.models import Token
 from app.user import SupabaseUserService, User
 
 
-def create_user_on_startup() -> User:
-    user_result = cast(
-        SupabaseUserResult, auth_service.get_user(Token(access_token=""))
-    )
+def create_new_user(token: Token) -> User:
+    user_result = cast(SupabaseUserResult, auth_service.get_user(token))
 
     if not user_result.succeeded:
         user_id = cast(

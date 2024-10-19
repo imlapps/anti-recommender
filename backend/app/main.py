@@ -5,9 +5,9 @@ from fastapi import FastAPI, Request
 from fastapi.responses import RedirectResponse
 
 from app.anti_recommendation_engine import AntiRecommendationEngine
-from app.models.credentials_error import CredentialsError
+from app.models import CredentialsError, Token
 from app.routers import router
-from app.utils import create_user_on_startup
+from app.user.create_new_user import create_new_user
 
 
 @asynccontextmanager
@@ -17,7 +17,7 @@ async def lifespan(app: FastAPI) -> AsyncIterator[None]:
     """
 
     app.state.anti_recommendation_engine = AntiRecommendationEngine(
-        user=create_user_on_startup()
+        user=create_new_user(Token(access_token=""))
     )
 
     yield

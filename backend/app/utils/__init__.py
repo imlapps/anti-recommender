@@ -1,1 +1,0 @@
-from .create_user_on_startup import create_user_on_startup as create_user_on_startup

@@ -12,7 +12,6 @@ from app.user import User, UserService
 
 
 class SupabaseUserService(UserService):
-
     @override
     def get_user_anti_recommendations_history(
         self, user_id: UUID
@@ -28,13 +27,13 @@ class SupabaseUserService(UserService):
         except DatabaseException as exception:
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
-                detail=f"Unable to get anti-recommendation history of User with id: {str(user_id)} from database. Encountered database exception: {exception.message}",
+                detail=f"Unable to get anti-recommendation history of User with id: {user_id!s} from database. Encountered database exception: {exception.message}",
             ) from exception
 
         if not database_service_result.succeeded:
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
-                detail=f"Unable to get anti-recommendation history of User with id {str(user_id)} from database. Check Supabase fetch query parameters",
+                detail=f"Unable to get anti-recommendation history of User with id {user_id!s} from database. Check Supabase fetch query parameters",
             ) from None
 
         return tuple(database_service_result.data[0]["anti_recommendations_history"])
@@ -74,13 +73,13 @@ class SupabaseUserService(UserService):
         except DatabaseException as exception:
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
-                detail=f"Unable to add anti-recommendation to history of User with id {str(user_id)} into database. Encountered database exception: {exception.message}",
+                detail=f"Unable to add anti-recommendation to history of User with id {user_id!s} into database. Encountered database exception: {exception.message}",
             ) from exception
 
         if not database_service_result.succeeded:
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
-                detail=f"Unable to add anti-recommendation to history of User with id {str(user_id)} into database. Check Supabase upsert query parameters.",
+                detail=f"Unable to add anti-recommendation to history of User with id {user_id!s} into database. Check Supabase upsert query parameters.",
             ) from None
 
     @override
@@ -107,13 +106,13 @@ class SupabaseUserService(UserService):
         except DatabaseException as exception:
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
-                detail=f"Unable to remove anti-recommendation from history of User with id {str(user_id)} in database. Encountered database exception: {exception.message}",
+                detail=f"Unable to remove anti-recommendation from history of User with id {user_id!s} in database. Encountered database exception: {exception.message}",
             ) from exception
 
         if not database_service_result.succeeded:
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
-                detail=f"Unable to remove anti-recommendation from history of User with id {str(user_id)} in database. Check Supabase upsert query parameters.",
+                detail=f"Unable to remove anti-recommendation from history of User with id {user_id!s} in database. Check Supabase upsert query parameters.",
             ) from None
 
     def get_user(self, user_id: UUID) -> User:

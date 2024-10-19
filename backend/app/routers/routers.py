@@ -8,13 +8,15 @@ from app.auth.supabase import supabase_auth_service as auth_service
 from app.dependencies import check_user_authentication
 from app.models import Credentials, Record, Token
 from app.models.types import RecordKey
-from app.user import User
+from app.user import create_new_user
 
 router = APIRouter(prefix="/api/v1", tags=["/api/v1"])
 
 
 @router.post("/login")
-async def login(form_data: Annotated[OAuth2PasswordRequestForm, Depends()]) -> Token:
+async def login(
+    form_data: Annotated[OAuth2PasswordRequestForm, Depends()], request: Request
+) -> Token:
     try:
         sign_in_result: AuthResult = auth_service.sign_in(
             Credentials(email=form_data.username, password=form_data.password)
@@ -32,6 +34,11 @@ async def login(form_data: Annotated[OAuth2PasswordRequestForm, Depends()]) -> T
             detail="Unable to login. Check username or password",
             headers={"WWW-Authenticate": "Bearer"},
         )
+
+    request.app.state.anti_recommendation_engine.reset_anti_recommendation_engine_with_new_user(  # type: ignore[no-any-return]
+        user=create_new_user(sign_in_result.authentication_token)
+    )
+
     return sign_in_result.authentication_token
 
 
@@ -49,7 +56,9 @@ async def sign_in_anonymously() -> Token:
 
 
 @router.post("/sign_up")
-async def sign_up(form_data: Annotated[OAuth2PasswordRequestForm, Depends()]) -> Token:
+async def sign_up(
+    form_data: Annotated[OAuth2PasswordRequestForm, Depends()], request: Request
+) -> Token:
     try:
         sign_up_result: AuthResult = auth_service.sign_up(
             Credentials(email=form_data.username, password=form_data.password)
@@ -67,6 +76,10 @@ async def sign_up(form_data: Annotated[OAuth2PasswordRequestForm, Depends()]) ->
             detail="Unable to signup. Check username or password",
             headers={"WWW-Authenticate": "Bearer"},
         )
+
+    request.app.state.anti_recommendation_engine.reset_anti_recommendation_engine_with_new_user(  # type: ignore[no-any-return]
+        user=create_new_user(sign_up_result.authentication_token)
+    )
 
     return sign_up_result.authentication_token
 

@@ -1,29 +1,21 @@
 import gotrue.types as gotrue
 import pytest
-from fastapi import HTTPException, status
+from fastapi import FastAPI, status
 from fastapi.security import OAuth2PasswordRequestForm
-from fastapi.testclient import TestClient
+from httpx import ASGITransport, AsyncClient
 from pytest_mock import MockFixture
 from supabase import SupabaseAuthClient
 
-from app.main import app
-from app.models import Token
 from app.models.types import RecordKey
 
 
-def get_auth_header(access_token: str | None) -> dict[str, str]:
-    if not access_token:
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED, detail="No access token"
-        )
-
-    return {"Authorization": f"Bearer {access_token}"}
-
-
-def test_login(
-    session_mocker: MockFixture,
-    form_data: OAuth2PasswordRequestForm,
+@pytest.mark.anyio(loop_scope="session")
+async def test_login(
+    app: FastAPI,
     auth_response: gotrue.AuthResponse,
+    form_data: OAuth2PasswordRequestForm,
+    mock_get_user: None,  # noqa: ARG001
+    session_mocker: MockFixture,
 ) -> None:
     """
     Test the /login endpoint.
@@ -33,32 +25,40 @@ def test_login(
         SupabaseAuthClient, "sign_in_with_password", return_value=auth_response
     )
 
-    with TestClient(app) as client:
-        response = client.post(
+    async with AsyncClient(
+        transport=ASGITransport(app=app), base_url="http://test.nerdswipe.com"
+    ) as client:
+        response = await client.post(
             url="/api/v1/login",
             data={"username": form_data.username, "password": form_data.password},
         )
 
-        assert response.status_code == status.HTTP_200_OK
+    assert response.status_code == status.HTTP_200_OK
 
 
-def test_sign_in_anonymously() -> None:
+@pytest.mark.anyio(loop_scope="session")
+async def test_sign_in_anonymously(app: FastAPI) -> None:
     """
     Test the /sign_in_anonymously endpoint.
     """
 
-    with TestClient(app) as client:
-        response = client.get(
+    async with AsyncClient(
+        transport=ASGITransport(app=app), base_url="http://test.nerdswipe.com"
+    ) as client:
+        response = await client.get(
             url="/api/v1/sign_in_anonymously",
         )
 
-        assert response.status_code == status.HTTP_200_OK
+    assert response.status_code == status.HTTP_200_OK
 
 
-def test_sign_up(
-    session_mocker: MockFixture,
-    form_data: OAuth2PasswordRequestForm,
+@pytest.mark.anyio(loop_scope="session")
+async def test_sign_up(
+    app: FastAPI,
     auth_response: gotrue.AuthResponse,
+    form_data: OAuth2PasswordRequestForm,
+    mock_get_user: None,  # noqa: ARG001
+    session_mocker: MockFixture,
 ) -> None:
     """
     Test the /sign_up endpoint.
@@ -68,83 +68,86 @@ def test_sign_up(
         SupabaseAuthClient, "sign_up", return_value=auth_response
     )
 
-    with TestClient(app) as client:
-        response = client.post(
+    async with AsyncClient(
+        transport=ASGITransport(app=app), base_url="http://test.nerdswipe.com"
+    ) as client:
+        response = await client.post(
             url="/api/v1/sign_up",
             data={"username": form_data.username, "password": form_data.password},
         )
 
-        assert response.status_code == status.HTTP_200_OK
+    assert response.status_code == status.HTTP_200_OK
 
 
-def test_sign_out() -> None:
+@pytest.mark.anyio(loop_scope="session")
+async def test_sign_out(app: FastAPI) -> None:
     """
     Test the /sign_out endpoint.
     """
 
-    with TestClient(app) as client:
-        response = client.get(
+    async with AsyncClient(
+        transport=ASGITransport(app=app), base_url="http://test.nerdswipe"
+    ) as client:
+        response = await client.get(
             url="/api/v1/sign_out",
         )
 
-        assert response.status_code == status.HTTP_200_OK
+    assert response.status_code == status.HTTP_200_OK
 
 
-@pytest.fixture(scope="session")
-def mock_get_user(session_mocker: MockFixture, gotrue_user: gotrue.User) -> None:
-    session_mocker.patch.object(
-        SupabaseAuthClient,
-        "get_user",
-        return_value=gotrue.UserResponse(user=gotrue_user),
-    )
-
-
-def test_next_records(
+@pytest.mark.anyio(loop_scope="session")
+async def test_next_records(
+    app: FastAPI,
+    auth_header: dict[str, str],
     mock_get_user: None,  # noqa: ARG001
     record_key: RecordKey,
-    token: Token,
 ) -> None:
     """
     Test the /next_records endpoint.
     """
 
-    headers = get_auth_header(access_token=token.access_token)
-
-    with TestClient(app) as client:
-        response = client.get(
+    async with AsyncClient(
+        transport=ASGITransport(app=app), base_url="http://test.nerdswipe"
+    ) as client:
+        response = await client.get(
             url=f"/api/v1/next_records/{record_key}",
-            headers=headers,
+            headers=auth_header,
         )
 
-        assert response.status_code == status.HTTP_200_OK
+    assert response.status_code == status.HTTP_200_OK
 
 
-def test_previous_records(
+@pytest.mark.anyio(loop_scope="session")
+async def test_previous_records(
+    app: FastAPI,
+    auth_header: dict[str, str],
     mock_get_user: None,  # noqa: ARG001
-    token: Token,
 ) -> None:
     """
     Test the /previous_records endpoint.
     """
 
-    headers = get_auth_header(access_token=token.access_token)
+    async with AsyncClient(
+        transport=ASGITransport(app=app), base_url="http://test.nerdswipe"
+    ) as client:
+        response = await client.get(url="/api/v1/previous_records", headers=auth_header)
 
-    with TestClient(app) as client:
-        response = client.get(url="/api/v1/previous_records", headers=headers)
-
-        assert response.status_code == status.HTTP_200_OK
+    assert response.status_code == status.HTTP_200_OK
 
 
-def test_initial_records(
+@pytest.mark.anyio(loop_scope="session")
+async def test_initial_records(
+    app: FastAPI,
+    auth_header: dict[str, str],
     mock_get_user: None,  # noqa: ARG001
-    token: Token,
 ) -> None:
     """
     Test the /initial_records endpoint.
     """
 
-    headers = get_auth_header(access_token=token.access_token)
+    async with AsyncClient(
+        transport=ASGITransport(app=app), base_url="http://test.nerdswipe"
+    ) as client:
+        response = await client.get(url="/api/v1/initial_records", headers=auth_header)
 
-    with TestClient(app) as client:
-        response = client.get(url="/api/v1/initial_records", headers=headers)
-        assert response.status_code == status.HTTP_200_OK
+    assert response.status_code == status.HTTP_200_OK

@@ -1,17 +1,22 @@
 import datetime
 import os
 import uuid
-from collections.abc import Collection
+from collections.abc import AsyncIterator, Collection
+from contextlib import asynccontextmanager
 from pathlib import Path
 from typing import Any
 
 import gotrue.types as gotrue
 import jwt
 import pytest
+import pytest_asyncio
+from asgi_lifespan import LifespanManager
+from fastapi import FastAPI, HTTPException, status
 from fastapi.security import OAuth2PasswordRequestForm
 from postgrest import APIResponse
 from pyoxigraph import NamedNode
 from pytest_mock import MockFixture
+from supabase import SupabaseAuthClient
 
 from app.anti_recommendation_engine import AntiRecommendationEngine
 from app.anti_recommenders.arkg import ArkgAntiRecommender
@@ -21,6 +26,7 @@ from app.models import AntiRecommendation, Record, Token, wikipedia
 from app.models.types import ModelResponse, RdfMimeType, RecordKey, RecordType
 from app.readers import AllSourceReader
 from app.readers.reader import WikipediaReader
+from app.routers import router
 from app.user import SupabaseUserService, User
 
 
@@ -355,3 +361,41 @@ def auth_response(
 @pytest.fixture(scope="session")
 def token(session: gotrue.Session) -> Token:
     return Token(**session.model_dump())
+
+
+@pytest.fixture(scope="session")
+def mock_get_user(session_mocker: MockFixture, gotrue_user: gotrue.User) -> None:
+    session_mocker.patch.object(
+        SupabaseAuthClient,
+        "get_user",
+        return_value=gotrue.UserResponse(user=gotrue_user),
+    )
+
+
+@pytest.fixture(scope="session")
+def auth_header(token: Token) -> dict[str, str]:
+    if not token.access_token:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED, detail="No access token"
+        )
+
+    return {"Authorization": f"Bearer {token.access_token}"}
+
+
+@pytest_asyncio.fixture(loop_scope="session")
+async def app(
+    anti_recommendation_engine: AntiRecommendationEngine,
+) -> AsyncIterator:
+    @asynccontextmanager
+    async def lifespan(app: FastAPI) -> AsyncIterator[None]:
+        app.state.anti_recommendation_engine = anti_recommendation_engine
+
+        yield
+
+    app = FastAPI(
+        lifespan=lifespan,
+    )
+
+    app.include_router(router)
+    async with LifespanManager(app) as manager:
+        yield manager.app

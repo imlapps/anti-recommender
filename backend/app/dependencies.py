@@ -1,5 +1,4 @@
 from typing import Annotated
-from uuid import UUID
 
 from fastapi import Depends
 from fastapi.security import OAuth2PasswordBearer
@@ -7,7 +6,6 @@ from fastapi.security import OAuth2PasswordBearer
 from app.auth import UserException, UserResult
 from app.auth.supabase import supabase_auth_service as auth_service
 from app.models import CredentialsError, Token
-
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="login")
 

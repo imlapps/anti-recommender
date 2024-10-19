@@ -24,6 +24,7 @@ class AntiRecommendationEngine:
         - Returns a tuple of Records that match the AntiRecommendations of the first key in __records_by_key.
         - Returns a tuple of Records that match the AntiRecommendations of a record_key.
         - Returns a tuple of Records that matched the previous AntiRecommendations.
+        - Resets itself by clearing all variables related to a previous session and set __user to a new object.
     """
 
     def __init__(self, user: User) -> None:
