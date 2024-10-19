@@ -67,7 +67,7 @@ class AntiRecommendationEngine:
                 self.__user.last_seen_anti_recommendation_key
             )
 
-            if last_seen_anti_recommendation_key != "":
+            if not last_seen_anti_recommendation_key:
                 return self.next_records(record_key=last_seen_anti_recommendation_key)
 
         return self.next_records(record_key=next(iter(self.__records_by_key.keys())))
@@ -96,16 +96,35 @@ class AntiRecommendationEngine:
                 *records_of_anti_recommendations,
             ]
 
+            if isinstance(self.__anti_recommender, ArkgAntiRecommender):
+                self.__user.add_anti_recommendation_to_history(
+                    records_of_anti_recommendations[0].key
+                )
+
         return tuple(records_of_anti_recommendations)
 
     def previous_records(self) -> tuple[Record, ...]:
         """
         Return a tuple of Records that matched the previous AntiRecommendations.
 
+        If the __anti_recommender is an ArkgAntiRecommender instance, the last 2 anti-recommendations are removed from __user's history.
+
         Return an empty tuple if there were no such Records.
         """
 
         if self.__stack:
+            if isinstance(self.__anti_recommender, ArkgAntiRecommender):
+                self.__user.remove_anti_recommendations_slice_from_history(
+                    start_index=-2, end_index=len(self.__records_by_key)
+                )
+
             return tuple(self.__stack.pop())
 
         return ()
+
+    def reset_anti_recommendation_engine_with_new_user(self, user: User) -> None:
+        """Remove all anti-recommendation and `User` state from the `AntiRecommendationEngine`, and set `__user` to a new object."""
+
+        self.__current_anti_recommendation_records = []
+        self.__stack = []
+        self.__user = user

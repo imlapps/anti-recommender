@@ -24,6 +24,6 @@ class UserService(ABC):
 
     @abstractmethod
     def remove_slice_from_user_anti_recommendations_history(
-        self, *, user_id: UUID, start_index: int
+        self, *, user_id: UUID, start_index: int, end_index: int
     ) -> None:
         pass
