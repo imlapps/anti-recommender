@@ -15,11 +15,6 @@ from app.user.supabase import SupabaseUserServiceException
 
 
 class SupabaseUserService(UserService):
-    """
-    A concrete implementation of `UserService`.
-
-    A `SupabaseUserService` uses a Supabase database service to manage the state of a `User`.
-    """
 
     def __init__(self, auth_service: AuthService, settings: Settings) -> None:
         self.__auth_service = auth_service
@@ -67,7 +62,7 @@ class SupabaseUserService(UserService):
             )
         except APIError as exception:
             raise SupabaseUserServiceException(
-                message=f"Unable to add anti-recommendation to history of User with id {user_id} into database. Encountered database exception: {exception.message}"
+                message=f"Unable to add anti-recommendation to history of User with id {user_id}. Encountered database exception: {exception.message}"
             ) from exception
 
     @override
@@ -84,7 +79,7 @@ class SupabaseUserService(UserService):
             )
         except APIError as exception:
             raise SupabaseUserServiceException(
-                message=f"Unable to get anti-recommendation history of User with id: {user_id} from database. Encountered database exception: {exception.message}"
+                message=f"Unable to get anti-recommendation history of User with id: {user_id}. Encountered database exception: {exception.message}"
             ) from exception
 
         return tuple(database_service_result.data[0]["anti_recommendations_history"])
@@ -130,7 +125,7 @@ class SupabaseUserService(UserService):
 
         except APIError as exception:
             raise SupabaseUserServiceException(
-                message=f"Unable to remove anti-recommendation from history of User with id {user_id} in database. Encountered database exception: {exception.message}"
+                message=f"Unable to remove anti-recommendation from history of User with id {user_id}. Encountered database exception: {exception.message}"
             ) from exception
 
     def create_user_from_id(self, user_id: UUID) -> User:
@@ -138,26 +133,21 @@ class SupabaseUserService(UserService):
 
         return User(id=user_id, _service=self)
 
-    def create_user_from_token(self, token: AuthToken) -> User:
+    def create_user_from_token(self, authentication_token: AuthToken) -> User:
         """
-        Return a new `User` with an id that corresponds to an authentication `token`.
+        Return a new `User` with an id that corresponds to an `authentication_token`.
 
         If no such User is found, return a new User with an anonymous id.
         """
 
         try:
             user_result = cast(
-                SupabaseAuthResponse, self.__auth_service.get_user(token)
+                SupabaseAuthResponse, self.__auth_service.get_user(authentication_token)
             )
-        except SupabaseAuthException:
-            try:
-                user_result = cast(
-                    SupabaseAuthResponse,
-                    self.__auth_service.sign_in_anonymously(),
-                )
-            except SupabaseAuthException as exception:
-                raise SupabaseUserServiceException(
-                    message=f"Unable to get anonymous User ID. Encountered authentication exception with the message: {exception.message}"
-                ) from exception
+        except SupabaseAuthException as exception:
+
+            raise SupabaseUserServiceException(
+                message=f"Unable to create new User. Encountered authentication exception: {exception.message}"
+            ) from exception
 
         return self.create_user_from_id(user_result.user_id)

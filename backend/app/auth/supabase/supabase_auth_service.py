@@ -30,9 +30,8 @@ class SupabaseAuthService(AuthService):
             raise SupabaseAuthException(exception) from exception
 
         if not supabase_user_result.user:
-            raise SupabaseAuthException(
-                AuthError(message="Unable to get user", code="user_not_found")
-            )
+            return self.sign_in_anonymously()
+
         return SupabaseAuthResponse(AuthResponse(user=supabase_user_result.user))
 
     @override

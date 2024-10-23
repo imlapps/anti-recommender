@@ -373,7 +373,7 @@ def auth_response(
 
 
 @pytest.fixture(scope="session")
-def auth_token(session: gotrue.Session) -> AuthToken:
+def authentication_token(session: gotrue.Session) -> AuthToken:
     return AuthToken(**session.model_dump())
 
 
@@ -387,13 +387,13 @@ def mock_get_user(session_mocker: MockFixture, gotrue_user: gotrue.User) -> None
 
 
 @pytest.fixture(scope="session")
-def auth_header(auth_token: AuthToken) -> dict[str, str]:
-    if not auth_token.access_token:
+def auth_header(authentication_token: AuthToken) -> dict[str, str]:
+    if not authentication_token.access_token:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED, detail="No access token"
         )
 
-    return {"Authorization": f"Bearer {auth_token.access_token}"}
+    return {"Authorization": f"Bearer {authentication_token.access_token}"}
 
 
 @pytest_asyncio.fixture(loop_scope="session")
