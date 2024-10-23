@@ -1,20 +1,16 @@
 from typing import cast, override
 from uuid import UUID
-from postgrest import APIError, APIResponse
 
 import supabase
+from postgrest import APIError, APIResponse
 from supabase import Client
-from app.models import Settings, AntiRecommendationsSelector
 
-from app.auth.supabase import SupabaseAuthResponse, SupabaseAuthException
+from app.auth import AuthService
+from app.auth.supabase import SupabaseAuthException, SupabaseAuthResponse
 from app.constants import ARKG_ANTI_RECOMMENDER_USER_STATE_TABLE_NAME
-
-
-from app.models import AuthToken
+from app.models import AntiRecommendationsSelector, AuthToken, Settings
 from app.models.types import RecordKey
 from app.user import User, UserService
-from app.auth import AuthService
-
 from app.user.supabase import SupabaseUserServiceException
 
 
@@ -32,33 +28,22 @@ class SupabaseUserService(UserService):
         )
 
     def __fetch(self, *, table_name: str, columns: str, eq: dict) -> APIResponse:
-        try:
-            fetch_query_result = (
-                self.__database_client.table(table_name)
-                .select(columns)
-                .eq(**eq)
-                .execute()
-            )
-        except APIError as exception:
-            raise exception
 
-        return fetch_query_result
+        return (
+            self.__database_client.table(table_name).select(columns).eq(**eq).execute()
+        )
 
     def __upsert(
         self, *, table_name: str, json: dict | tuple, constraint: str = ""
     ) -> APIResponse:
-        try:
-            upsert_json: dict | list = list(json) if isinstance(json, tuple) else json
 
-            upsert_query_result = (
-                self.__database_client.table(table_name)
-                .upsert(upsert_json, on_conflict=constraint)
-                .execute()
-            )
-        except APIError as exception:
-            raise exception
+        upsert_json: dict | list = list(json) if isinstance(json, tuple) else json
 
-        return upsert_query_result
+        return (
+            self.__database_client.table(table_name)
+            .upsert(upsert_json, on_conflict=constraint)
+            .execute()
+        )
 
     @override
     def add_to_user_anti_recommendations_history(
@@ -119,7 +104,10 @@ class SupabaseUserService(UserService):
 
     @override
     def remove_slice_from_user_anti_recommendations_history(
-        self, *, user_id: UUID, slice: AntiRecommendationsSelector.Slice
+        self,
+        *,
+        user_id: UUID,
+        anti_recommendations_slice: AntiRecommendationsSelector.Slice,
     ) -> None:
         """
         Remove a slice of anti-recommendations from a User's anti-recommendation history.
@@ -128,7 +116,9 @@ class SupabaseUserService(UserService):
         try:
             anti_recommendations_history = list(
                 self.get_user_anti_recommendations_history(user_id)
-            )[slice.start_index : slice.end_index]
+            )[
+                anti_recommendations_slice.start_index : anti_recommendations_slice.end_index
+            ]
 
             self.__upsert(
                 table_name=ARKG_ANTI_RECOMMENDER_USER_STATE_TABLE_NAME,
@@ -159,12 +149,7 @@ class SupabaseUserService(UserService):
             user_result = cast(
                 SupabaseAuthResponse, self.__auth_service.get_user(token)
             )
-        except SupabaseAuthException as exception:
-            raise SupabaseUserServiceException(
-                message=f"Unable to get create user. Encountered authentication exception with the message: {exception.message}"
-            ) from exception
-
-        if not user_result.authenticated_user:
+        except SupabaseAuthException:
             try:
                 user_result = cast(
                     SupabaseAuthResponse,
@@ -173,6 +158,6 @@ class SupabaseUserService(UserService):
             except SupabaseAuthException as exception:
                 raise SupabaseUserServiceException(
                     message=f"Unable to get anonymous User ID. Encountered authentication exception with the message: {exception.message}"
-                )
+                ) from exception
 
-        return self.create_user_from_id(user_result.authenticated_user.id)
+        return self.create_user_from_id(user_result.user_id)

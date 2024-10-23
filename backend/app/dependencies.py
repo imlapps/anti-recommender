@@ -5,7 +5,7 @@ from fastapi.security import OAuth2PasswordBearer
 
 from app.auth import AuthException
 from app.auth.supabase import SupabaseAuthService
-from app.models import CredentialsError, AuthToken, settings
+from app.models import AuthToken, CredentialsError, settings
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="login")
 

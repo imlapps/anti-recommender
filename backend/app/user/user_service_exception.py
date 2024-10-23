@@ -1,8 +1,9 @@
-from abc import ABC, abstractmethod
+from abc import abstractmethod
 
 
-class UserServiceException(ABC, BaseException):
-    @property
+class UserServiceException(BaseException):
+
     @abstractmethod
+    @property
     def message(self) -> str:
         pass

@@ -5,7 +5,7 @@ from collections.abc import AsyncIterator, Collection
 from contextlib import asynccontextmanager
 from pathlib import Path
 from typing import Any
-from app.auth.supabase import SupabaseAuthService
+
 import gotrue.types as gotrue
 import jwt
 import pytest
@@ -13,7 +13,7 @@ import pytest_asyncio
 from asgi_lifespan import LifespanManager
 from fastapi import FastAPI, HTTPException, status
 from fastapi.security import OAuth2PasswordRequestForm
-from postgrest import APIResponse, SyncSelectRequestBuilder, SyncQueryRequestBuilder
+from postgrest import APIResponse, SyncQueryRequestBuilder, SyncSelectRequestBuilder
 from pyoxigraph import NamedNode
 from pytest_mock import MockFixture
 from supabase import SupabaseAuthClient
@@ -21,8 +21,8 @@ from supabase import SupabaseAuthClient
 from app.anti_recommendation_engine import AntiRecommendationEngine
 from app.anti_recommenders.arkg import ArkgAntiRecommender
 from app.anti_recommenders.openai import NormalOpenaiAntiRecommender
-
-from app.models import AntiRecommendation, Record, AuthToken, wikipedia, settings
+from app.auth.supabase import SupabaseAuthService
+from app.models import AntiRecommendation, AuthToken, Record, settings, wikipedia
 from app.models.types import ModelResponse, RdfMimeType, RecordKey, RecordType
 from app.readers import AllSourceReader
 from app.readers.reader import WikipediaReader
@@ -279,7 +279,6 @@ def supabase_user_service() -> SupabaseUserService:
 
 @pytest.fixture(scope="session")
 def user(supabase_user_service: SupabaseUserService) -> User:
-
     return supabase_user_service.create_user_from_id(uuid.uuid4())
 
 
@@ -317,7 +316,7 @@ def mock_database_upsert(session_mocker: MockFixture) -> None:
 
 
 @pytest.fixture(scope="session")
-def arkg_anti_recommender(
+def arkg_anti_recommender(  # noqa: PLR0913
     arkg_file_path: Path,
     base_iri: NamedNode,
     mime_type: RdfMimeType,
@@ -401,10 +400,8 @@ def auth_header(auth_token: AuthToken) -> dict[str, str]:
 async def app(
     anti_recommendation_engine: AntiRecommendationEngine,
 ) -> AsyncIterator:
-
     @asynccontextmanager
     async def lifespan(app: FastAPI) -> AsyncIterator[None]:
-
         app.state.anti_recommendation_engine = anti_recommendation_engine
         app.state.settings = settings
         app.state.auth_service = SupabaseAuthService(settings=settings)

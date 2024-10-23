@@ -2,14 +2,15 @@ from typing import override
 
 import supabase
 from gotrue.types import AuthResponse
-from supabase import AuthError, AuthInvalidCredentialsError, SupabaseAuthClient
+from supabase import (
+    AuthError,
+    AuthInvalidCredentialsError,
+    SupabaseAuthClient,
+)
 
 from app.auth import AuthService
-from app.auth.supabase import (
-    SupabaseAuthException,
-    SupabaseAuthResponse,
-)
-from app.models import Credentials, AuthToken, Settings, settings
+from app.auth.supabase import SupabaseAuthException, SupabaseAuthResponse
+from app.models import AuthToken, Credentials, Settings
 
 
 class SupabaseAuthService(AuthService):
@@ -28,6 +29,10 @@ class SupabaseAuthService(AuthService):
         except AuthError as exception:
             raise SupabaseAuthException(exception) from exception
 
+        if not supabase_user_result.user:
+            raise SupabaseAuthException(
+                AuthError(message="Unable to get user", code="user_not_found")
+            )
         return SupabaseAuthResponse(AuthResponse(user=supabase_user_result.user))
 
     @override

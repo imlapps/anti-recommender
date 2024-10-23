@@ -4,10 +4,6 @@ from app.models import AuthToken
 
 
 class AuthResponse(ABC):
-    # @property
-    # @abstractmethod
-    # def succeeded(self) -> bool:
-    #     pass
 
     @property
     @abstractmethod

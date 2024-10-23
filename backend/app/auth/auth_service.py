@@ -1,7 +1,7 @@
 from abc import ABC, abstractmethod
 
 from app.auth import AuthResponse
-from app.models import Credentials, AuthToken
+from app.models import AuthToken, Credentials
 
 
 class AuthService(ABC):

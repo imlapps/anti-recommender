@@ -1,8 +1,5 @@
-from postgrest import APIResponse
-from pytest_mock import MockFixture
-from postgrest import SyncQueryRequestBuilder
-from app.anti_recommenders.arkg import ArkgAntiRecommender
 
+from app.anti_recommenders.arkg import ArkgAntiRecommender
 from app.models import Record
 
 

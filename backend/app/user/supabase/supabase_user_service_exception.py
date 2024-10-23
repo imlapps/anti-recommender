@@ -1,12 +1,11 @@
-from dataclasses import dataclass
 
 from app.user import UserServiceException
 
 
-@dataclass(frozen=True)
 class SupabaseUserServiceException(UserServiceException):
-    message: str
+    def __init__(self, message: str) -> None:
+        self.__message = message
 
     @property
     def message(self) -> str:
-        return str(self.message)
+        return str(self.__message)

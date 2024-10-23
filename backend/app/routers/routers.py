@@ -3,13 +3,13 @@ from typing import Annotated
 from fastapi import APIRouter, Depends, HTTPException, Request, status
 from fastapi.security import OAuth2PasswordRequestForm
 
-from app.auth import AuthException
-
+from app.anti_recommendation_engine import AntiRecommendationEngine
+from app.auth import AuthException, AuthResponse
 from app.dependencies import check_user_authentication
-from app.models import Credentials, Record, AuthToken, settings
+from app.models import AuthToken, Credentials, Record
 from app.models.types import RecordKey
 from app.user import SupabaseUserService
-from app.anti_recommendation_engine import AntiRecommendationEngine
+
 
 router = APIRouter(prefix="/api/v1", tags=["/api/v1"])
 
@@ -19,7 +19,7 @@ async def login(
     form_data: Annotated[OAuth2PasswordRequestForm, Depends()], request: Request
 ) -> AuthToken:
     try:
-        sign_in_result = request.app.state.auth_service.sign_in(
+        sign_in_result: AuthResponse = request.app.state.auth_service.sign_in(
             Credentials(email=form_data.username, password=form_data.password)
         )
     except AuthException as exception:
@@ -45,7 +45,7 @@ async def login(
 @router.get("/sign_in_anonymously")
 async def sign_in_anonymously(request: Request) -> AuthToken:
     try:
-        sign_in_anonymously_result = (
+        sign_in_anonymously_result: AuthResponse = (
             request.app.state.auth_service.sign_in_anonymously()
         )
     except AuthException as exception:
@@ -63,7 +63,7 @@ async def sign_up(
     form_data: Annotated[OAuth2PasswordRequestForm, Depends()], request: Request
 ) -> AuthToken:
     try:
-        sign_up_result = request.app.state.auth_service.sign_up(
+        sign_up_result: AuthResponse = request.app.state.auth_service.sign_up(
             Credentials(email=form_data.username, password=form_data.password)
         )
     except AuthException as exception:

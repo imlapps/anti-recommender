@@ -1,3 +1,4 @@
+# isort: skip_file
 from .auth_exception import (
     AuthException as AuthException,
 )

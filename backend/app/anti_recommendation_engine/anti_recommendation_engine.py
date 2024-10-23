@@ -2,10 +2,10 @@ from app.anti_recommenders import AntiRecommender
 from app.anti_recommenders.arkg.arkg_anti_recommender import ArkgAntiRecommender
 from app.anti_recommenders.openai import NormalOpenaiAntiRecommender
 from app.models import Record, settings
+from app.models.anti_recommendations_selector import AntiRecommendationsSelector
 from app.models.types import AntiRecommenderType, RecordKey
 from app.readers import AllSourceReader
 from app.user import User
-from app.models.anti_recommendations_selector import AntiRecommendationsSelector
 
 
 class AntiRecommendationEngine:
@@ -110,7 +110,6 @@ class AntiRecommendationEngine:
         """
 
         if self.__stack:
-
             self.__user.remove_anti_recommendations_slice_from_history(
                 AntiRecommendationsSelector.SELECT_ALL_BUT_LAST_TWO_RECORDS
             )
