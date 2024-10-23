@@ -72,6 +72,3 @@ class SupabaseAuthService(AuthService):
         return SupabaseAuthResponse(
             AuthResponse(session=self.__auth_client.get_session())
         )
-
-
-supabase_auth_service = SupabaseAuthService(settings=settings)

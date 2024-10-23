@@ -5,4 +5,4 @@ from .supabase_auth_exception import (
 
 from .supabase_auth_response import SupabaseAuthResponse as SupabaseAuthResponse
 
-from .supabase_auth_service import supabase_auth_service as supabase_auth_service
+from .supabase_auth_service import SupabaseAuthService as SupabaseAuthService

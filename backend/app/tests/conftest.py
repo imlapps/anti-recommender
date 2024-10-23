@@ -5,7 +5,7 @@ from collections.abc import AsyncIterator, Collection
 from contextlib import asynccontextmanager
 from pathlib import Path
 from typing import Any
-from app.auth.supabase import supabase_auth_service as auth_service
+from app.auth.supabase import SupabaseAuthService
 import gotrue.types as gotrue
 import jwt
 import pytest
@@ -272,7 +272,9 @@ def base_iri() -> NamedNode:
 
 @pytest.fixture(scope="session")
 def supabase_user_service() -> SupabaseUserService:
-    return SupabaseUserService(auth_service=auth_service, settings=settings)
+    return SupabaseUserService(
+        auth_service=SupabaseAuthService(settings=settings), settings=settings
+    )
 
 
 @pytest.fixture(scope="session")
@@ -399,10 +401,13 @@ def auth_header(auth_token: AuthToken) -> dict[str, str]:
 async def app(
     anti_recommendation_engine: AntiRecommendationEngine,
 ) -> AsyncIterator:
+
     @asynccontextmanager
     async def lifespan(app: FastAPI) -> AsyncIterator[None]:
-        app.state.anti_recommendation_engine = anti_recommendation_engine
 
+        app.state.anti_recommendation_engine = anti_recommendation_engine
+        app.state.settings = settings
+        app.state.auth_service = SupabaseAuthService(settings=settings)
         yield
 
     app = FastAPI(

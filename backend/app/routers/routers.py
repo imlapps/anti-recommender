@@ -4,7 +4,7 @@ from fastapi import APIRouter, Depends, HTTPException, Request, status
 from fastapi.security import OAuth2PasswordRequestForm
 
 from app.auth import AuthException
-from app.auth.supabase import supabase_auth_service as auth_service
+
 from app.dependencies import check_user_authentication
 from app.models import Credentials, Record, AuthToken, settings
 from app.models.types import RecordKey
@@ -19,7 +19,7 @@ async def login(
     form_data: Annotated[OAuth2PasswordRequestForm, Depends()], request: Request
 ) -> AuthToken:
     try:
-        sign_in_result = auth_service.sign_in(
+        sign_in_result = request.app.state.auth_service.sign_in(
             Credentials(email=form_data.username, password=form_data.password)
         )
     except AuthException as exception:
@@ -30,7 +30,7 @@ async def login(
         ) from exception
 
     supabase_user_service = SupabaseUserService(
-        auth_service=auth_service, settings=settings
+        auth_service=request.app.state.auth_service, settings=request.app.state.settings
     )
 
     request.app.state.anti_recommendation_engine = AntiRecommendationEngine(  # type: ignore[no-any-return]
@@ -43,9 +43,11 @@ async def login(
 
 
 @router.get("/sign_in_anonymously")
-async def sign_in_anonymously() -> AuthToken:
+async def sign_in_anonymously(request: Request) -> AuthToken:
     try:
-        sign_in_anonymously_result = auth_service.sign_in_anonymously()
+        sign_in_anonymously_result = (
+            request.app.state.auth_service.sign_in_anonymously()
+        )
     except AuthException as exception:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
@@ -61,7 +63,7 @@ async def sign_up(
     form_data: Annotated[OAuth2PasswordRequestForm, Depends()], request: Request
 ) -> AuthToken:
     try:
-        sign_up_result = auth_service.sign_up(
+        sign_up_result = request.app.state.auth_service.sign_up(
             Credentials(email=form_data.username, password=form_data.password)
         )
     except AuthException as exception:
@@ -72,7 +74,7 @@ async def sign_up(
         ) from exception
 
     supabase_user_service = SupabaseUserService(
-        auth_service=auth_service, settings=settings
+        auth_service=request.app.state.auth_service, settings=request.app.state.settings
     )
 
     request.app.state.anti_recommendation_engine = AntiRecommendationEngine(  # type: ignore[no-any-return]
@@ -85,9 +87,9 @@ async def sign_up(
 
 
 @router.get("/sign_out")
-async def sign_out() -> None:
+async def sign_out(request: Request) -> None:
     try:
-        auth_service.sign_out()
+        request.app.state.auth_service.sign_out()
     except AuthException as exception:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
