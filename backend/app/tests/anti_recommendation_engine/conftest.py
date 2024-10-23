@@ -15,6 +15,8 @@ def _anti_recommender(
     request: pytest.FixtureRequest,
     session_mocker: MockFixture,
     model_response: ModelResponse,
+    mock_database_fetch: None,
+    mock_database_upsert: None,
 ) -> None:
     """Run this fixture before all tests in the module, and mock AntiRecommenders based on parameterized types."""
 

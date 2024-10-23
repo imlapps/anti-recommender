@@ -9,6 +9,7 @@ from app.dependencies import check_user_authentication
 from app.models import Credentials, Record, AuthToken, settings
 from app.models.types import RecordKey
 from app.user import SupabaseUserService
+from app.anti_recommendation_engine import AntiRecommendationEngine
 
 router = APIRouter(prefix="/api/v1", tags=["/api/v1"])
 
@@ -32,7 +33,7 @@ async def login(
         auth_service=auth_service, settings=settings
     )
 
-    request.app.state.anti_recommendation_engine.reset_anti_recommendation_engine_with_new_user(  # type: ignore[no-any-return]
+    request.app.state.anti_recommendation_engine = AntiRecommendationEngine(  # type: ignore[no-any-return]
         user=supabase_user_service.create_user_from_token(
             sign_in_result.authentication_token
         )
@@ -74,7 +75,7 @@ async def sign_up(
         auth_service=auth_service, settings=settings
     )
 
-    request.app.state.anti_recommendation_engine.reset_anti_recommendation_engine_with_new_user(  # type: ignore[no-any-return]
+    request.app.state.anti_recommendation_engine = AntiRecommendationEngine(  # type: ignore[no-any-return]
         user=supabase_user_service.create_user_from_token(
             sign_up_result.authentication_token
         )

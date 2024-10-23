@@ -75,7 +75,7 @@ class SupabaseUserService(UserService):
 
             self.__upsert(
                 table_name=ARKG_ANTI_RECOMMENDER_USER_STATE_TABLE_NAME,
-                upsert_json={
+                json={
                     "anti_recommendations_history": anti_recommendations_history,
                 },
                 constraint=str(user_id),
@@ -132,7 +132,7 @@ class SupabaseUserService(UserService):
 
             self.__upsert(
                 table_name=ARKG_ANTI_RECOMMENDER_USER_STATE_TABLE_NAME,
-                upsert_json={
+                json={
                     "anti_recommendations_history": anti_recommendations_history,
                 },
                 constraint=str(user_id),

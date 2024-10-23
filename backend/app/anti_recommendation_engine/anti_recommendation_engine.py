@@ -50,27 +50,23 @@ class AntiRecommendationEngine:
         ):
             return NormalOpenaiAntiRecommender()
 
-        record_keys_list = list(self.__records_by_key.keys())
-        record_keys_list.sort()
-
         return ArkgAntiRecommender(
             base_iri=settings.arkg_base_iri,
             file_path=settings.arkg_file_path,
             mime_type=settings.arkg_mime_type,
-            record_keys=tuple(record_keys_list),
+            record_keys=tuple(sorted(self.__records_by_key.keys())),
             user=self.__user,
         )
 
     def initial_records(self) -> tuple[Record, ...]:
         """Return an initial tuple of Records."""
 
-        if isinstance(self.__anti_recommender, ArkgAntiRecommender):
-            last_seen_anti_recommendation_key = (
-                self.__user.last_seen_anti_recommendation_key
-            )
+        last_seen_anti_recommendation_key = (
+            self.__user.last_seen_anti_recommendation_key
+        )
 
-            if not last_seen_anti_recommendation_key:
-                return self.next_records(record_key=last_seen_anti_recommendation_key)
+        if last_seen_anti_recommendation_key:
+            return self.next_records(record_key=last_seen_anti_recommendation_key)
 
         return self.next_records(record_key=next(iter(self.__records_by_key.keys())))
 
@@ -98,10 +94,9 @@ class AntiRecommendationEngine:
                 *records_of_anti_recommendations,
             ]
 
-            if isinstance(self.__anti_recommender, ArkgAntiRecommender):
-                self.__user.add_anti_recommendation_to_history(
-                    records_of_anti_recommendations[0].key
-                )
+            self.__user.add_anti_recommendation_to_history(
+                records_of_anti_recommendations[0].key
+            )
 
         return tuple(records_of_anti_recommendations)
 
@@ -115,18 +110,11 @@ class AntiRecommendationEngine:
         """
 
         if self.__stack:
-            if isinstance(self.__anti_recommender, ArkgAntiRecommender):
-                self.__user.remove_anti_recommendations_slice_from_history(
-                    AntiRecommendationsSelector.SELECT_ALL_BUT_LAST_TWO_RECORDS
-                )
+
+            self.__user.remove_anti_recommendations_slice_from_history(
+                AntiRecommendationsSelector.SELECT_ALL_BUT_LAST_TWO_RECORDS
+            )
 
             return tuple(self.__stack.pop())
 
         return ()
-
-    def reset_anti_recommendation_engine_with_new_user(self, user: User) -> None:
-        """Remove all anti-recommendation and `User` state from the `AntiRecommendationEngine`, and set `__user` to a new object."""
-
-        self.__current_anti_recommendation_records = []
-        self.__stack = []
-        self.__user = user

@@ -13,10 +13,10 @@ import pytest_asyncio
 from asgi_lifespan import LifespanManager
 from fastapi import FastAPI, HTTPException, status
 from fastapi.security import OAuth2PasswordRequestForm
-from postgrest import APIResponse, SyncSelectRequestBuilder
+from postgrest import APIResponse, SyncSelectRequestBuilder, SyncQueryRequestBuilder
 from pyoxigraph import NamedNode
 from pytest_mock import MockFixture
-from supabase import Client, SupabaseAuthClient
+from supabase import SupabaseAuthClient
 
 from app.anti_recommendation_engine import AntiRecommendationEngine
 from app.anti_recommenders.arkg import ArkgAntiRecommender
@@ -271,10 +271,12 @@ def base_iri() -> NamedNode:
 
 
 @pytest.fixture(scope="session")
-def user() -> User:
-    supabase_user_service = SupabaseUserService(
-        auth_service=auth_service, settings=settings
-    )
+def supabase_user_service() -> SupabaseUserService:
+    return SupabaseUserService(auth_service=auth_service, settings=settings)
+
+
+@pytest.fixture(scope="session")
+def user(supabase_user_service: SupabaseUserService) -> User:
 
     return supabase_user_service.create_user_from_id(uuid.uuid4())
 
@@ -291,17 +293,9 @@ def anti_recommendation_engine(
 
 
 @pytest.fixture(scope="session")
-def arkg_anti_recommender(  # noqa: PLR0913
-    arkg_file_path: Path,
-    base_iri: NamedNode,
-    mime_type: RdfMimeType,
-    record_key: RecordKey,
-    records_by_key: dict[RecordKey, Record],
-    session_mocker: MockFixture,
-    user: User,
-) -> ArkgAntiRecommender:
-    """Return an ArkgAntiRecommender."""
-
+def mock_database_fetch(
+    session_mocker: MockFixture, user: User, record_key: RecordKey
+) -> None:
     session_mocker.patch.object(
         SyncSelectRequestBuilder,
         "execute",
@@ -309,6 +303,27 @@ def arkg_anti_recommender(  # noqa: PLR0913
             data=[{"user_id": user.id, "anti_recommendations_history": [record_key]}]
         ),
     )
+
+
+@pytest.fixture(scope="session")
+def mock_database_upsert(session_mocker: MockFixture) -> None:
+    session_mocker.patch.object(
+        SyncQueryRequestBuilder,
+        "execute",
+        return_value=APIResponse(data=[{"name": "N/A"}]),
+    )
+
+
+@pytest.fixture(scope="session")
+def arkg_anti_recommender(
+    arkg_file_path: Path,
+    base_iri: NamedNode,
+    mime_type: RdfMimeType,
+    mock_database_fetch: None,  # noqa: ARG001
+    records_by_key: dict[RecordKey, Record],
+    user: User,
+) -> ArkgAntiRecommender:
+    """Return an ArkgAntiRecommender."""
 
     return ArkgAntiRecommender(
         base_iri=base_iri,
