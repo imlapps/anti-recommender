@@ -6,11 +6,11 @@ import supabase
 from supabase import Client
 from app.models import Settings, AntiRecommendationsSelector
 
-from app.auth.supabase import SupabaseSignInAnonymouslyResult, SupabaseUserResult
+from app.auth.supabase import SupabaseAuthResponse, SupabaseAuthException
 from app.constants import ARKG_ANTI_RECOMMENDER_USER_STATE_TABLE_NAME
 
 
-from app.models import TableQuery, Token
+from app.models import TableQuery, AuthToken
 from app.models.types import RecordKey
 from app.user import User, UserService
 from app.auth import AuthService
@@ -123,7 +123,7 @@ class SupabaseUserService(UserService):
 
     @override
     def remove_slice_from_user_anti_recommendations_history(
-        self, *, user_id: UUID, selector: AntiRecommendationsSelector
+        self, *, user_id: UUID, slice: AntiRecommendationsSelector.Slice
     ) -> None:
         """
         Remove a slice of anti-recommendations from a User's anti-recommendation history.
@@ -132,7 +132,7 @@ class SupabaseUserService(UserService):
         try:
             anti_recommendations_history = list(
                 self.get_user_anti_recommendations_history(user_id)
-            )[*selector.value]
+            )[slice.start_index : slice.end_index]
 
             self.__upsert(
                 **TableQuery(
@@ -154,21 +154,31 @@ class SupabaseUserService(UserService):
 
         return User(id=user_id, _service=self)
 
-    def create_user_from_token(self, token: Token) -> User:
+    def create_user_from_token(self, token: AuthToken) -> User:
         """
         Return a new `User` with an id that corresponds to an authentication `token`.
 
         If no such User is found, return a new User with an anonymous id.
         """
 
-        user_result = cast(SupabaseUserResult, self.__auth_service.get_user(token))
+        try:
+            user_result = cast(
+                SupabaseAuthResponse, self.__auth_service.get_user(token)
+            )
+        except SupabaseAuthException as exception:
+            raise SupabaseUserServiceException(
+                message=f"Unable to get create user. Encountered authentication exception with the message: {exception.message}"
+            ) from exception
 
-        if not user_result.succeeded:
-            user_id = cast(
-                SupabaseSignInAnonymouslyResult,
-                self.__auth_service.sign_in_anonymously(),
-            ).user.id
-        else:
-            user_id = user_result.user_id
+        if not user_result.authenticated_user:
+            try:
+                user_result = cast(
+                    SupabaseAuthResponse,
+                    self.__auth_service.sign_in_anonymously(),
+                )
+            except SupabaseAuthException as exception:
+                raise SupabaseUserServiceException(
+                    message=f"Unable to get anonymous User ID. Encountered authentication exception with the message: {exception.message}"
+                )
 
-        return self.create_user_from_id(user_id)
+        return self.create_user_from_id(user_result.authenticated_user.id)

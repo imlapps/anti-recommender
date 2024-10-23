@@ -22,7 +22,7 @@ from app.anti_recommendation_engine import AntiRecommendationEngine
 from app.anti_recommenders.arkg import ArkgAntiRecommender
 from app.anti_recommenders.openai import NormalOpenaiAntiRecommender
 from app.database.supabase import SupabaseDatabaseService, SupabaseFetchQueryResult
-from app.models import AntiRecommendation, Record, Token, wikipedia
+from app.models import AntiRecommendation, Record, AuthToken, wikipedia
 from app.models.types import ModelResponse, RdfMimeType, RecordKey, RecordType
 from app.readers import AllSourceReader
 from app.readers.reader import WikipediaReader
@@ -359,8 +359,8 @@ def auth_response(
 
 
 @pytest.fixture(scope="session")
-def token(session: gotrue.Session) -> Token:
-    return Token(**session.model_dump())
+def token(session: gotrue.Session) -> AuthToken:
+    return AuthToken(**session.model_dump())
 
 
 @pytest.fixture(scope="session")
@@ -373,7 +373,7 @@ def mock_get_user(session_mocker: MockFixture, gotrue_user: gotrue.User) -> None
 
 
 @pytest.fixture(scope="session")
-def auth_header(token: Token) -> dict[str, str]:
+def auth_header(token: AuthToken) -> dict[str, str]:
     if not token.access_token:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED, detail="No access token"

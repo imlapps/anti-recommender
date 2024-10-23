@@ -1,26 +1,26 @@
 from abc import ABC, abstractmethod
 
-from app.auth.results import AuthResult, UserResult
-from app.models import Credentials, Token
+from app.auth import AuthResponse
+from app.models import Credentials, AuthToken
 
 
 class AuthService(ABC):
     @abstractmethod
-    def get_user(self, authentication_token: Token) -> UserResult:
+    def get_user(self, authentication_token: AuthToken) -> AuthResponse:
         pass
 
     @abstractmethod
-    def sign_in(self, authentication_credentials: Credentials) -> AuthResult:
+    def sign_in(self, authentication_credentials: Credentials) -> AuthResponse:
         pass
 
     @abstractmethod
-    def sign_in_anonymously(self) -> AuthResult:
+    def sign_in_anonymously(self) -> AuthResponse:
         pass
 
     @abstractmethod
-    def sign_out(self) -> AuthResult:
+    def sign_out(self) -> AuthResponse:
         pass
 
     @abstractmethod
-    def sign_up(self, authentication_credentials: Credentials) -> AuthResult:
+    def sign_up(self, authentication_credentials: Credentials) -> AuthResponse:
         pass

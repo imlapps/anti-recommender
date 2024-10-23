@@ -1,5 +1,12 @@
-from enum import Enum
+from dataclasses import dataclass
+from typing import NamedTuple
 
 
-class AntiRecommendationsSelector(tuple, Enum):
-    SELECT_ALL_BUT_LAST_TWO = (0, -2)
+class AntiRecommendationsSelector:
+
+    @dataclass(frozen=True)
+    class Slice(NamedTuple):
+        start_index: int
+        end_index: int
+
+    SELECT_ALL_BUT_LAST_TWO_RECORDS = Slice(0, -2)

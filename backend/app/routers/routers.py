@@ -3,10 +3,10 @@ from typing import Annotated
 from fastapi import APIRouter, Depends, HTTPException, Request, status
 from fastapi.security import OAuth2PasswordRequestForm
 
-from app.auth import AuthInvalidCredentialsException, AuthResult
+from app.auth import AuthException
 from app.auth.supabase import supabase_auth_service as auth_service
 from app.dependencies import check_user_authentication
-from app.models import Credentials, Record, Token
+from app.models import Credentials, Record, AuthToken
 from app.models.types import RecordKey
 from app.user import SupabaseUserService
 
@@ -16,24 +16,17 @@ router = APIRouter(prefix="/api/v1", tags=["/api/v1"])
 @router.post("/login")
 async def login(
     form_data: Annotated[OAuth2PasswordRequestForm, Depends()], request: Request
-) -> Token:
+) -> AuthToken:
     try:
-        sign_in_result: AuthResult = auth_service.sign_in(
+        sign_in_result = auth_service.sign_in(
             Credentials(email=form_data.username, password=form_data.password)
         )
-    except AuthInvalidCredentialsException as exception:
+    except AuthException as exception:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail=f"Unable to login. Encountered exception with the message: {exception.message}",
+            detail=f"Unable to login. Encountered AuthException with message: {exception.message}",
             headers={"WWW-Authenticate": "Bearer"},
         ) from exception
-
-    if not sign_in_result.succeeded:
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Unable to login. Check username or password",
-            headers={"WWW-Authenticate": "Bearer"},
-        )
 
     supabase_user_service = SupabaseUserService()
 
@@ -47,39 +40,33 @@ async def login(
 
 
 @router.get("/sign_in_anonymously")
-async def sign_in_anonymously() -> Token:
-    sign_in_anonymously_result: AuthResult = auth_service.sign_in_anonymously()
-
-    if not sign_in_anonymously_result.succeeded:
+async def sign_in_anonymously() -> AuthToken:
+    try:
+        sign_in_anonymously_result = auth_service.sign_in_anonymously()
+    except AuthException as exception:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Unable TO sign_in_anonymously.",
+            detail=f"Unable To sign_in_anonymously. Encountered AuthException with message: {exception.message}",
             headers={"WWW-Authenticate": "Bearer"},
-        )
+        ) from exception
+
     return sign_in_anonymously_result.authentication_token
 
 
 @router.post("/sign_up")
 async def sign_up(
     form_data: Annotated[OAuth2PasswordRequestForm, Depends()], request: Request
-) -> Token:
+) -> AuthToken:
     try:
-        sign_up_result: AuthResult = auth_service.sign_up(
+        sign_up_result = auth_service.sign_up(
             Credentials(email=form_data.username, password=form_data.password)
         )
-    except AuthInvalidCredentialsException as exception:
+    except AuthException as exception:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail=f"Unable to signup. Encountered APIError with exception: {exception.message}",
+            detail=f"Unable to signup. Encountered AuthException with message: {exception.message}",
             headers={"WWW-Authenticate": "Bearer"},
         ) from exception
-
-    if not sign_up_result.succeeded:
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Unable to signup. Check username or password",
-            headers={"WWW-Authenticate": "Bearer"},
-        )
 
     supabase_user_service = SupabaseUserService()
 
@@ -94,14 +81,14 @@ async def sign_up(
 
 @router.get("/sign_out")
 async def sign_out() -> None:
-    sign_out_result: AuthResult = auth_service.sign_out()
-
-    if not sign_out_result.succeeded:
+    try:
+        auth_service.sign_out()
+    except AuthException as exception:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Unable to signout.",
+            detail=f"Unable to signout. Encountered AuthException with message: {exception.message}",
             headers={"WWW-Authenticate": "Bearer"},
-        )
+        ) from exception
 
 
 @router.get(

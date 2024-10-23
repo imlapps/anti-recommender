@@ -5,7 +5,7 @@ from fastapi import FastAPI, Request
 from fastapi.responses import RedirectResponse
 
 from app.anti_recommendation_engine import AntiRecommendationEngine
-from app.models import CredentialsError, Token
+from app.models import CredentialsError, AuthToken
 from app.routers import router
 from app.user import SupabaseUserService
 
@@ -19,7 +19,7 @@ async def lifespan(app: FastAPI) -> AsyncIterator[None]:
     supabase_user_service = SupabaseUserService()
 
     app.state.anti_recommendation_engine = AntiRecommendationEngine(
-        user=supabase_user_service.create_user_from_token(Token(access_token=""))
+        user=supabase_user_service.create_user_from_token(AuthToken(access_token=""))
     )
 
     yield
