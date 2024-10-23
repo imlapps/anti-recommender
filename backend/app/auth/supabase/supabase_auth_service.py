@@ -9,7 +9,7 @@ from app.auth.supabase import (
     SupabaseAuthException,
     SupabaseAuthResponse,
 )
-from app.models import Credentials, AuthToken, Settings
+from app.models import Credentials, AuthToken, Settings, settings
 
 
 class SupabaseAuthService(AuthService):
@@ -28,7 +28,7 @@ class SupabaseAuthService(AuthService):
         except AuthError as exception:
             raise SupabaseAuthException(exception) from exception
 
-        return SupabaseAuthResponse(AuthResponse(user=supabase_user_result))
+        return SupabaseAuthResponse(AuthResponse(user=supabase_user_result.user))
 
     @override
     def sign_in(self, authentication_credentials: Credentials) -> SupabaseAuthResponse:
@@ -74,4 +74,4 @@ class SupabaseAuthService(AuthService):
         )
 
 
-supabase_auth_service = SupabaseAuthService()
+supabase_auth_service = SupabaseAuthService(settings=settings)

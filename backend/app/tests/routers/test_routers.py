@@ -86,7 +86,7 @@ async def test_sign_out(app: FastAPI) -> None:
     """
 
     async with AsyncClient(
-        transport=ASGITransport(app=app), base_url="http://test.nerdswipe"
+        transport=ASGITransport(app=app), base_url="http://test.nerdswipe.com"
     ) as client:
         response = await client.get(
             url="/api/v1/sign_out",
@@ -107,7 +107,7 @@ async def test_next_records(
     """
 
     async with AsyncClient(
-        transport=ASGITransport(app=app), base_url="http://test.nerdswipe"
+        transport=ASGITransport(app=app), base_url="http://test.nerdswipe.com"
     ) as client:
         response = await client.get(
             url=f"/api/v1/next_records/{record_key}",
@@ -128,7 +128,7 @@ async def test_previous_records(
     """
 
     async with AsyncClient(
-        transport=ASGITransport(app=app), base_url="http://test.nerdswipe"
+        transport=ASGITransport(app=app), base_url="http://test.nerdswipe.com"
     ) as client:
         response = await client.get(url="/api/v1/previous_records", headers=auth_header)
 
@@ -146,7 +146,7 @@ async def test_initial_records(
     """
 
     async with AsyncClient(
-        transport=ASGITransport(app=app), base_url="http://test.nerdswipe"
+        transport=ASGITransport(app=app), base_url="http://test.nerdswipe.com"
     ) as client:
         response = await client.get(url="/api/v1/initial_records", headers=auth_header)
 

@@ -1,4 +1,7 @@
 import pytest
+from pytest_mock import MockFixture
+from postgrest import APIResponse, SyncQueryRequestBuilder
+
 
 from app.anti_recommendation_engine import AntiRecommendationEngine
 from app.models import Record
@@ -17,6 +20,7 @@ def test_get_previous_records_with_empty_stack(
 
 @pytest.mark.order(2)
 def test_get_initial_records(
+    session_mocker: MockFixture,
     records: tuple[Record, ...],
     anti_recommendation_engine: AntiRecommendationEngine,
 ) -> None:
@@ -24,6 +28,11 @@ def test_get_initial_records(
     Test that AntiRecommendationEngine.get_initial_records returns a tuple of Records
     with keys that match the AntiRecommendations of the first Record in records.
     """
+    session_mocker.patch.object(
+        SyncQueryRequestBuilder,
+        "execute",
+        return_value=APIResponse(data=[{"name": "N/A"}]),
+    )
 
     assert anti_recommendation_engine.initial_records() == records[1:]
 

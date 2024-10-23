@@ -5,6 +5,7 @@ from app.models import Record, settings
 from app.models.types import AntiRecommenderType, RecordKey
 from app.readers import AllSourceReader
 from app.user import User
+from app.models.anti_recommendations_selector import AntiRecommendationsSelector
 
 
 class AntiRecommendationEngine:
@@ -116,7 +117,7 @@ class AntiRecommendationEngine:
         if self.__stack:
             if isinstance(self.__anti_recommender, ArkgAntiRecommender):
                 self.__user.remove_anti_recommendations_slice_from_history(
-                    start_index=-2, end_index=len(self.__records_by_key)
+                    AntiRecommendationsSelector.SELECT_ALL_BUT_LAST_TWO_RECORDS
                 )
 
             return tuple(self.__stack.pop())

@@ -4,7 +4,6 @@ from typing import NamedTuple
 
 class AntiRecommendationsSelector:
 
-    @dataclass(frozen=True)
     class Slice(NamedTuple):
         start_index: int
         end_index: int

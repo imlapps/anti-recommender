@@ -6,6 +6,7 @@ from pydantic import Field
 
 from app.models.types import RecordKey
 from app.user import UserService
+from app.models.anti_recommendations_selector import AntiRecommendationsSelector
 
 
 @dataclass(frozen=True)
@@ -42,10 +43,10 @@ class User:
         )
 
     def remove_anti_recommendations_slice_from_history(
-        self, *, start_index: int, end_index: int
+        self, *, slice: AntiRecommendationsSelector.Slice
     ) -> None:
         """Remove a slice of anti-recommendations from a `User` history."""
 
         self._service.remove_slice_from_user_anti_recommendations_history(
-            user_id=self.id, start_index=start_index, end_index=end_index
+            user_id=self.id, start_index=slice.start_index, end_index=slice.end_index
         )

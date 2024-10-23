@@ -6,7 +6,7 @@ from fastapi.security import OAuth2PasswordRequestForm
 from app.auth import AuthException
 from app.auth.supabase import supabase_auth_service as auth_service
 from app.dependencies import check_user_authentication
-from app.models import Credentials, Record, AuthToken
+from app.models import Credentials, Record, AuthToken, settings
 from app.models.types import RecordKey
 from app.user import SupabaseUserService
 
@@ -28,7 +28,9 @@ async def login(
             headers={"WWW-Authenticate": "Bearer"},
         ) from exception
 
-    supabase_user_service = SupabaseUserService()
+    supabase_user_service = SupabaseUserService(
+        auth_service=auth_service, settings=settings
+    )
 
     request.app.state.anti_recommendation_engine.reset_anti_recommendation_engine_with_new_user(  # type: ignore[no-any-return]
         user=supabase_user_service.create_user_from_token(
@@ -68,7 +70,9 @@ async def sign_up(
             headers={"WWW-Authenticate": "Bearer"},
         ) from exception
 
-    supabase_user_service = SupabaseUserService()
+    supabase_user_service = SupabaseUserService(
+        auth_service=auth_service, settings=settings
+    )
 
     request.app.state.anti_recommendation_engine.reset_anti_recommendation_engine_with_new_user(  # type: ignore[no-any-return]
         user=supabase_user_service.create_user_from_token(
