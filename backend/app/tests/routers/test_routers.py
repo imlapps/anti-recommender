@@ -37,11 +37,15 @@ async def test_login(
 
 
 @pytest.mark.anyio(loop_scope="session")
-async def test_sign_in_anonymously(app: FastAPI) -> None:
+async def test_sign_in_anonymously(
+    app: FastAPI, auth_response: gotrue.AuthResponse, session_mocker: MockFixture
+) -> None:
     """
     Test the /sign_in_anonymously endpoint.
     """
-
+    session_mocker.patch.object(
+        SupabaseAuthClient, "sign_in_anonymously", return_value=auth_response
+    )
     async with AsyncClient(
         transport=ASGITransport(app=app), base_url="http://test.nerdswipe.com"
     ) as client:

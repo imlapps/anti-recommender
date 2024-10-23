@@ -408,6 +408,7 @@ async def app(
         app.state.anti_recommendation_engine = anti_recommendation_engine
         app.state.settings = settings
         app.state.auth_service = SupabaseAuthService(settings=settings)
+
         yield
 
     app = FastAPI(
