@@ -25,7 +25,6 @@ class AntiRecommendationEngine:
         - Returns a tuple of Records that match the AntiRecommendations of the first key in __records_by_key.
         - Returns a tuple of Records that match the AntiRecommendations of a record_key.
         - Returns a tuple of Records that matched the previous AntiRecommendations.
-        - Resets itself by clearing all variables related to a previous session and set __user to a new object.
     """
 
     def __init__(self, user: User, settings: Settings) -> None:
@@ -106,12 +105,11 @@ class AntiRecommendationEngine:
         """
         Return a tuple of Records that matched the previous AntiRecommendations.
 
-        If __anti_recommender is an ArkgAntiRecommender instance, the last 2 anti-recommendations are removed from __user's history.
-
         Return an empty tuple if there were no such Records.
         """
 
         if self.__stack:
+            # Remove the last 2 anti-recommendations from a user's history.
             self.__user.remove_anti_recommendations_slice_from_history(
                 AntiRecommendationsSelector.SELECT_ALL_BUT_LAST_TWO_RECORDS
             )

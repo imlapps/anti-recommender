@@ -14,6 +14,12 @@ from app.user.supabase import SupabaseUserServiceException
 
 
 class SupabaseUserService(UserService):
+    """
+    A concrete implementation of `UserService`.
+
+    A `SupabaseUserService` uses a Supabase database to manage the state of a `User`.
+    """
+
     def __init__(self, auth_service: AuthService, settings: Settings) -> None:
         self.__auth_service = auth_service
         self.__database_client: Client = supabase.create_client(
@@ -23,6 +29,12 @@ class SupabaseUserService(UserService):
     def __fetch_from_database(
         self, *, table_name: str, columns: str, eq: dict
     ) -> APIResponse:
+        """
+        Run a `SELECT` query on a table with the name `table_name`.
+
+        An `equal_to` filter is added to the query via the `eq` parameter.
+        """
+
         return (
             self.__database_client.table(table_name).select(columns).eq(**eq).execute()
         )
@@ -30,6 +42,14 @@ class SupabaseUserService(UserService):
     def __upsert_into_database(
         self, *, table_name: str, json: dict | tuple, constraint: str = ""
     ) -> APIResponse:
+        """
+        Run an `UPSERT` query on a table with the name `table_name`.
+
+        An `UPDATE` query is run if there is a column conflict with `constraint`.
+
+        An `INSERT` query is run otherwise.
+        """
+
         upsert_json: dict | list = list(json) if isinstance(json, tuple) else json
 
         return (

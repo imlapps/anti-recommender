@@ -5,6 +5,8 @@ from app.models import AuthToken, Credentials
 
 
 class AuthService(ABC):
+    """An interface to authenticate a `User` on the NerdSwipe backend."""
+
     @abstractmethod
     def get_user(self, authentication_token: AuthToken) -> AuthResponse:
         pass

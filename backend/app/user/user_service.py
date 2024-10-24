@@ -5,6 +5,8 @@ from app.models.types import RecordKey, UserId
 
 
 class UserService(ABC):
+    """An interface to manage the state of a `User`."""
+
     @abstractmethod
     def add_to_user_anti_recommendations_history(
         self, *, user_id: UserId, anti_recommendation_key: RecordKey

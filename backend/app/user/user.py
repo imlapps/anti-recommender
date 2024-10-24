@@ -11,6 +11,7 @@ class User:
     A dataclass that contains information of a User.
 
     `id` is the UUID of the User.
+
     `_service` manages the state of the User.
     """
 
