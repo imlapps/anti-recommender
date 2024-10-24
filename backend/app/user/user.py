@@ -1,24 +1,20 @@
 from dataclasses import dataclass
-from typing import Annotated
-from uuid import UUID
-
-from pydantic import Field
 
 from app.models.anti_recommendations_selector import AntiRecommendationsSelector
-from app.models.types import RecordKey
+from app.models.types import RecordKey, UserId
 from app.user import UserService
 
 
 @dataclass(frozen=True)
 class User:
     """
-    Pydantic model that contains information of a User.
+    A dataclass that contains information of a User.
 
     `id` is the UUID of the User.
     `_service` manages the state of the User.
     """
 
-    id: Annotated[UUID, Field(..., alias="user_id")]
+    id: UserId
     _service: UserService
 
     @property

@@ -3,6 +3,7 @@ from contextlib import asynccontextmanager
 
 from fastapi import FastAPI, Request
 from fastapi.responses import RedirectResponse
+from pydantic import SecretStr
 
 from app.anti_recommendation_engine import AntiRecommendationEngine
 from app.auth.supabase import SupabaseAuthService
@@ -15,17 +16,19 @@ from app.user import SupabaseUserService
 async def lifespan(app: FastAPI) -> AsyncIterator[None]:
     """
     A lifespan event to persist the AntiRecommendationEngine on start up.
+
     """
-    supabase_auth_service = SupabaseAuthService(settings=settings)
+
     supabase_user_service = SupabaseUserService(
-        auth_service=supabase_auth_service, settings=settings
+        auth_service=SupabaseAuthService(settings=settings), settings=settings
     )
 
     app.state.anti_recommendation_engine = AntiRecommendationEngine(
-        user=supabase_user_service.create_user_from_token(AuthToken(access_token=""))
+        user=supabase_user_service.create_user_from_token(
+            AuthToken(access_token=SecretStr(""))
+        ),
+        settings=settings,
     )
-    app.state.settings = settings
-    app.state.auth_service = supabase_auth_service
 
     yield
 

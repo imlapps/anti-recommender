@@ -1,4 +1,3 @@
-
 from app.anti_recommenders.arkg import ArkgAntiRecommender
 from app.models import Record
 

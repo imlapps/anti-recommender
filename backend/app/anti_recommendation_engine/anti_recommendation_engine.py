@@ -1,7 +1,7 @@
 from app.anti_recommenders import AntiRecommender
 from app.anti_recommenders.arkg.arkg_anti_recommender import ArkgAntiRecommender
 from app.anti_recommenders.openai import NormalOpenaiAntiRecommender
-from app.models import Record, settings
+from app.models import Record, Settings
 from app.models.anti_recommendations_selector import AntiRecommendationsSelector
 from app.models.types import AntiRecommenderType, RecordKey
 from app.readers import AllSourceReader
@@ -28,8 +28,10 @@ class AntiRecommendationEngine:
         - Resets itself by clearing all variables related to a previous session and set __user to a new object.
     """
 
-    def __init__(self, user: User) -> None:
-        self.__anti_recommender: AntiRecommender = self.__select_anti_recommender()
+    def __init__(self, user: User, settings: Settings) -> None:
+        self.__anti_recommender: AntiRecommender = self.__select_anti_recommender(
+            settings
+        )
         self.__current_anti_recommendation_records: list[Record] = []
         self.__records_by_key: dict[RecordKey, Record] = {
             record.key: record for record in AllSourceReader().read()
@@ -37,7 +39,7 @@ class AntiRecommendationEngine:
         self.__stack: list[list[Record]] = []
         self.__user = user
 
-    def __select_anti_recommender(self) -> AntiRecommender:
+    def __select_anti_recommender(self, settings: Settings) -> AntiRecommender:
         """
         Select and return an `AntiRecommender` based on values stored in `settings`.
 

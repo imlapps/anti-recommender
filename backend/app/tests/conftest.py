@@ -14,6 +14,7 @@ from asgi_lifespan import LifespanManager
 from fastapi import FastAPI, HTTPException, status
 from fastapi.security import OAuth2PasswordRequestForm
 from postgrest import APIResponse, SyncQueryRequestBuilder, SyncSelectRequestBuilder
+from pydantic import AnyUrl
 from pyoxigraph import NamedNode
 from pytest_mock import MockFixture
 from supabase import SupabaseAuthClient
@@ -100,11 +101,11 @@ def anti_recommendations() -> tuple[AntiRecommendation, ...]:
     return (
         AntiRecommendation(
             key="Laplace's_demon",
-            url="https://en.wikipedia.org/wiki/Laplace's_demon",
+            url=AnyUrl("https://en.wikipedia.org/wiki/Laplace's_demon"),
         ),
         AntiRecommendation(
             key="Leonardo_da_Vinci",
-            url="https://en.wikipedia.org/wiki/Leonardo_da_Vinci",
+            url=AnyUrl("https://en.wikipedia.org/wiki/Leonardo_da_Vinci"),
         ),
     )
 
@@ -290,7 +291,7 @@ def anti_recommendation_engine(
 
     session_mocker.patch.object(AllSourceReader, "read", return_value=records)
 
-    return AntiRecommendationEngine(user=user)
+    return AntiRecommendationEngine(user=user, settings=settings)
 
 
 @pytest.fixture(scope="session")

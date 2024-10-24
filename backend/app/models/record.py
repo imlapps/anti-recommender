@@ -1,6 +1,4 @@
-from typing import Annotated
-
-from pydantic import BaseModel, ConfigDict, Field, field_validator
+from pydantic import AnyUrl, BaseModel, ConfigDict, field_validator
 
 from app.models.types import RecordKey
 
@@ -15,9 +13,7 @@ class Record(BaseModel):
     """
 
     key: RecordKey
-    url: Annotated[
-        str, Field(min_length=1, json_schema_extra={"strip_whitespace": "True"})
-    ]
+    url: AnyUrl
 
     model_config = ConfigDict(extra="allow")
 

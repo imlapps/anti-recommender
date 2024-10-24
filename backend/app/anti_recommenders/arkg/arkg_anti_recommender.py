@@ -3,6 +3,7 @@ from pathlib import Path
 from typing import override
 
 import pyoxigraph as ox
+from pydantic import AnyUrl
 
 from app.anti_recommenders import AntiRecommender
 from app.constants import WIKIPEDIA_BASE_URL
@@ -122,7 +123,7 @@ class ArkgAntiRecommender(AntiRecommender):
             return (
                 AntiRecommendation(
                     key=anti_recommendation_key,
-                    url=WIKIPEDIA_BASE_URL + anti_recommendation_key,
+                    url=AnyUrl(WIKIPEDIA_BASE_URL + anti_recommendation_key),
                 )
                 for anti_recommendation_key in anti_recommendation_keys
             )

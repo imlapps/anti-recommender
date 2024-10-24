@@ -1,11 +1,11 @@
 from pathlib import Path
 from typing import Annotated
 
-from pydantic import Field, field_validator
+from pydantic import AnyUrl, Field, SecretStr, field_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 from pyoxigraph import NamedNode
 
-from app.models.types import AntiRecommenderType, ApiKey, RdfMimeType, RecordType
+from app.models.types import AntiRecommenderType, RdfMimeType, RecordType
 
 CONFIG_DIRECTORY_PATH = Path(__file__).parent.parent.parent.absolute()
 DATA_DIRECTORY_PATH = Path(__file__).parent.parent.absolute() / "data"
@@ -23,13 +23,13 @@ class Settings(BaseSettings):
     arkg_mime_type: RdfMimeType = RdfMimeType.TURTLE
 
     anti_recommender_type: AntiRecommenderType = AntiRecommenderType.ARKG
-    openai_api_key: ApiKey | None = None
+    openai_api_key: SecretStr | None = None
     output_file_paths: frozenset[Path] = Field(
         default=frozenset(), validation_alias="output_file_names"
     )
     record_types: frozenset[RecordType] = frozenset()
-    supabase_url: str = ""
-    supabase_key: str = ""
+    supabase_url: AnyUrl = AnyUrl("https://nerdswipe.supabase.co")
+    supabase_key: SecretStr = SecretStr("")
     model_config = SettingsConfigDict(
         env_file=(
             CONFIG_DIRECTORY_PATH / ".env.local",

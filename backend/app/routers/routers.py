@@ -2,14 +2,15 @@ from typing import Annotated
 
 from fastapi import APIRouter, Depends, HTTPException, Request, status
 from fastapi.security import OAuth2PasswordRequestForm
+from pydantic import SecretStr
 
 from app.anti_recommendation_engine import AntiRecommendationEngine
 from app.auth import AuthException, AuthResponse
+from app.auth.supabase import SupabaseAuthService
 from app.dependencies import check_user_authentication
-from app.models import AuthToken, Credentials, Record
+from app.models import AuthToken, Credentials, Record, settings
 from app.models.types import RecordKey
 from app.user import SupabaseUserService
-
 
 router = APIRouter(prefix="/api/v1", tags=["/api/v1"])
 
@@ -18,9 +19,13 @@ router = APIRouter(prefix="/api/v1", tags=["/api/v1"])
 async def login(
     form_data: Annotated[OAuth2PasswordRequestForm, Depends()], request: Request
 ) -> AuthToken:
+    supabase_auth_service = SupabaseAuthService(settings=settings)
+
     try:
-        sign_in_result: AuthResponse = request.app.state.auth_service.sign_in(
-            Credentials(email=form_data.username, password=form_data.password)
+        sign_in_result: AuthResponse = supabase_auth_service.sign_in(
+            Credentials(
+                email=form_data.username, password=SecretStr(form_data.password)
+            )
         )
     except AuthException as exception:
         raise HTTPException(
@@ -30,23 +35,26 @@ async def login(
         ) from exception
 
     supabase_user_service = SupabaseUserService(
-        auth_service=request.app.state.auth_service, settings=request.app.state.settings
+        auth_service=supabase_auth_service, settings=settings
     )
 
     request.app.state.anti_recommendation_engine = AntiRecommendationEngine(  # type: ignore[no-any-return]
         user=supabase_user_service.create_user_from_token(
             sign_in_result.authentication_token
-        )
+        ),
+        settings=settings,
     )
 
     return sign_in_result.authentication_token
 
 
 @router.get("/sign_in_anonymously")
-async def sign_in_anonymously(request: Request) -> AuthToken:
+async def sign_in_anonymously() -> AuthToken:
+    supabase_auth_service = SupabaseAuthService(settings=settings)
+
     try:
         sign_in_anonymously_result: AuthResponse = (
-            request.app.state.auth_service.sign_in_anonymously()
+            supabase_auth_service.sign_in_anonymously()
         )
     except AuthException as exception:
         raise HTTPException(
@@ -62,9 +70,13 @@ async def sign_in_anonymously(request: Request) -> AuthToken:
 async def sign_up(
     form_data: Annotated[OAuth2PasswordRequestForm, Depends()], request: Request
 ) -> AuthToken:
+    supabase_auth_service = SupabaseAuthService(settings=settings)
+
     try:
-        sign_up_result: AuthResponse = request.app.state.auth_service.sign_up(
-            Credentials(email=form_data.username, password=form_data.password)
+        sign_up_result: AuthResponse = supabase_auth_service.sign_up(
+            Credentials(
+                email=form_data.username, password=SecretStr(form_data.password)
+            )
         )
     except AuthException as exception:
         raise HTTPException(
@@ -74,22 +86,25 @@ async def sign_up(
         ) from exception
 
     supabase_user_service = SupabaseUserService(
-        auth_service=request.app.state.auth_service, settings=request.app.state.settings
+        auth_service=supabase_auth_service, settings=settings
     )
 
     request.app.state.anti_recommendation_engine = AntiRecommendationEngine(  # type: ignore[no-any-return]
         user=supabase_user_service.create_user_from_token(
             sign_up_result.authentication_token
-        )
+        ),
+        settings=settings,
     )
 
     return sign_up_result.authentication_token
 
 
 @router.get("/sign_out")
-async def sign_out(request: Request) -> None:
+async def sign_out() -> None:
+    supabase_auth_service = SupabaseAuthService(settings=settings)
+
     try:
-        request.app.state.auth_service.sign_out()
+        supabase_auth_service.sign_out()
     except AuthException as exception:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,

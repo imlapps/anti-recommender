@@ -2,11 +2,7 @@ from typing import override
 
 import supabase
 from gotrue.types import AuthResponse
-from supabase import (
-    AuthError,
-    AuthInvalidCredentialsError,
-    SupabaseAuthClient,
-)
+from supabase import AuthError, AuthInvalidCredentialsError, SupabaseAuthClient
 
 from app.auth import AuthService
 from app.auth.supabase import SupabaseAuthException, SupabaseAuthResponse
@@ -16,15 +12,15 @@ from app.models import AuthToken, Credentials, Settings
 class SupabaseAuthService(AuthService):
     def __init__(self, settings: Settings):
         self.__auth_client: SupabaseAuthClient = supabase.create_client(
-            supabase_url=settings.supabase_url,
-            supabase_key=settings.supabase_key,
+            supabase_url=str(settings.supabase_url),
+            supabase_key=settings.supabase_key.get_secret_value(),
         ).auth
 
     @override
     def get_user(self, authentication_token: AuthToken) -> SupabaseAuthResponse:
         try:
             supabase_user_result = self.__auth_client.get_user(
-                authentication_token.access_token
+                authentication_token.access_token.get_secret_value()
             )
         except AuthError as exception:
             raise SupabaseAuthException(exception) from exception

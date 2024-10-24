@@ -1,5 +1,4 @@
 from typing import cast, override
-from uuid import UUID
 
 import supabase
 from postgrest import APIError, APIResponse
@@ -9,29 +8,28 @@ from app.auth import AuthService
 from app.auth.supabase import SupabaseAuthException, SupabaseAuthResponse
 from app.constants import ARKG_ANTI_RECOMMENDER_USER_STATE_TABLE_NAME
 from app.models import AntiRecommendationsSelector, AuthToken, Settings
-from app.models.types import RecordKey
+from app.models.types import RecordKey, UserId
 from app.user import User, UserService
 from app.user.supabase import SupabaseUserServiceException
 
 
 class SupabaseUserService(UserService):
-
     def __init__(self, auth_service: AuthService, settings: Settings) -> None:
         self.__auth_service = auth_service
         self.__database_client: Client = supabase.create_client(
-            settings.supabase_url, settings.supabase_key
+            str(settings.supabase_url), settings.supabase_key.get_secret_value()
         )
 
-    def __fetch(self, *, table_name: str, columns: str, eq: dict) -> APIResponse:
-
+    def __fetch_from_database(
+        self, *, table_name: str, columns: str, eq: dict
+    ) -> APIResponse:
         return (
             self.__database_client.table(table_name).select(columns).eq(**eq).execute()
         )
 
-    def __upsert(
+    def __upsert_into_database(
         self, *, table_name: str, json: dict | tuple, constraint: str = ""
     ) -> APIResponse:
-
         upsert_json: dict | list = list(json) if isinstance(json, tuple) else json
 
         return (
@@ -42,7 +40,7 @@ class SupabaseUserService(UserService):
 
     @override
     def add_to_user_anti_recommendations_history(
-        self, *, user_id: UUID, anti_recommendation_key: RecordKey
+        self, *, user_id: UserId, anti_recommendation_key: RecordKey
     ) -> None:
         """Append `anti_recommendation_key` to a User's anti-recommendation history."""
 
@@ -53,7 +51,7 @@ class SupabaseUserService(UserService):
 
             anti_recommendations_history.append(anti_recommendation_key)
 
-            self.__upsert(
+            self.__upsert_into_database(
                 table_name=ARKG_ANTI_RECOMMENDER_USER_STATE_TABLE_NAME,
                 json={
                     "anti_recommendations_history": anti_recommendations_history,
@@ -67,12 +65,12 @@ class SupabaseUserService(UserService):
 
     @override
     def get_user_anti_recommendations_history(
-        self, user_id: UUID
+        self, user_id: UserId
     ) -> tuple[RecordKey, ...]:
         """Return a tuple containing Record keys in a User's anti-recommendation history."""
 
         try:
-            database_service_result = self.__fetch(
+            database_service_result = self.__fetch_from_database(
                 table_name=ARKG_ANTI_RECOMMENDER_USER_STATE_TABLE_NAME,
                 columns="anti_recommendations_history",
                 eq={"column": "user_id", "value": str(user_id)},
@@ -85,7 +83,7 @@ class SupabaseUserService(UserService):
         return tuple(database_service_result.data[0]["anti_recommendations_history"])
 
     @override
-    def get_user_last_seen_anti_recommendation(self, user_id: UUID) -> str:
+    def get_user_last_seen_anti_recommendation(self, user_id: UserId) -> str:
         """Return the last Record key in a User's anti-recommendation history."""
 
         anti_recommendations_history = self.get_user_anti_recommendations_history(
@@ -101,7 +99,7 @@ class SupabaseUserService(UserService):
     def remove_slice_from_user_anti_recommendations_history(
         self,
         *,
-        user_id: UUID,
+        user_id: UserId,
         anti_recommendations_slice: AntiRecommendationsSelector.Slice,
     ) -> None:
         """
@@ -115,7 +113,7 @@ class SupabaseUserService(UserService):
                 anti_recommendations_slice.start_index : anti_recommendations_slice.end_index
             ]
 
-            self.__upsert(
+            self.__upsert_into_database(
                 table_name=ARKG_ANTI_RECOMMENDER_USER_STATE_TABLE_NAME,
                 json={
                     "anti_recommendations_history": anti_recommendations_history,
@@ -128,7 +126,7 @@ class SupabaseUserService(UserService):
                 message=f"Unable to remove anti-recommendation from history of User with id {user_id}. Encountered database exception: {exception.message}"
             ) from exception
 
-    def create_user_from_id(self, user_id: UUID) -> User:
+    def create_user_from_id(self, user_id: UserId) -> User:
         """Return a new User, with an id matching `user_id`."""
 
         return User(id=user_id, _service=self)
@@ -145,7 +143,6 @@ class SupabaseUserService(UserService):
                 SupabaseAuthResponse, self.__auth_service.get_user(authentication_token)
             )
         except SupabaseAuthException as exception:
-
             raise SupabaseUserServiceException(
                 message=f"Unable to create new User. Encountered authentication exception: {exception.message}"
             ) from exception

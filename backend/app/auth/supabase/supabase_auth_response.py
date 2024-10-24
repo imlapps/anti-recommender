@@ -1,9 +1,9 @@
 from dataclasses import dataclass
 from uuid import UUID
+
 import gotrue.types as gotrue
 
 from app.auth import AuthResponse
-
 from app.models import AuthToken
 
 

@@ -5,6 +5,7 @@ from langchain.prompts import PromptTemplate
 from langchain.schema import StrOutputParser
 from langchain.schema.runnable import RunnablePassthrough, RunnableSerializable
 from langchain_openai import OpenAI
+from pydantic import AnyUrl
 
 from app.anti_recommenders.openai import OpenaiAntiRecommender
 from app.models import AntiRecommendation
@@ -55,7 +56,7 @@ class NormalOpenaiAntiRecommender(OpenaiAntiRecommender):
             if RecordType.WIKIPEDIA in line_chunk[2]:
                 url = line_chunk[2].strip()
 
-            yield AntiRecommendation(key=title, url=url)
+            yield AntiRecommendation(key=title, url=AnyUrl(url))
 
     @typing.override
     def generate_anti_recommendations(

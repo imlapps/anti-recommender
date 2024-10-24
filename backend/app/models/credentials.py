@@ -1,6 +1,8 @@
 from typing import TypedDict
 
+from pydantic import EmailStr, SecretStr
+
 
 class Credentials(TypedDict):
-    email: str
-    password: str
+    email: EmailStr
+    password: SecretStr
