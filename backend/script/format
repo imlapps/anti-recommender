@@ -5,4 +5,4 @@ set -e
 cd "$(dirname "$0")/.."
 
 poetry run isort app
-poetry run black app
+poetry run ruff format app
