@@ -18,9 +18,9 @@ async def lifespan(app: FastAPI) -> AsyncIterator[None]:
     A lifespan event to persist the AntiRecommendationEngine on start up.
 
     """
-
+    supabase_auth_service = SupabaseAuthService(settings=settings)
     supabase_user_service = SupabaseUserService(
-        auth_service=SupabaseAuthService(settings=settings), settings=settings
+        auth_service=supabase_auth_service, settings=settings
     )
 
     app.state.anti_recommendation_engine = AntiRecommendationEngine(
@@ -29,6 +29,9 @@ async def lifespan(app: FastAPI) -> AsyncIterator[None]:
         ),
         settings=settings,
     )
+    app.state.settings = settings
+    app.state.user_service = supabase_user_service
+    app.state.auth_service = supabase_auth_service
 
     yield
 

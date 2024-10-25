@@ -6,11 +6,11 @@ from pydantic import SecretStr
 
 from app.anti_recommendation_engine import AntiRecommendationEngine
 from app.auth import AuthException, AuthResponse
-from app.auth.supabase import SupabaseAuthService
+
 from app.dependencies import check_user_authentication
-from app.models import AuthToken, Credentials, Record, settings
+from app.models import AuthToken, Credentials, Record
 from app.models.types import RecordKey
-from app.user import SupabaseUserService
+
 
 router = APIRouter(prefix="/api/v1", tags=["/api/v1"])
 
@@ -19,10 +19,9 @@ router = APIRouter(prefix="/api/v1", tags=["/api/v1"])
 async def login(
     form_data: Annotated[OAuth2PasswordRequestForm, Depends()], request: Request
 ) -> AuthToken:
-    supabase_auth_service = SupabaseAuthService(settings=settings)
 
     try:
-        sign_in_result: AuthResponse = supabase_auth_service.sign_in(
+        sign_in_result: AuthResponse = request.app.state.auth_service.sign_in(
             Credentials(
                 email=form_data.username, password=SecretStr(form_data.password)
             )
@@ -31,36 +30,29 @@ async def login(
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail=f"Unable to login. Encountered AuthException with message: {exception.message}",
-            headers={"WWW-Authenticate": "Bearer"},
         ) from exception
 
-    supabase_user_service = SupabaseUserService(
-        auth_service=supabase_auth_service, settings=settings
-    )
-
     request.app.state.anti_recommendation_engine = AntiRecommendationEngine(  # type: ignore[no-any-return]
-        user=supabase_user_service.create_user_from_token(
+        user=request.app.state.user_service.create_user_from_token(
             sign_in_result.authentication_token
         ),
-        settings=settings,
+        settings=request.app.state.settings,
     )
 
     return sign_in_result.authentication_token
 
 
 @router.get("/sign_in_anonymously")
-async def sign_in_anonymously() -> AuthToken:
-    supabase_auth_service = SupabaseAuthService(settings=settings)
+async def sign_in_anonymously(request: Request) -> AuthToken:
 
     try:
         sign_in_anonymously_result: AuthResponse = (
-            supabase_auth_service.sign_in_anonymously()
+            request.app.state.auth_service.sign_in_anonymously()
         )
     except AuthException as exception:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail=f"Unable To sign_in_anonymously. Encountered AuthException with message: {exception.message}",
-            headers={"WWW-Authenticate": "Bearer"},
         ) from exception
 
     return sign_in_anonymously_result.authentication_token
@@ -70,10 +62,9 @@ async def sign_in_anonymously() -> AuthToken:
 async def sign_up(
     form_data: Annotated[OAuth2PasswordRequestForm, Depends()], request: Request
 ) -> AuthToken:
-    supabase_auth_service = SupabaseAuthService(settings=settings)
 
     try:
-        sign_up_result: AuthResponse = supabase_auth_service.sign_up(
+        sign_up_result: AuthResponse = request.app.state.auth_service.sign_up(
             Credentials(
                 email=form_data.username, password=SecretStr(form_data.password)
             )
@@ -82,34 +73,26 @@ async def sign_up(
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail=f"Unable to signup. Encountered AuthException with message: {exception.message}",
-            headers={"WWW-Authenticate": "Bearer"},
         ) from exception
 
-    supabase_user_service = SupabaseUserService(
-        auth_service=supabase_auth_service, settings=settings
-    )
-
     request.app.state.anti_recommendation_engine = AntiRecommendationEngine(  # type: ignore[no-any-return]
-        user=supabase_user_service.create_user_from_token(
+        user=request.app.state.user_service.create_user_from_token(
             sign_up_result.authentication_token
         ),
-        settings=settings,
+        settings=request.app.state.settings,
     )
 
     return sign_up_result.authentication_token
 
 
 @router.get("/sign_out")
-async def sign_out() -> None:
-    supabase_auth_service = SupabaseAuthService(settings=settings)
-
+async def sign_out(request: Request) -> None:
     try:
-        supabase_auth_service.sign_out()
+        request.app.state.auth_service.sign_out()
     except AuthException as exception:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail=f"Unable to signout. Encountered AuthException with message: {exception.message}",
-            headers={"WWW-Authenticate": "Bearer"},
         ) from exception
 
 

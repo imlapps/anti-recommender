@@ -110,7 +110,9 @@ class SupabaseUserService(UserService):
         return tuple(database_service_result.data[0]["anti_recommendations_history"])
 
     @override
-    def get_user_last_seen_anti_recommendation(self, user_id: UserId) -> str:
+    def get_user_last_seen_anti_recommendation(
+        self, user_id: UserId
+    ) -> RecordKey | None:
         """Return the last Record key in a User's anti-recommendation history."""
 
         anti_recommendations_history = self.get_user_anti_recommendations_history(
@@ -120,7 +122,7 @@ class SupabaseUserService(UserService):
         if anti_recommendations_history:
             return anti_recommendations_history[-1]
 
-        return ""
+        return None
 
     @override
     def remove_anti_recommendations_from_user_history(
@@ -136,7 +138,7 @@ class SupabaseUserService(UserService):
             )
             match selector:
                 case AntiRecommendationsSelector.REMOVE_LAST_TWO_RECORDS:
-                    del anti_recommendations_history[-2:0]
+                    del anti_recommendations_history[-2:]
                 case _:
                     raise SupabaseUserServiceException from ValueError
 

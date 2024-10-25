@@ -272,6 +272,11 @@ def base_iri() -> NamedNode:
 
 
 @pytest.fixture(scope="session")
+def supabase_auth_service() -> SupabaseAuthService:
+    return SupabaseAuthService(settings=settings)
+
+
+@pytest.fixture(scope="session")
 def supabase_user_service() -> SupabaseUserService:
     return SupabaseUserService(
         auth_service=SupabaseAuthService(settings=settings), settings=settings
@@ -400,13 +405,15 @@ def auth_header(authentication_token: AuthToken) -> dict[str, str]:
 @pytest_asyncio.fixture(loop_scope="session")
 async def app(
     anti_recommendation_engine: AntiRecommendationEngine,
+    supabase_user_service: SupabaseUserService,
+    supabase_auth_service: SupabaseAuthService,
 ) -> AsyncIterator:
     @asynccontextmanager
     async def lifespan(app: FastAPI) -> AsyncIterator[None]:
         app.state.anti_recommendation_engine = anti_recommendation_engine
         app.state.settings = settings
-        app.state.auth_service = SupabaseAuthService(settings=settings)
-
+        app.state.auth_service = supabase_auth_service
+        app.state.user_service = supabase_user_service
         yield
 
     app = FastAPI(
