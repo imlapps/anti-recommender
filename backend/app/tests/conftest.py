@@ -46,6 +46,12 @@ def settings() -> Settings:
 
 
 @pytest.fixture(scope="session")
+def supabase_parameters(settings: Settings) -> None:
+    if not settings.supabase_url and settings.supabase_key:
+        pytest.skip(reason="don't have Supabase URL and Supabase key.")
+
+
+@pytest.fixture(scope="session")
 def all_source_reader(settings: Settings) -> AllSourceReader:
     """Return an AllSourceReader."""
 
@@ -281,7 +287,9 @@ def base_iri() -> NamedNode:
 
 
 @pytest.fixture(scope="session")
-def supabase_auth_service(settings: Settings) -> SupabaseAuthService:
+def supabase_auth_service(
+    settings: Settings, supabase_parameters: None
+) -> SupabaseAuthService:
     """Return a SupabaseAuthService object."""
 
     return SupabaseAuthService(settings=settings)
@@ -289,7 +297,8 @@ def supabase_auth_service(settings: Settings) -> SupabaseAuthService:
 
 @pytest.fixture(scope="session")
 def supabase_user_service(
-    settings: Settings, supabase_auth_service: SupabaseAuthService
+    settings: Settings,
+    supabase_auth_service: SupabaseAuthService,
 ) -> SupabaseUserService:
     """Return a SupabaseUserService object."""
 
