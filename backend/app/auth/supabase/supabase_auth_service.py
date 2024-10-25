@@ -17,7 +17,14 @@ class SupabaseAuthService(AuthService):
     """
 
     def __init__(self, settings: Settings):
-        self.__auth_client: SupabaseAuthClient = supabase.create_client(
+        self.__auth_client = self.__create_client(settings)
+
+    @staticmethod
+    def __create_client(settings: Settings) -> SupabaseAuthClient:
+        if not settings.supabase_key and not settings.supabase_url:
+            raise SupabaseAuthException
+
+        return supabase.create_client(
             supabase_url=str(settings.supabase_url),
             supabase_key=settings.supabase_key.get_secret_value(),
         ).auth

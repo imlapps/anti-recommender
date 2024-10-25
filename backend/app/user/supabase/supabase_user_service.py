@@ -22,7 +22,14 @@ class SupabaseUserService(UserService):
 
     def __init__(self, auth_service: AuthService, settings: Settings) -> None:
         self.__auth_service = auth_service
-        self.__database_client: Client = supabase.create_client(
+        self.__database_client: Client = self.__create_database_client(settings)
+
+    @staticmethod
+    def __create_database_client(settings: Settings) -> Client:
+        if not settings.supabase_url and not settings.supabase_key:
+            raise SupabaseUserServiceException
+
+        return supabase.create_client(
             str(settings.supabase_url), settings.supabase_key.get_secret_value()
         )
 
