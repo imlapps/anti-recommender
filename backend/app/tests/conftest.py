@@ -47,7 +47,7 @@ def settings() -> Settings:
 
 @pytest.fixture(scope="session")
 def supabase_parameters(settings: Settings) -> None:
-    if not settings.supabase_url and settings.supabase_key:
+    if not settings.supabase_url and not settings.supabase_key:
         pytest.skip(reason="don't have Supabase URL and Supabase key.")
 
 
