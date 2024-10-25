@@ -7,17 +7,16 @@ from pydantic import SecretStr
 
 from app.anti_recommendation_engine import AntiRecommendationEngine
 from app.auth.supabase import SupabaseAuthService
-from app.models import AuthToken, CredentialsError, settings
+from app.models import AuthToken, CredentialsError, Settings
 from app.routers import router
 from app.user import SupabaseUserService
 
 
 @asynccontextmanager
 async def lifespan(app: FastAPI) -> AsyncIterator[None]:
-    """
-    A lifespan event to persist the AntiRecommendationEngine on start up.
+    """A lifespan event to persist variables in an app's state on startup."""
 
-    """
+    settings = Settings()
     supabase_auth_service = SupabaseAuthService(settings=settings)
     supabase_user_service = SupabaseUserService(
         auth_service=supabase_auth_service, settings=settings
@@ -45,4 +44,6 @@ async def credentials_exception_handler(
     request: Request,  # noqa: ARG001
     exc: CredentialsError,  # noqa: ARG001
 ) -> RedirectResponse:
+    """Redirect to /sign_in_anonymously when a CredentialsError is encountered."""
+
     return RedirectResponse("/sign_in_anonymously")

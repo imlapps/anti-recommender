@@ -1,7 +1,6 @@
 from pathlib import Path
-from typing import Annotated
 
-from pydantic import AnyUrl, Field, SecretStr, field_validator
+from pydantic import AnyUrl, Field, FilePath, SecretStr, field_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 from pyoxigraph import NamedNode
 
@@ -17,9 +16,7 @@ class Settings(BaseSettings):
     arkg_base_iri: NamedNode = NamedNode(
         "http://imlapps.github.io/anti-recommender/anti-recommendation/"
     )
-    arkg_file_path: Annotated[
-        Path, Field(min_length=1, json_schema_extra={"strip_whitespace": "True"})
-    ] = DATA_DIRECTORY_PATH / "wikipedia_arkg_file.ttl"
+    arkg_file_path: FilePath = DATA_DIRECTORY_PATH / "wikipedia_arkg_file.ttl"
     arkg_mime_type: RdfMimeType = RdfMimeType.TURTLE
 
     anti_recommender_type: AntiRecommenderType = AntiRecommenderType.ARKG
@@ -57,6 +54,3 @@ class Settings(BaseSettings):
         """Convert the file name of an ARKG into a Path."""
 
         return DATA_DIRECTORY_PATH / arkg_file_name
-
-
-settings = Settings()
