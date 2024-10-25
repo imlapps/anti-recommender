@@ -23,8 +23,9 @@ from app.anti_recommendation_engine import AntiRecommendationEngine
 from app.anti_recommenders.arkg import ArkgAntiRecommender
 from app.anti_recommenders.openai import NormalOpenaiAntiRecommender
 from app.auth.supabase import SupabaseAuthService
-from app.models import AntiRecommendation, AuthToken, Record, settings, wikipedia
-from app.models.types import ModelResponse, RdfMimeType, RecordKey, RecordType
+from app.models import AntiRecommendation, AuthToken, Record, Settings, wikipedia
+from app.models.types import RdfMimeType, RecordKey, RecordType
+from app.models.types import StrippedString as ModelResponse
 from app.readers import AllSourceReader
 from app.readers.reader import WikipediaReader
 from app.routers import router
@@ -38,10 +39,17 @@ def openai_api_key() -> None:
 
 
 @pytest.fixture(scope="session")
-def all_source_reader() -> AllSourceReader:
+def settings() -> Settings:
+    "Return a Settings object."
+
+    return Settings()
+
+
+@pytest.fixture(scope="session")
+def all_source_reader(settings: Settings) -> AllSourceReader:
     """Return an AllSourceReader."""
 
-    return AllSourceReader()
+    return AllSourceReader(settings=settings)
 
 
 @pytest.fixture(scope="session")
@@ -69,6 +77,7 @@ def openai_normal_anti_recommender(
     openai_api_key: None,  # noqa: ARG001
 ) -> NormalOpenaiAntiRecommender:
     """Return an OpenaiNormalAntiRecommender."""
+
     return NormalOpenaiAntiRecommender()
 
 
@@ -272,25 +281,34 @@ def base_iri() -> NamedNode:
 
 
 @pytest.fixture(scope="session")
-def supabase_auth_service() -> SupabaseAuthService:
+def supabase_auth_service(settings: Settings) -> SupabaseAuthService:
+    """Return a SupabaseAuthService object."""
+
     return SupabaseAuthService(settings=settings)
 
 
 @pytest.fixture(scope="session")
-def supabase_user_service() -> SupabaseUserService:
-    return SupabaseUserService(
-        auth_service=SupabaseAuthService(settings=settings), settings=settings
-    )
+def supabase_user_service(
+    settings: Settings, supabase_auth_service: SupabaseAuthService
+) -> SupabaseUserService:
+    """Return a SupabaseUserService object."""
+
+    return SupabaseUserService(auth_service=supabase_auth_service, settings=settings)
 
 
 @pytest.fixture(scope="session")
 def user(supabase_user_service: SupabaseUserService) -> User:
+    """Return a User object."""
+
     return supabase_user_service.create_user_from_id(uuid.uuid4())
 
 
 @pytest.fixture(scope="session")
 def anti_recommendation_engine(
-    session_mocker: MockFixture, records: tuple[Record, ...], user: User
+    settings: Settings,
+    session_mocker: MockFixture,
+    records: tuple[Record, ...],
+    user: User,
 ) -> AntiRecommendationEngine:
     """Return an AntiRecommendationEngine."""
 
@@ -303,6 +321,8 @@ def anti_recommendation_engine(
 def mock_database_fetch(
     session_mocker: MockFixture, user: User, record_key: RecordKey
 ) -> None:
+    """Mock a Supabase database client's select request builder."""
+
     session_mocker.patch.object(
         SyncSelectRequestBuilder,
         "execute",
@@ -314,6 +334,8 @@ def mock_database_fetch(
 
 @pytest.fixture(scope="session")
 def mock_database_upsert(session_mocker: MockFixture) -> None:
+    """Mock a Supabase database client's upsert request builder."""
+
     session_mocker.patch.object(
         SyncQueryRequestBuilder,
         "execute",
@@ -343,11 +365,15 @@ def arkg_anti_recommender(  # noqa: PLR0913
 
 @pytest.fixture(scope="session")
 def form_data() -> OAuth2PasswordRequestForm:
+    """Return an OAuth2 password flow form data."""
+
     return OAuth2PasswordRequestForm(username="Imlapps", password="Imlapps@2024!")
 
 
 @pytest.fixture(scope="session")
 def gotrue_user(user: User) -> gotrue.User:
+    """Return a GoTrue User."""
+
     return gotrue.User(
         id=str(user.id),
         app_metadata={"app_metadata": ""},
@@ -359,6 +385,8 @@ def gotrue_user(user: User) -> gotrue.User:
 
 @pytest.fixture(scope="session")
 def session(gotrue_user: gotrue.User) -> gotrue.Session:
+    """Return a GoTrue Session."""
+
     return gotrue.Session(
         access_token=jwt.encode({"some": "payload"}, "secret", algorithm="HS256"),
         refresh_token="",
@@ -372,6 +400,8 @@ def session(gotrue_user: gotrue.User) -> gotrue.Session:
 def auth_response(
     gotrue_user: gotrue.User, session: gotrue.Session
 ) -> gotrue.AuthResponse:
+    """Return a GoTrue AuthResponse."""
+
     return gotrue.AuthResponse(
         user=gotrue_user,
         session=session,
@@ -380,11 +410,15 @@ def auth_response(
 
 @pytest.fixture(scope="session")
 def authentication_token(session: gotrue.Session) -> AuthToken:
+    """Return an authentication token."""
+
     return AuthToken(**session.model_dump())
 
 
 @pytest.fixture(scope="session")
 def mock_get_user(session_mocker: MockFixture, gotrue_user: gotrue.User) -> None:
+    """Mock a SupabaseAuthClient's get_user method."""
+
     session_mocker.patch.object(
         SupabaseAuthClient,
         "get_user",
@@ -394,6 +428,8 @@ def mock_get_user(session_mocker: MockFixture, gotrue_user: gotrue.User) -> None
 
 @pytest.fixture(scope="session")
 def auth_header(authentication_token: AuthToken) -> dict[str, str]:
+    """Return an Authorization header for HTTP requests."""
+
     if not authentication_token.access_token:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED, detail="No access token"
@@ -405,14 +441,17 @@ def auth_header(authentication_token: AuthToken) -> dict[str, str]:
 @pytest_asyncio.fixture(loop_scope="session")
 async def app(
     anti_recommendation_engine: AntiRecommendationEngine,
+    settings: Settings,
     supabase_user_service: SupabaseUserService,
     supabase_auth_service: SupabaseAuthService,
 ) -> AsyncIterator:
+    "Yield a FastAPI app from a LifespanManager."
+
     @asynccontextmanager
     async def lifespan(app: FastAPI) -> AsyncIterator[None]:
         app.state.anti_recommendation_engine = anti_recommendation_engine
-        app.state.settings = settings
         app.state.auth_service = supabase_auth_service
+        app.state.settings = settings
         app.state.user_service = supabase_user_service
         yield
 

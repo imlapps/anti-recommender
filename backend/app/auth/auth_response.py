@@ -1,6 +1,7 @@
 from abc import ABC, abstractmethod
 
 from app.models import AuthToken
+from app.models.types import UserId
 
 
 class AuthResponse(ABC):
@@ -8,5 +9,12 @@ class AuthResponse(ABC):
 
     @property
     @abstractmethod
+    def user_id(self) -> UserId:
+        """The user ID of the authenticated user."""
+        raise NotImplementedError
+
+    @property
+    @abstractmethod
     def authentication_token(self) -> AuthToken:
-        pass
+        """A new AuthToken containing parameters from an authenticated user."""
+        raise NotImplementedError

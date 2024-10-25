@@ -9,14 +9,16 @@ from pydantic import AnyUrl
 
 from app.anti_recommenders.openai import OpenaiAntiRecommender
 from app.models import AntiRecommendation
-from app.models.types import ModelQuery, ModelResponse, RecordKey, RecordType
+from app.models.types import NonBlankString as ModelQuery
+from app.models.types import NonBlankString as ModelResponse
+from app.models.types import RecordKey, RecordType
 
 
 class NormalOpenaiAntiRecommender(OpenaiAntiRecommender):
     """
     A subclass of OpenaiAntiRecommender.
 
-    NormalOpenaiAntiRecommender relies solely on the large language model's parametric knowledge to generate AntiRecommendations.
+    A NormalOpenaiAntiRecommender relies solely on the large language model's parametric knowledge to generate anti-recommendations.
     """
 
     def _build_chain(self) -> RunnableSerializable:
@@ -38,7 +40,7 @@ class NormalOpenaiAntiRecommender(OpenaiAntiRecommender):
     def _parse_llm_response(
         self, open_ai_llm_response: ModelResponse
     ) -> Iterable[AntiRecommendation]:
-        """Extract anti-recommendations from the response and yield AntiRecommendations."""
+        """Extract anti-recommendations from open_ai_llm_response, and yield anti-recommendations."""
 
         model_response_length = 3
 
@@ -62,7 +64,7 @@ class NormalOpenaiAntiRecommender(OpenaiAntiRecommender):
     def generate_anti_recommendations(
         self, *, record_key: RecordKey
     ) -> Iterable[AntiRecommendation]:
-        """Yield AntiRecommendations of a given record key, and of type record_type."""
+        """Yield anti-recommendations of a given record_key."""
 
         yield from self._generate_anti_recommendendations(
             record_key=record_key,

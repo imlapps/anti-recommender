@@ -1,2 +1,1 @@
-class UserServiceException(BaseException):
-    """"""
+class UserServiceException(BaseException): ...

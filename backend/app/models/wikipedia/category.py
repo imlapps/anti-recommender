@@ -1,11 +1,6 @@
-from typing import Annotated
+from pydantic import BaseModel
 
-from pydantic import BaseModel, Field
-
-# A custom data type for str fields in Category
-CategoryStringType = Annotated[
-    str, Field(json_schema_extra={"strip_whitespace": "True"})
-]
+from app.models.types import StrippedString as CategoryStringType
 
 
 class Category(BaseModel):

@@ -12,19 +12,19 @@ class AntiRecommendationEngine:
     """
     AntiRecommendationEngine for the NerdSwipe backend.
 
-    An AntiRecommendationEngine reaches out to an AntiRecommender to retrieve AntiRecommendations of a record_key.
+    An AntiRecommendationEngine reaches out to an AntiRecommender to retrieve anti-recommendations of a record_key.
 
     An AntiRecommendationEngine consists of:
-        - __anti_recommender: An AntiRecommnder for the AntiRecommedationEngine.
+        - __anti_recommender: An AntiRecommender for the AntiRecommedationEngine.
         - __current_anti_recommendation_records: A list of Records that are currently used for anti-recommendations.
         - __records_by_key: A dictionary of type RecordKey: Record, that holds Records obtained from storage.
         - __stack: A stack that stores a list of Records that were previously used for anti-recommendations.
         - __user: The User of the current session.
 
     An AntiRecommendationEngine also:
-        - Returns a tuple of Records that match the AntiRecommendations of the first key in __records_by_key.
-        - Returns a tuple of Records that match the AntiRecommendations of a record_key.
-        - Returns a tuple of Records that matched the previous AntiRecommendations.
+        - Returns a tuple of Records that match the anti-recommendations of the last record a User saw, or the first key in __records_by_key.
+        - Returns a tuple of Records that match the anti-recommendations of a record_key.
+        - Returns a tuple of Records that matched the previous anti-recommendations.
     """
 
     def __init__(self, user: User, settings: Settings) -> None:
@@ -33,16 +33,16 @@ class AntiRecommendationEngine:
         )
         self.__current_anti_recommendation_records: list[Record] = []
         self.__records_by_key: dict[RecordKey, Record] = {
-            record.key: record for record in AllSourceReader().read()
+            record.key: record for record in AllSourceReader(settings=settings).read()
         }
         self.__stack: list[list[Record]] = []
         self.__user = user
 
     def __select_anti_recommender(self, settings: Settings) -> AntiRecommender:
         """
-        Select and return an `AntiRecommender` based on values stored in `settings`.
+        Select and return an AntiRecommender based on values stored in settings.
 
-        An `ArkgAntiRecommender` is the default AntiRecommender selection.
+        An ArkgAntiRecommender is the default AntiRecommender selection.
         """
 
         if (
@@ -72,7 +72,7 @@ class AntiRecommendationEngine:
         return self.next_records(record_key=next(iter(self.__records_by_key.keys())))
 
     def next_records(self, *, record_key: RecordKey) -> tuple[Record, ...]:
-        """Return a tuple of Records that have the same key as the AntiRecommendations of record_key."""
+        """Return a tuple of Records that have the same key as the anti-recommendations of record_key."""
 
         records_of_anti_recommendations: list[Record] = []
 
@@ -103,7 +103,7 @@ class AntiRecommendationEngine:
 
     def previous_records(self) -> tuple[Record, ...]:
         """
-        Return a tuple of Records that matched the previous AntiRecommendations.
+        Return a tuple of Records that matched the previous anti-recommendations.
 
         Return an empty tuple if there were no such Records.
         """

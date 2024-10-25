@@ -6,12 +6,11 @@ from app.models.types import RecordKey
 
 
 class AntiRecommender(ABC):
-    """
-    An interface to generate AntiRecommendations of a record.
-    """
+    """An interface for an AntiRecommender."""
 
     @abstractmethod
     def generate_anti_recommendations(
         self, *, record_key: RecordKey
     ) -> Iterable[AntiRecommendation]:
-        pass
+        """Generate anti-recommendations of a record_key."""
+        raise NotImplementedError

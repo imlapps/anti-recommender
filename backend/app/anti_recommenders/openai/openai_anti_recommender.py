@@ -5,14 +5,16 @@ from langchain.schema.runnable import RunnableSerializable
 
 from app.anti_recommenders.anti_recommender import AntiRecommender
 from app.models import AntiRecommendation
-from app.models.types import ModelQuery, ModelResponse, RecordKey
+from app.models.types import NonBlankString as ModelQuery
+from app.models.types import NonBlankString as ModelResponse
+from app.models.types import RecordKey
 
 
 class OpenaiAntiRecommender(AntiRecommender):
     """
     A concrete implementation of AntiRecommender.
 
-    OpenaiAntiRecommender uses OpenAI's large language model to generate AntiRecommendations.
+    An OpenaiAntiRecommender uses OpenAI's large language model to generate anti-recommendations.
     """
 
     def __init__(self) -> None:
@@ -25,7 +27,7 @@ class OpenaiAntiRecommender(AntiRecommender):
                 """
 
     def _create_query(self, record_key: RecordKey) -> ModelQuery:
-        """Create a query for the large language model with the given record key."""
+        """Create a query for the large language model with the given record_key."""
 
         return (
             "What are 10 Wikipedia articles on the featured list that are dissimilar but surprisingly similar to the \
@@ -46,7 +48,7 @@ class OpenaiAntiRecommender(AntiRecommender):
         ],
         parse_llm_response: Callable[[ModelResponse], Iterable[AntiRecommendation]],
     ) -> Iterable[AntiRecommendation]:
-        """Create a generalized workflow that yields AntiRecommendations."""
+        """Create a generalized workflow that yields anti-recommendations."""
 
         open_ai_chain = build_chain()
         open_ai_query = create_query(record_key)
@@ -60,4 +62,5 @@ class OpenaiAntiRecommender(AntiRecommender):
     def generate_anti_recommendations(
         self, *, record_key: RecordKey
     ) -> Iterable[AntiRecommendation]:
-        pass
+        """Generate anti-recommendations of a record_key."""
+        raise NotImplementedError

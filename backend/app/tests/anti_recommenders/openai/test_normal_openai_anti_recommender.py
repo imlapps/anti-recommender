@@ -3,7 +3,8 @@ from pytest_mock import MockFixture
 
 from app.anti_recommenders.openai import NormalOpenaiAntiRecommender
 from app.models import AntiRecommendation
-from app.models.types import ModelResponse, RecordKey
+from app.models.types import RecordKey
+from app.models.types import StrippedString as ModelResponse
 
 
 def test_build_chain(

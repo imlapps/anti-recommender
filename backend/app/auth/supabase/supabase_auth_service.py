@@ -11,9 +11,9 @@ from app.models import AuthToken, Credentials, Settings
 
 class SupabaseAuthService(AuthService):
     """
-    A concrete implementation of `AuthService`.
+    A concrete implementation of AuthService.
 
-    A `SupabaseAuthService` uses Supabase Auth to authenticate a `User`.
+    A SupabaseAuthService uses Supabase Auth to authenticate a User.
     """
 
     def __init__(self, settings: Settings):
@@ -21,6 +21,8 @@ class SupabaseAuthService(AuthService):
 
     @staticmethod
     def __create_client(settings: Settings) -> SupabaseAuthClient:
+        """Return a Supabase auth client, if Supabase URL and Supabase key are present in Settings."""
+
         if settings.supabase_key and settings.supabase_url:
             return supabase.create_client(
                 supabase_url=str(settings.supabase_url),
@@ -32,10 +34,11 @@ class SupabaseAuthService(AuthService):
     @override
     def get_user(self, authentication_token: AuthToken) -> SupabaseAuthResponse:
         """
-        Return a SupabaseAuthResponse containing a Supabase user that corresponds to `authentication_token`.
+        Return a SupabaseAuthResponse containing a Supabase user that corresponds to authentication_token.
 
         If no such user is found, invoke SupabaseAuthService.sign_in_anonymously.
         """
+
         try:
             supabase_user_result = self.__auth_client.get_user(
                 authentication_token.access_token.get_secret_value()

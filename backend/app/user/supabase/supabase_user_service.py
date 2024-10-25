@@ -14,9 +14,9 @@ from app.user import User, UserService, UserServiceException
 
 class SupabaseUserService(UserService):
     """
-    A concrete implementation of `UserService`.
+    A concrete implementation of UserService.
 
-    A `SupabaseUserService` uses a Supabase database to manage the state of a `User`.
+    A SupabaseUserService uses a Supabase database to manage the state of a User.
     """
 
     def __init__(self, auth_service: AuthService, settings: Settings) -> None:
@@ -25,6 +25,8 @@ class SupabaseUserService(UserService):
 
     @staticmethod
     def __create_database_client(settings: Settings) -> Client:
+        """Return a Supabase database client, if Supabase URL and Supabase key are present in Settings."""
+
         if settings.supabase_url and settings.supabase_key:
             return supabase.create_client(
                 str(settings.supabase_url), settings.supabase_key.get_secret_value()
@@ -39,9 +41,9 @@ class SupabaseUserService(UserService):
         self, *, table_name: str, columns: str, eq: dict
     ) -> APIResponse:
         """
-        Run a `SELECT` query on a table with the name `table_name`.
+        Run a SELECT query on a table with the name table_name.
 
-        An `equal_to` filter is added to the query via the `eq` parameter.
+        An equal_to filter is added to the query via the eq parameter.
         """
 
         return (
@@ -52,11 +54,11 @@ class SupabaseUserService(UserService):
         self, *, table_name: str, json: dict | tuple, constraint: str = ""
     ) -> APIResponse:
         """
-        Run an `UPSERT` query on a table with the name `table_name`.
+        Run an UPSERT query on a table with the name table_name.
 
-        An `UPDATE` query is run if there is a column conflict with `constraint`.
+        An UPDATE query is run if there is a column conflict with constraint.
 
-        An `INSERT` query is run otherwise.
+        An INSERT query is run otherwise.
         """
 
         upsert_json: dict | list = list(json) if isinstance(json, tuple) else json
@@ -71,7 +73,7 @@ class SupabaseUserService(UserService):
     def add_to_user_anti_recommendations_history(
         self, *, user_id: UserId, anti_recommendation_key: RecordKey
     ) -> None:
-        """Append `anti_recommendation_key` to a User's anti-recommendation history."""
+        """Append anti_recommendation_key to a User's anti-recommendation history."""
 
         try:
             anti_recommendations_history = list(
@@ -129,6 +131,8 @@ class SupabaseUserService(UserService):
         user_id: UserId,
         selector: AntiRecommendationsSelector,
     ) -> None:
+        """Use selector to remove anti-recommendations from a User's history."""
+
         try:
             anti_recommendations_history = list(
                 self.get_user_anti_recommendations_history(user_id)
@@ -151,13 +155,13 @@ class SupabaseUserService(UserService):
             raise UserServiceException from exception
 
     def create_user_from_id(self, user_id: UserId) -> User:
-        """Return a new User, with an id matching `user_id`."""
+        """Return a new User, with an id that matches user_id."""
 
         return User(id=user_id, _service=self)
 
     def create_user_from_token(self, authentication_token: AuthToken) -> User:
         """
-        Return a new `User` with an id that corresponds to an `authentication_token`.
+        Return a new User with an id that corresponds to an authentication_token.
 
         If no such User is found, return a new User with an anonymous id.
         """

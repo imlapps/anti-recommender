@@ -15,9 +15,9 @@ from app.user import User
 
 class ArkgAntiRecommender(AntiRecommender):
     """
-    A concrete implementation of `AntiRecommender`.
+    A concrete implementation of AntiRecommender.
 
-    `ArkgAntiRecommender` uses information stored in an Anti-Recommendation Knowledge Graph to generate `AntiRecommendations`.
+    An ArkgAntiRecommender uses information stored in an Anti-Recommendation Knowledge Graph to generate anti-recommendations.
     """
 
     def __init__(
@@ -40,7 +40,7 @@ class ArkgAntiRecommender(AntiRecommender):
     def __load_store(
         base_iri: ox.NamedNode, file_path: Path, mime_type: RdfMimeType
     ) -> ox.Store:
-        """Load an `ARKG` serialization into an `RDF Store`."""
+        """Load an ARKG serialization into an RDF Store."""
 
         store = ox.Store()
         store.load(
@@ -53,7 +53,7 @@ class ArkgAntiRecommender(AntiRecommender):
     def __retrieve_anti_recommendations_from_store(
         self, record_key: RecordKey
     ) -> tuple[RecordKey, ...]:
-        """Return a tuple of `AntiRecommendations` that have been retrieved from an `ARKG Store`."""
+        """Return a tuple of anti-recommendations that have been retrieved from an ARKG Store."""
 
         return tuple(
             binding["title"].value
@@ -69,11 +69,11 @@ class ArkgAntiRecommender(AntiRecommender):
         """
         Select and return a primary anti-recommendation key.
 
-        A primary anti-recommendation key is a `Recordkey` that has not yet been visited by a `User`.
+        A primary anti-recommendation key is a Recordkey that has not yet been visited by a User.
 
-        A primary anti-recommendation key is first looked for in `anti_recommendation_keys`
+        A primary anti-recommendation key is first looked for in anti_recommendation_keys.
 
-        If no unseen key is found in anti_recommendation_keys, the first unseen key in `__record_keys` is returned.
+        If no unseen key is found in anti_recommendation_keys, the first unseen key in __record_keys is returned.
         """
 
         anti_recommendations_history = list(self.__user.anti_recommendations_history)
@@ -97,11 +97,11 @@ class ArkgAntiRecommender(AntiRecommender):
         self, *, record_key: RecordKey
     ) -> Iterable[AntiRecommendation]:
         """
-        Generate anti-recommendations of a `Record`.
+        Generate AntiRecommendations of a record_key.
 
-        Anti-recommendations are obtained from an `ARKG`.
+        Anti-recommendations are obtained from an ARKG.
 
-        The first anti-recommendation generated is an anti-recommendation that has not yet been seen by a `User`.
+        The first anti-recommendation generated is an anti-recommendation that has not yet been seen by a User.
 
         All other anti-recommendations may or may not have been seen by a User.
         """

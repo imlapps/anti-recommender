@@ -1,2 +1,1 @@
-class CredentialsError(Exception):
-    """"""
+class CredentialsError(Exception): ...
