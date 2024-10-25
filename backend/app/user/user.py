@@ -25,7 +25,7 @@ class User:
         return self._service.get_user_anti_recommendations_history(self.id)
 
     @property
-    def last_seen_anti_recommendation_key(self) -> RecordKey:
+    def last_seen_anti_recommendation_key(self) -> RecordKey | None:
         """The last anti-recommendation that was seen by a `User`."""
 
         return self._service.get_user_last_seen_anti_recommendation(self.id)

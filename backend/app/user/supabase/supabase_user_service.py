@@ -4,13 +4,12 @@ import supabase
 from postgrest import APIError, APIResponse
 from supabase import Client
 
-from app.auth import AuthService
-from app.auth.supabase import SupabaseAuthException, SupabaseAuthResponse
+from app.auth import AuthException, AuthService
+from app.auth.supabase import SupabaseAuthResponse
 from app.constants import ARKG_ANTI_RECOMMENDER_USER_STATE_TABLE_NAME
 from app.models import AntiRecommendationsSelector, AuthToken, Settings
 from app.models.types import RecordKey, UserId
-from app.user import User, UserService
-from app.user.supabase import SupabaseUserServiceException
+from app.user import User, UserService, UserServiceException
 
 
 class SupabaseUserService(UserService):
@@ -26,12 +25,15 @@ class SupabaseUserService(UserService):
 
     @staticmethod
     def __create_database_client(settings: Settings) -> Client:
-        if not settings.supabase_url and not settings.supabase_key:
-            raise SupabaseUserServiceException
+        if settings.supabase_url and settings.supabase_key:
+            return supabase.create_client(
+                str(settings.supabase_url), settings.supabase_key.get_secret_value()
+            )
 
-        return supabase.create_client(
-            str(settings.supabase_url), settings.supabase_key.get_secret_value()
+        msg = (
+            "Cannot use Supabase database client without Supabase URL and Supabase key."
         )
+        raise UserServiceException(msg)
 
     def __fetch_from_database(
         self, *, table_name: str, columns: str, eq: dict
@@ -86,9 +88,7 @@ class SupabaseUserService(UserService):
                 constraint=str(user_id),
             )
         except APIError as exception:
-            raise SupabaseUserServiceException(
-                message=f"Unable to add anti-recommendation to history of User with id {user_id}. Encountered database exception: {exception.message}"
-            ) from exception
+            raise UserServiceException from exception
 
     @override
     def get_user_anti_recommendations_history(
@@ -103,9 +103,7 @@ class SupabaseUserService(UserService):
                 eq={"column": "user_id", "value": str(user_id)},
             )
         except APIError as exception:
-            raise SupabaseUserServiceException(
-                message=f"Unable to get anti-recommendation history of User with id: {user_id}. Encountered database exception: {exception.message}"
-            ) from exception
+            raise UserServiceException from exception
 
         return tuple(database_service_result.data[0]["anti_recommendations_history"])
 
@@ -131,7 +129,6 @@ class SupabaseUserService(UserService):
         user_id: UserId,
         selector: AntiRecommendationsSelector,
     ) -> None:
-
         try:
             anti_recommendations_history = list(
                 self.get_user_anti_recommendations_history(user_id)
@@ -140,7 +137,7 @@ class SupabaseUserService(UserService):
                 case AntiRecommendationsSelector.REMOVE_LAST_TWO_RECORDS:
                     del anti_recommendations_history[-2:]
                 case _:
-                    raise SupabaseUserServiceException from ValueError
+                    raise UserServiceException from ValueError
 
             self.__upsert_into_database(
                 table_name=ARKG_ANTI_RECOMMENDER_USER_STATE_TABLE_NAME,
@@ -151,9 +148,7 @@ class SupabaseUserService(UserService):
             )
 
         except APIError as exception:
-            raise SupabaseUserServiceException(
-                message=f"Unable to remove anti-recommendation from history of User with id {user_id}. Encountered database exception: {exception.message}"
-            ) from exception
+            raise UserServiceException from exception
 
     def create_user_from_id(self, user_id: UserId) -> User:
         """Return a new User, with an id matching `user_id`."""
@@ -171,9 +166,7 @@ class SupabaseUserService(UserService):
             user_result = cast(
                 SupabaseAuthResponse, self.__auth_service.get_user(authentication_token)
             )
-        except SupabaseAuthException as exception:
-            raise SupabaseUserServiceException(
-                message=f"Unable to create new User. Encountered authentication exception: {exception.message}"
-            ) from exception
+        except AuthException as exception:
+            raise UserServiceException from exception
 
         return self.create_user_from_id(user_result.user_id)

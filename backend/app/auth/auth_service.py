@@ -20,7 +20,7 @@ class AuthService(ABC):
         pass
 
     @abstractmethod
-    def sign_out(self) -> AuthResponse:
+    def sign_out(self) -> None:
         pass
 
     @abstractmethod

@@ -20,7 +20,9 @@ class UserService(ABC):
         pass
 
     @abstractmethod
-    def get_user_last_seen_anti_recommendation(self, user_id: UserId) -> RecordKey:
+    def get_user_last_seen_anti_recommendation(
+        self, user_id: UserId
+    ) -> RecordKey | None:
         pass
 
     @abstractmethod

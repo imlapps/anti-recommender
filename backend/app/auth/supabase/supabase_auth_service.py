@@ -4,8 +4,8 @@ import supabase
 from gotrue.types import AuthResponse
 from supabase import AuthError, AuthInvalidCredentialsError, SupabaseAuthClient
 
-from app.auth import AuthService
-from app.auth.supabase import SupabaseAuthException, SupabaseAuthResponse
+from app.auth import AuthException, AuthService
+from app.auth.supabase import SupabaseAuthResponse
 from app.models import AuthToken, Credentials, Settings
 
 
@@ -21,13 +21,13 @@ class SupabaseAuthService(AuthService):
 
     @staticmethod
     def __create_client(settings: Settings) -> SupabaseAuthClient:
-        if not settings.supabase_key and not settings.supabase_url:
-            raise SupabaseAuthException
-
-        return supabase.create_client(
-            supabase_url=str(settings.supabase_url),
-            supabase_key=settings.supabase_key.get_secret_value(),
-        ).auth
+        if settings.supabase_key and settings.supabase_url:
+            return supabase.create_client(
+                supabase_url=str(settings.supabase_url),
+                supabase_key=settings.supabase_key.get_secret_value(),
+            ).auth
+        msg = "Cannot use Supabase auth client without Supabase URL and Supabase key."
+        raise AuthException(msg)
 
     @override
     def get_user(self, authentication_token: AuthToken) -> SupabaseAuthResponse:
@@ -41,7 +41,7 @@ class SupabaseAuthService(AuthService):
                 authentication_token.access_token.get_secret_value()
             )
         except AuthError as exception:
-            raise SupabaseAuthException(exception) from exception
+            raise AuthException from exception
 
         if not supabase_user_result.user:
             return self.sign_in_anonymously()
@@ -57,7 +57,7 @@ class SupabaseAuthService(AuthService):
                 **authentication_credentials
             )
         except AuthInvalidCredentialsError as exception:
-            raise SupabaseAuthException(exception) from exception
+            raise AuthException from exception
 
         return SupabaseAuthResponse(supabase_sign_in_result)
 
@@ -72,7 +72,7 @@ class SupabaseAuthService(AuthService):
                 self.__auth_client.sign_in_anonymously()
             )
         except AuthInvalidCredentialsError as exception:
-            raise SupabaseAuthException(exception) from exception
+            raise AuthException from exception
 
         return SupabaseAuthResponse(supabase_sign_in_anonymously_result)
 
@@ -85,16 +85,15 @@ class SupabaseAuthService(AuthService):
                 **authentication_credentials
             )
         except AuthInvalidCredentialsError as exception:
-            raise SupabaseAuthException(exception) from exception
+            raise AuthException from exception
 
         return SupabaseAuthResponse(supabase_sign_up_result)
 
     @override
-    def sign_out(self) -> SupabaseAuthResponse:
+    def sign_out(self) -> None:
         """Sign out from Supabase Auth."""
 
-        self.__auth_client.sign_out()
-
-        return SupabaseAuthResponse(
-            AuthResponse(session=self.__auth_client.get_session())
-        )
+        try:
+            self.__auth_client.sign_out()
+        except AuthError as exception:
+            raise AuthException from exception

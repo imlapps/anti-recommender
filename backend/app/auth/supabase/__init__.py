@@ -1,7 +1,4 @@
 # isort: skip_file
-from .supabase_auth_exception import (
-    SupabaseAuthException as SupabaseAuthException,
-)
 
 from .supabase_auth_response import SupabaseAuthResponse as SupabaseAuthResponse
 

@@ -26,6 +26,4 @@ async def check_user_authentication(
             authentication_token=AuthToken(access_token=access_token)
         )
     except AuthException as exception:
-        raise CredentialsError(
-            detail=f"Could not validate credentials. Encountered exception: {exception.message}"
-        ) from exception
+        raise CredentialsError from exception
