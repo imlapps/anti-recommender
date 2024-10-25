@@ -24,10 +24,10 @@ class UserService(ABC):
         pass
 
     @abstractmethod
-    def remove_slice_from_user_anti_recommendations_history(
+    def remove_anti_recommendations_from_user_history(
         self,
         *,
         user_id: UserId,
-        anti_recommendations_slice: AntiRecommendationsSelector.Slice,
+        selector: AntiRecommendationsSelector,
     ) -> None:
         pass

@@ -110,8 +110,8 @@ class AntiRecommendationEngine:
 
         if self.__stack:
             # Remove the last 2 anti-recommendations from a user's history.
-            self.__user.remove_anti_recommendations_slice_from_history(
-                AntiRecommendationsSelector.SELECT_ALL_BUT_LAST_TWO_RECORDS
+            self.__user.remove_anti_recommendations_from_history(
+                AntiRecommendationsSelector.REMOVE_LAST_TWO_RECORDS
             )
 
             return tuple(self.__stack.pop())

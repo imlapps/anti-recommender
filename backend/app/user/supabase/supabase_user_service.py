@@ -123,22 +123,22 @@ class SupabaseUserService(UserService):
         return ""
 
     @override
-    def remove_slice_from_user_anti_recommendations_history(
+    def remove_anti_recommendations_from_user_history(
         self,
         *,
         user_id: UserId,
-        anti_recommendations_slice: AntiRecommendationsSelector.Slice,
+        selector: AntiRecommendationsSelector,
     ) -> None:
-        """
-        Remove a slice of anti-recommendations from a User's anti-recommendation history.
 
-        """
         try:
             anti_recommendations_history = list(
                 self.get_user_anti_recommendations_history(user_id)
-            )[
-                anti_recommendations_slice.start_index : anti_recommendations_slice.end_index
-            ]
+            )
+            match selector:
+                case AntiRecommendationsSelector.REMOVE_LAST_TWO_RECORDS:
+                    del anti_recommendations_history[-2:0]
+                case _:
+                    raise SupabaseUserServiceException from ValueError
 
             self.__upsert_into_database(
                 table_name=ARKG_ANTI_RECOMMENDER_USER_STATE_TABLE_NAME,

@@ -39,11 +39,11 @@ class User:
             user_id=self.id, anti_recommendation_key=anti_recommendation_key
         )
 
-    def remove_anti_recommendations_slice_from_history(
-        self, anti_recommendations_slice: AntiRecommendationsSelector.Slice
+    def remove_anti_recommendations_from_history(
+        self, selector: AntiRecommendationsSelector
     ) -> None:
         """Remove a slice of anti-recommendations from a `User` history."""
 
-        self._service.remove_slice_from_user_anti_recommendations_history(
-            user_id=self.id, anti_recommendations_slice=anti_recommendations_slice
+        self._service.remove_anti_recommendations_from_user_history(
+            user_id=self.id, selector=selector
         )
