@@ -288,7 +288,8 @@ def base_iri() -> NamedNode:
 
 @pytest.fixture(scope="session")
 def supabase_auth_service(
-    settings: Settings, supabase_parameters: None
+    settings: Settings,
+    supabase_parameters: None,  # noqa: ARG001
 ) -> SupabaseAuthService:
     """Return a SupabaseAuthService object."""
 
