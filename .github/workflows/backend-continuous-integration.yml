@@ -8,6 +8,9 @@ jobs:
   backend-continuous-integration:
     name: Build and test
     runs-on: ubuntu-latest
+    env:
+      SUPABASE_URL: ${{ secrets.SUPABASE_URL}}
+      SUPABASE_KEY: ${{ secrets.SUPABASE_KEY}}
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
@@ -26,9 +29,6 @@ jobs:
       - name: Install dependencies
         if: steps.cached-poetry-dependencies.outputs.cache-hit != 'true'
         run: script/backend/bootstrap
-        env:
-          SUPABASE_URL: ${{ secrets.SUPABASE_URL}}
-          SUPABASE_KEY: ${{ secrets.SUPABASE_KEY}}
       - name: Format app
         run: script/backend/format
       - name: Run tests
