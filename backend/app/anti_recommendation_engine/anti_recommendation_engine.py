@@ -28,13 +28,13 @@ class AntiRecommendationEngine:
     """
 
     def __init__(self, user: User, settings: Settings) -> None:
-        self.__anti_recommender: AntiRecommender = self.__select_anti_recommender(
-            settings
-        )
         self.__current_anti_recommendation_records: list[Record] = []
         self.__records_by_key: dict[RecordKey, Record] = {
             record.key: record for record in AllSourceReader(settings=settings).read()
         }
+        self.__anti_recommender: AntiRecommender = self.__select_anti_recommender(
+            settings
+        )
         self.__stack: list[list[Record]] = []
         self.__user = user
 
