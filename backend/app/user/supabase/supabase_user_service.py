@@ -97,7 +97,6 @@ class SupabaseUserService(UserService):
         """
         Retrieve a user ID from __auth_service, and return a new User with a matching ID.
         """
-
         return self.create_user_from_id(self.__retrieve_user_id(authentication_token))
 
     @override
