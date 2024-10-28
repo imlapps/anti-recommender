@@ -15,12 +15,6 @@ class SupabaseAuthResponse(AuthResponse):
     supabase_auth_response: gotrue.AuthResponse
 
     @property
-    def authenticated_user(self) -> gotrue.User:
-        """The authenticated Supabase user."""
-
-        return self.supabase_auth_response.user
-
-    @property
     def user_id(self) -> UserId:
         """The user ID of the authenticated Supabase user."""
 

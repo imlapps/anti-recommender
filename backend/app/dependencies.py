@@ -4,7 +4,7 @@ from fastapi import Depends, Request
 from fastapi.security import OAuth2PasswordBearer
 from pydantic import SecretStr
 
-from app.auth import AuthException
+from app.auth import AuthException, UserResponse
 from app.models import AuthToken, CredentialsError
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="login")
@@ -20,8 +20,11 @@ async def check_user_authentication(
     """
 
     try:
-        request.app.state.auth_service.get_user(
+        user_response: UserResponse = request.app.state.auth_service.get_user(
             authentication_token=AuthToken(access_token=access_token)
         )
     except AuthException as exception:
         raise CredentialsError from exception
+
+    if not user_response.user_id:
+        raise CredentialsError

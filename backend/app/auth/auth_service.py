@@ -1,6 +1,6 @@
 from abc import ABC, abstractmethod
 
-from app.auth import AuthResponse
+from app.auth import AuthResponse, UserResponse
 from app.models import AuthToken, Credentials
 
 
@@ -8,7 +8,7 @@ class AuthService(ABC):
     """An interface to authenticate a User on the NerdSwipe backend."""
 
     @abstractmethod
-    def get_user(self, authentication_token: AuthToken) -> AuthResponse:
+    def get_user(self, authentication_token: AuthToken) -> UserResponse:
         raise NotImplementedError
 
     @abstractmethod

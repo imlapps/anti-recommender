@@ -1,11 +1,10 @@
 from typing import override
 
 import supabase
-from gotrue.types import AuthResponse
 from supabase import AuthError, AuthInvalidCredentialsError, SupabaseAuthClient
 
 from app.auth import AuthException, AuthService
-from app.auth.supabase import SupabaseAuthResponse
+from app.auth.supabase import SupabaseAuthResponse, SupabaseUserResponse
 from app.models import AuthToken, Credentials, Settings
 
 
@@ -32,11 +31,9 @@ class SupabaseAuthService(AuthService):
         raise AuthException(msg)
 
     @override
-    def get_user(self, authentication_token: AuthToken) -> SupabaseAuthResponse:
+    def get_user(self, authentication_token: AuthToken) -> SupabaseUserResponse:
         """
-        Return a SupabaseAuthResponse containing a Supabase user that corresponds to authentication_token.
-
-        If no such user is found, invoke SupabaseAuthService.sign_in_anonymously.
+        Return a SupabaseUserResponse containing a Supabase user that corresponds to authentication_token.
         """
 
         try:
@@ -46,10 +43,7 @@ class SupabaseAuthService(AuthService):
         except AuthError as exception:
             raise AuthException from exception
 
-        if not supabase_user_result.user:
-            return self.sign_in_anonymously()
-
-        return SupabaseAuthResponse(AuthResponse(user=supabase_user_result.user))
+        return SupabaseUserResponse(supabase_user_result)
 
     @override
     def sign_in(self, authentication_credentials: Credentials) -> SupabaseAuthResponse:

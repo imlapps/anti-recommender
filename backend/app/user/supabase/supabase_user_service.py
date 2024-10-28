@@ -1,11 +1,10 @@
-from typing import cast, override
+from typing import override
 
 import supabase
 from postgrest import APIError, APIResponse
 from supabase import Client
 
 from app.auth import AuthException, AuthService
-from app.auth.supabase import SupabaseAuthResponse
 from app.constants import ARKG_ANTI_RECOMMENDER_USER_STATE_TABLE_NAME
 from app.models import AntiRecommendationsSelector, AuthToken, Settings
 from app.models.types import RecordKey, UserId
@@ -155,22 +154,33 @@ class SupabaseUserService(UserService):
             raise UserServiceException from exception
 
     def create_user_from_id(self, user_id: UserId) -> User:
-        """Return a new User, with an id that matches user_id."""
+        """Return a new User, with an ID that matches user_id."""
 
         return User(id=user_id, _service=self)
 
-    def create_user_from_token(self, authentication_token: AuthToken) -> User:
+    def __retrieve_user_id(self, authentication_token: AuthToken) -> UserId:
         """
-        Return a new User with an id that corresponds to an authentication_token.
+        Return a user ID that corresponds to an authentication_token.
 
-        If no such User is found, return a new User with an anonymous id.
+        If no such user ID is found, return an anonymous user ID.
         """
 
         try:
-            user_result = cast(
-                SupabaseAuthResponse, self.__auth_service.get_user(authentication_token)
-            )
+            user_response = self.__auth_service.get_user(authentication_token)
         except AuthException as exception:
             raise UserServiceException from exception
 
-        return self.create_user_from_id(user_result.user_id)
+        if user_response.user_id:
+            return user_response.user_id
+
+        try:
+            return self.__auth_service.sign_in_anonymously().user_id
+        except AuthException as exception:
+            raise UserServiceException from exception
+
+    def create_user_from_token(self, authentication_token: AuthToken) -> User:
+        """
+        Retrieve a user ID from __auth_service, and return a new User with a matching ID.
+        """
+
+        return self.create_user_from_id(self.__retrieve_user_id(authentication_token))
