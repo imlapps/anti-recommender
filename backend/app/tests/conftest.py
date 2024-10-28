@@ -24,7 +24,7 @@ from app.anti_recommenders.arkg import ArkgAntiRecommender
 from app.anti_recommenders.openai import NormalOpenaiAntiRecommender
 from app.auth.supabase import SupabaseAuthService
 from app.models import AntiRecommendation, AuthToken, Record, Settings, wikipedia
-from app.models.types import RdfMimeType, RecordKey, RecordType
+from app.models.types import RdfMimeType, RecordKey
 from app.models.types import StrippedString as ModelResponse
 from app.readers import AllSourceReader
 from app.readers.reader import WikipediaReader
@@ -39,16 +39,49 @@ def openai_api_key() -> None:
 
 
 @pytest.fixture(scope="session")
-def settings() -> Settings:
-    "Return a Settings object."
-
-    return Settings()
-
-
-@pytest.fixture(scope="session")
 def supabase_parameters(settings: Settings) -> None:
     if not settings.supabase_url and not settings.supabase_key:
         pytest.skip(reason="don't have Supabase URL and Supabase key.")
+
+
+@pytest.fixture(scope="session")
+def test_data_directory_path() -> Path:
+    """Return the Path of test data files."""
+
+    return Path(__file__).parent.parent.absolute() / "data" / "test"
+
+
+@pytest.fixture(scope="session")
+def wikipedia_output_file_path(test_data_directory_path: Path) -> Path:
+    """Return the Path of the Wikipedia output file."""
+
+    wikipedia_output_file_path = test_data_directory_path / "mini-wikipedia.output.txt"
+    if wikipedia_output_file_path.exists():
+        return wikipedia_output_file_path
+
+    pytest.skip(reason="don't have Wikipedia output test file.")
+
+
+@pytest.fixture(scope="session")
+def arkg_file_path(test_data_directory_path: Path) -> Path:
+    """Return the file path of a Wikipedia ARKG."""
+
+    wikipedia_arkg_file_path = test_data_directory_path / "wikipedia_arkg.ttl"
+
+    if wikipedia_arkg_file_path.exists():
+        return wikipedia_arkg_file_path
+
+    pytest.skip(reason="don't have Wikipedia ARKG test file.")
+
+
+@pytest.fixture(scope="session")
+def settings(wikipedia_output_file_path: Path, arkg_file_path: Path) -> Settings:
+    "Return a Settings object."
+
+    _settings = Settings()
+    _settings.arkg_file_path = arkg_file_path
+    _settings.output_file_paths = frozenset([wikipedia_output_file_path])
+    return _settings
 
 
 @pytest.fixture(scope="session")
@@ -56,19 +89,6 @@ def all_source_reader(settings: Settings) -> AllSourceReader:
     """Return an AllSourceReader."""
 
     return AllSourceReader(settings=settings)
-
-
-@pytest.fixture(scope="session")
-def wikipedia_output_file_path() -> Path:
-    """Return the Path of the Wikipedia output file."""
-
-    wikipedia_output_file_path = (
-        Path(__file__).parent.parent.absolute() / "data" / "mini-wikipedia.output.txt"
-    )
-    if wikipedia_output_file_path.exists():
-        return wikipedia_output_file_path
-
-    pytest.skip(reason="don't have Wikipedia ARKG test file.")
 
 
 @pytest.fixture(scope="session")
@@ -92,13 +112,6 @@ def record_key() -> RecordKey:
     """Return a sample record key."""
 
     return "Nikola_Tesla"
-
-
-@pytest.fixture(scope="session")
-def record_type() -> RecordType:
-    """Return a sample record type."""
-
-    return RecordType.WIKIPEDIA
 
 
 @pytest.fixture(scope="session")
@@ -257,19 +270,6 @@ def records_by_key(records: tuple[Record, ...]) -> dict[RecordKey, Record]:
         _records_by_key[record.key] = record
 
     return _records_by_key
-
-
-@pytest.fixture(scope="session")
-def arkg_file_path() -> Path:
-    """Return the file path of a Wikipedia ARKG."""
-
-    wikipedia_arkg_file_path = (
-        Path(__file__).parent.parent.absolute() / "data" / "wikipedia_arkg.ttl"
-    )
-    if wikipedia_arkg_file_path.exists():
-        return wikipedia_arkg_file_path
-
-    pytest.skip(reason="don't have Wikipedia ARKG test file.")
 
 
 @pytest.fixture(scope="session")
