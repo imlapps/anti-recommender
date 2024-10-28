@@ -14,6 +14,12 @@ class SupabaseUserResponse(UserResponse):
     supabase_user_response: gotrue.UserResponse | None
 
     @property
+    def succeeded(self) -> bool:
+        """Returns True if a Supabase user response is present, and False otherwise."""
+
+        return self.supabase_user_response is not None
+
+    @property
     def user_id(self) -> UserId | None:
         """The user ID of the Supabase user."""
 

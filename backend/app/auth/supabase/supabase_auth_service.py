@@ -27,7 +27,7 @@ class SupabaseAuthService(AuthService):
                 supabase_url=str(settings.supabase_url),
                 supabase_key=settings.supabase_key.get_secret_value(),
             ).auth
-        msg = "Cannot use Supabase auth client without Supabase URL and Supabase key."
+        msg = "Cannot use Supabase Auth without Supabase URL and Supabase key."
         raise AuthException(msg)
 
     @override
@@ -47,7 +47,7 @@ class SupabaseAuthService(AuthService):
 
     @override
     def sign_in(self, authentication_credentials: Credentials) -> SupabaseAuthResponse:
-        """Sign in to Supabase Auth, and return a SupabaseAuthResponse containing a Supabase user."""
+        """Sign in to Supabase Auth with authentication_credentials."""
 
         try:
             supabase_sign_in_result = self.__auth_client.sign_in_with_password(
@@ -62,7 +62,7 @@ class SupabaseAuthService(AuthService):
     def sign_in_anonymously(
         self,
     ) -> SupabaseAuthResponse:
-        """Sign in anonymously to Supabase Auth, and return a SupabaseAuthResponse containing a new Supabase user."""
+        """Sign in anonymously to Supabase Auth."""
 
         try:
             supabase_sign_in_anonymously_result = (
@@ -75,7 +75,7 @@ class SupabaseAuthService(AuthService):
 
     @override
     def sign_up(self, authentication_credentials: Credentials) -> SupabaseAuthResponse:
-        """Sign up for Supabase Auth, and return a SupabaseAuthResponse containing a new Supabase user."""
+        """Sign up for Supabase Auth with authentication_credentials."""
 
         try:
             supabase_sign_up_result = self.__auth_client.sign_up(

@@ -1,4 +1,3 @@
-
 from app.models import Record
 from app.readers import AllSourceReader
 

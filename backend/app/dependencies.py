@@ -26,5 +26,5 @@ async def check_user_authentication(
     except AuthException as exception:
         raise CredentialsError from exception
 
-    if not user_response.user_id:
+    if not user_response.succeeded:
         raise CredentialsError

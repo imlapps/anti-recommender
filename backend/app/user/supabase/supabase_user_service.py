@@ -31,9 +31,7 @@ class SupabaseUserService(UserService):
                 str(settings.supabase_url), settings.supabase_key.get_secret_value()
             )
 
-        msg = (
-            "Cannot use Supabase database client without Supabase URL and Supabase key."
-        )
+        msg = "Cannot use Supabase Database without Supabase URL and Supabase key."
         raise UserServiceException(msg)
 
     def __fetch_from_database(
