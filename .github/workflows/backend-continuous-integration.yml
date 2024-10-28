@@ -28,6 +28,9 @@ jobs:
         run: script/backend/bootstrap
       - name: Format app
         run: script/backend/format
+      - env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL}}
+          SUPABASE_KEY: ${{ secrets.SUPABASE_KEY}}
       - name: Run tests
         run: script/backend/test
       - name: Publish unit test results
