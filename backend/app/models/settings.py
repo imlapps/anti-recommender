@@ -4,7 +4,7 @@ from pydantic import AnyUrl, Field, FilePath, SecretStr, field_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 from pyoxigraph import NamedNode
 
-from app.models.types import AntiRecommenderType, RdfMimeType, RecordType
+from app.models.types import AntiRecommenderType, RdfMimeType
 
 CONFIG_DIRECTORY_PATH = Path(__file__).parent.parent.parent.absolute()
 DATA_DIRECTORY_PATH = Path(__file__).parent.parent.absolute() / "data"
@@ -24,7 +24,6 @@ class Settings(BaseSettings):
     output_file_paths: frozenset[Path] = Field(
         default=frozenset(), validation_alias="output_file_names"
     )
-    record_types: frozenset[RecordType] = frozenset()
     supabase_url: AnyUrl | None = None
     supabase_key: SecretStr | None = None
     model_config = SettingsConfigDict(
