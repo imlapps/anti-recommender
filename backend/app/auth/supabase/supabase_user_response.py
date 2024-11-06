@@ -11,19 +11,10 @@ from app.models.types import UserId
 class SupabaseUserResponse(UserResponse):
     """A dataclass containing a user response from a SupabaseAuthService."""
 
-    supabase_user_response: gotrue.UserResponse | None
+    supabase_user_response: gotrue.UserResponse
 
     @property
-    def succeeded(self) -> bool:
-        """Returns True if a Supabase user response is present, and False otherwise."""
-
-        return self.supabase_user_response is not None
-
-    @property
-    def user_id(self) -> UserId | None:
+    def user_id(self) -> UserId:
         """The user ID of the Supabase user."""
 
-        if self.supabase_user_response:
-            return UUID(self.supabase_user_response.user.id)
-
-        return None
+        return UUID(self.supabase_user_response.user.id)

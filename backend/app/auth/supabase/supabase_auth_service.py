@@ -43,6 +43,9 @@ class SupabaseAuthService(AuthService):
         except AuthError as exception:
             raise AuthException from exception
 
+        if not supabase_user_result:
+            raise AuthException
+
         return SupabaseUserResponse(supabase_user_result)
 
     @override

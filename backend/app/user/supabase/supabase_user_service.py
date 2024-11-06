@@ -66,26 +66,6 @@ class SupabaseUserService(UserService):
             .execute()
         )
 
-    def __retrieve_user_id(self, authentication_token: AuthToken) -> UserId:
-        """
-        Return a user ID that corresponds to an authentication_token.
-
-        If no such user ID is found, return an anonymous user ID.
-        """
-
-        try:
-            user_response = self.__auth_service.get_user(authentication_token)
-        except AuthException as exception:
-            raise UserServiceException from exception
-
-        if user_response.user_id:
-            return user_response.user_id
-
-        try:
-            return self.__auth_service.sign_in_anonymously().user_id
-        except AuthException as exception:
-            raise UserServiceException from exception
-
     def create_user_from_id(self, user_id: UserId) -> User:
         """Return a new User, with an ID that matches user_id."""
 
@@ -95,7 +75,18 @@ class SupabaseUserService(UserService):
         """
         Retrieve a user ID from __auth_service, and return a new User with a matching ID.
         """
-        return self.create_user_from_id(self.__retrieve_user_id(authentication_token))
+
+        try:
+            return self.create_user_from_id(
+                user_id=self.__auth_service.get_user(authentication_token).user_id
+            )
+        except AuthException:
+            try:
+                return self.create_user_from_id(
+                    user_id=self.__auth_service.get_user(authentication_token).user_id
+                )
+            except AuthException as exception:
+                raise UserServiceException from exception
 
     @override
     def add_to_user_anti_recommendations_history(

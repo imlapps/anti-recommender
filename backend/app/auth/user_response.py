@@ -8,14 +8,7 @@ class UserResponse(ABC):
 
     @property
     @abstractmethod
-    def succeeded(self) -> bool:
-        """Returns True if user information is present, and False otherwise."""
-
-        raise NotImplementedError
-
-    @property
-    @abstractmethod
-    def user_id(self) -> UserId | None:
+    def user_id(self) -> UserId:
         """The user ID of an authenticated user."""
 
         raise NotImplementedError
