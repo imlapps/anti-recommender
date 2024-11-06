@@ -32,13 +32,13 @@ class ArkgAntiRecommender(AntiRecommender):
         self.__base_iri = base_iri
         self.__record_keys: tuple[RecordKey, ...] = record_keys
         self.__store: ox.Store = self.__load_store(
-            file_path=file_path, mime_type=mime_type, base_iri=base_iri
+            base_iri=base_iri, file_path=file_path, mime_type=mime_type
         )
         self.__user = user
 
     @staticmethod
     def __load_store(
-        base_iri: ox.NamedNode, file_path: Path, mime_type: RdfMimeType
+        *, base_iri: ox.NamedNode, file_path: Path, mime_type: RdfMimeType
     ) -> ox.Store:
         """Load an ARKG serialization into an RDF Store."""
 

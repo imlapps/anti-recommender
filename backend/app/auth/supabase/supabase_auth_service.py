@@ -15,11 +15,11 @@ class SupabaseAuthService(AuthService):
     A SupabaseAuthService uses Supabase Auth to authenticate a User.
     """
 
-    def __init__(self, settings: Settings):
-        self.__auth_client = self.__create_client(settings)
+    def __init__(self, *, settings: Settings):
+        self.__auth_client = self.__create_client(settings=settings)
 
     @staticmethod
-    def __create_client(settings: Settings) -> SupabaseAuthClient:
+    def __create_client(*, settings: Settings) -> SupabaseAuthClient:
         """Return a Supabase auth client, if Supabase URL and Supabase key are present in Settings."""
 
         if settings.supabase_key and settings.supabase_url:
@@ -31,7 +31,7 @@ class SupabaseAuthService(AuthService):
         raise AuthException(msg)
 
     @override
-    def get_user(self, authentication_token: AuthToken) -> SupabaseUserResponse:
+    def get_user(self, *, authentication_token: AuthToken) -> SupabaseUserResponse:
         """
         Return a SupabaseUserResponse containing a Supabase user that corresponds to authentication_token.
         """
@@ -49,7 +49,9 @@ class SupabaseAuthService(AuthService):
         return SupabaseUserResponse(supabase_user_result)
 
     @override
-    def sign_in(self, authentication_credentials: Credentials) -> SupabaseAuthResponse:
+    def sign_in(
+        self, *, authentication_credentials: Credentials
+    ) -> SupabaseAuthResponse:
         """Sign in to Supabase Auth with authentication_credentials."""
 
         try:
@@ -77,7 +79,9 @@ class SupabaseAuthService(AuthService):
         return SupabaseAuthResponse(supabase_sign_in_anonymously_result)
 
     @override
-    def sign_up(self, authentication_credentials: Credentials) -> SupabaseAuthResponse:
+    def sign_up(
+        self, *, authentication_credentials: Credentials
+    ) -> SupabaseAuthResponse:
         """Sign up for Supabase Auth with authentication_credentials."""
 
         try:

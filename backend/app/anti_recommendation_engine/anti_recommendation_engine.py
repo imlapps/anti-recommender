@@ -27,7 +27,7 @@ class AntiRecommendationEngine:
         - Returns a tuple of Records that matched the previous anti-recommendations.
     """
 
-    def __init__(self, user: User, settings: Settings) -> None:
+    def __init__(self, *, user: User, settings: Settings) -> None:
         self.__current_anti_recommendation_records: list[Record] = []
         self.__records_by_key: dict[RecordKey, Record] = {
             record.key: record for record in AllSourceReader(settings=settings).read()
@@ -35,10 +35,10 @@ class AntiRecommendationEngine:
         self.__stack: list[list[Record]] = []
         self.__user = user
         self.__anti_recommender: AntiRecommender = self.__select_anti_recommender(
-            settings
+            settings=settings
         )
 
-    def __select_anti_recommender(self, settings: Settings) -> AntiRecommender:
+    def __select_anti_recommender(self, *, settings: Settings) -> AntiRecommender:
         """
         Select and return an AntiRecommender based on values stored in settings.
 
@@ -96,7 +96,7 @@ class AntiRecommendationEngine:
             ]
 
             self.__user.add_anti_recommendation_to_history(
-                records_of_anti_recommendations[0].key
+                anti_recommendation_key=records_of_anti_recommendations[0].key
             )
 
         return tuple(records_of_anti_recommendations)
@@ -111,7 +111,7 @@ class AntiRecommendationEngine:
         if self.__stack:
             # Remove the last 2 anti-recommendations from a user's history.
             self.__user.remove_anti_recommendations_from_history(
-                AntiRecommendationsSelector.REMOVE_LAST_TWO_RECORDS
+                selector=AntiRecommendationsSelector.LAST_TWO_RECORDS
             )
 
             return tuple(self.__stack.pop())

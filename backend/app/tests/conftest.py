@@ -310,7 +310,7 @@ def supabase_user_service(
 def user(supabase_user_service: SupabaseUserService) -> User:
     """Return a User object."""
 
-    return supabase_user_service.create_user_from_id(uuid.uuid4())
+    return supabase_user_service.create_user_from_id(user_id=uuid.uuid4())
 
 
 @pytest.fixture(scope="session")

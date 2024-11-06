@@ -12,7 +12,7 @@ class AllSourceReader(Reader):
     Read in output data and yield them as Records.
     """
 
-    def __init__(self, settings: Settings) -> None:
+    def __init__(self, *, settings: Settings) -> None:
         self.__readers: tuple[Reader, ...] = create_readers(settings=settings)
 
     def read(self) -> Iterable[Record]:

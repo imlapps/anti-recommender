@@ -7,7 +7,7 @@ def create_readers(settings: Settings) -> tuple[Reader, ...]:
 
     return tuple(
         [
-            WikipediaReader(output_file_path)
+            WikipediaReader(file_path=output_file_path)
             for output_file_path in settings.output_file_paths
         ]
     )

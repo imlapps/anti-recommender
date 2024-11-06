@@ -18,12 +18,14 @@ class SupabaseUserService(UserService):
     A SupabaseUserService uses a Supabase database to manage the state of a User.
     """
 
-    def __init__(self, auth_service: AuthService, settings: Settings) -> None:
+    def __init__(self, *, auth_service: AuthService, settings: Settings) -> None:
         self.__auth_service = auth_service
-        self.__database_client: Client = self.__create_database_client(settings)
+        self.__database_client: Client = self.__create_database_client(
+            settings=settings
+        )
 
     @staticmethod
-    def __create_database_client(settings: Settings) -> Client:
+    def __create_database_client(*, settings: Settings) -> Client:
         """Return a Supabase database client, if Supabase URL and Supabase key are present in Settings."""
 
         if settings.supabase_url and settings.supabase_key:
@@ -66,24 +68,28 @@ class SupabaseUserService(UserService):
             .execute()
         )
 
-    def create_user_from_id(self, user_id: UserId) -> User:
+    def create_user_from_id(self, *, user_id: UserId) -> User:
         """Return a new User, with an ID that matches user_id."""
 
         return User(id=user_id, _service=self)
 
-    def create_user_from_token(self, authentication_token: AuthToken) -> User:
+    def create_user_from_token(self, *, authentication_token: AuthToken) -> User:
         """
         Retrieve a user ID from __auth_service, and return a new User with a matching ID.
         """
 
         try:
             return self.create_user_from_id(
-                user_id=self.__auth_service.get_user(authentication_token).user_id
+                user_id=self.__auth_service.get_user(
+                    authentication_token=authentication_token
+                ).user_id
             )
         except AuthException:
             try:
                 return self.create_user_from_id(
-                    user_id=self.__auth_service.get_user(authentication_token).user_id
+                    user_id=self.__auth_service.get_user(
+                        authentication_token=authentication_token
+                    ).user_id
                 )
             except AuthException as exception:
                 raise UserServiceException from exception
@@ -96,7 +102,7 @@ class SupabaseUserService(UserService):
 
         try:
             anti_recommendations_history = list(
-                self.get_user_anti_recommendations_history(user_id)
+                self.get_user_anti_recommendations_history(user_id=user_id)
             )
 
             anti_recommendations_history.append(anti_recommendation_key)
@@ -113,7 +119,7 @@ class SupabaseUserService(UserService):
 
     @override
     def get_user_anti_recommendations_history(
-        self, user_id: UserId
+        self, *, user_id: UserId
     ) -> tuple[RecordKey, ...]:
         """Return a tuple containing Record keys in a User's anti-recommendation history."""
 
@@ -130,12 +136,12 @@ class SupabaseUserService(UserService):
 
     @override
     def get_user_last_seen_anti_recommendation(
-        self, user_id: UserId
+        self, *, user_id: UserId
     ) -> RecordKey | None:
         """Return the last Record key in a User's anti-recommendation history."""
 
         anti_recommendations_history = self.get_user_anti_recommendations_history(
-            user_id
+            user_id=user_id
         )
 
         if anti_recommendations_history:
@@ -154,10 +160,10 @@ class SupabaseUserService(UserService):
 
         try:
             anti_recommendations_history = list(
-                self.get_user_anti_recommendations_history(user_id)
+                self.get_user_anti_recommendations_history(user_id=user_id)
             )
             match selector:
-                case AntiRecommendationsSelector.REMOVE_LAST_TWO_RECORDS:
+                case AntiRecommendationsSelector.LAST_TWO_RECORDS:
                     del anti_recommendations_history[-2:]
                 case _:
                     raise UserServiceException from ValueError

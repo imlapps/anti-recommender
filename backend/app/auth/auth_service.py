@@ -8,11 +8,11 @@ class AuthService(ABC):
     """An interface to authenticate a User on the NerdSwipe backend."""
 
     @abstractmethod
-    def get_user(self, authentication_token: AuthToken) -> UserResponse:
+    def get_user(self, *, authentication_token: AuthToken) -> UserResponse:
         raise NotImplementedError
 
     @abstractmethod
-    def sign_in(self, authentication_credentials: Credentials) -> AuthResponse:
+    def sign_in(self, *, authentication_credentials: Credentials) -> AuthResponse:
         raise NotImplementedError
 
     @abstractmethod
@@ -24,5 +24,5 @@ class AuthService(ABC):
         raise NotImplementedError
 
     @abstractmethod
-    def sign_up(self, authentication_credentials: Credentials) -> AuthResponse:
+    def sign_up(self, *, authentication_credentials: Credentials) -> AuthResponse:
         raise NotImplementedError

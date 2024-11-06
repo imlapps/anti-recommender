@@ -24,7 +24,7 @@ async def lifespan(app: FastAPI) -> AsyncIterator[None]:
 
     app.state.anti_recommendation_engine = AntiRecommendationEngine(
         user=supabase_user_service.create_user_from_token(
-            AuthToken(access_token=SecretStr(""))
+            authentication_token=AuthToken(access_token=SecretStr(""))
         ),
         settings=settings,
     )

@@ -14,7 +14,7 @@ class WikipediaReader(Reader):
     Read in Wikipedia output data and yield them as Articles.
     """
 
-    def __init__(self, file_path: Path) -> None:
+    def __init__(self, *, file_path: Path) -> None:
         self.__file_path = file_path
 
     def read(self) -> Iterable[wikipedia.Article]:

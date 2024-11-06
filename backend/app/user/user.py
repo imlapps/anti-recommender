@@ -22,16 +22,16 @@ class User:
     def anti_recommendations_history(self) -> tuple[RecordKey, ...]:
         """The anti-recommendations history of a User."""
 
-        return self._service.get_user_anti_recommendations_history(self.id)
+        return self._service.get_user_anti_recommendations_history(user_id=self.id)
 
     @property
     def last_seen_anti_recommendation_key(self) -> RecordKey | None:
         """The last anti-recommendation that was seen by a User."""
 
-        return self._service.get_user_last_seen_anti_recommendation(self.id)
+        return self._service.get_user_last_seen_anti_recommendation(user_id=self.id)
 
     def add_anti_recommendation_to_history(
-        self, anti_recommendation_key: RecordKey
+        self, *, anti_recommendation_key: RecordKey
     ) -> None:
         """Add anti_recommendation_key to a User's history."""
 
@@ -40,7 +40,7 @@ class User:
         )
 
     def remove_anti_recommendations_from_history(
-        self, selector: AntiRecommendationsSelector
+        self, *, selector: AntiRecommendationsSelector
     ) -> None:
         """Remove anti-recommendations from a User's history."""
 

@@ -4,4 +4,4 @@ from enum import Enum
 class AntiRecommendationsSelector(Enum):
     """An enum containing types used to select anti-recommendations from sequences."""
 
-    REMOVE_LAST_TWO_RECORDS = "remove last two records"
+    LAST_TWO_RECORDS = "remove last two records"
