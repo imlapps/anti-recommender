@@ -1,9 +1,16 @@
-<http://imlapps.github.io/anti-recommender/anti-recommendation/Nikola_Tesla> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://schema.org/Recommendation> .
-<http://imlapps.github.io/anti-recommender/anti-recommendation/Nikola_Tesla> <http://schema.org/itemReviewed> <http://www.wikidata.org/entity/Q44666> .
-<http://www.wikidata.org/entity/Q44666> <http://schema.org/url> "http://www.wikidata.org/entity/Q44666" .
-<http://www.wikidata.org/entity/Q44666> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://schema.org/WebPage> .
-<http://www.wikidata.org/entity/Q44666> <http://schema.org/title> "Laplace's_demon" .
-<http://imlapps.github.io/anti-recommender/anti-recommendation/Nikola_Tesla> <http://schema.org/itemReviewed> <http://www.wikidata.org/entity/Q762> .
-<http://www.wikidata.org/entity/Q762> <http://schema.org/url> "http://www.wikidata.org/entity/Q762" .
-<http://www.wikidata.org/entity/Q762> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://schema.org/WebPage> .
-<http://www.wikidata.org/entity/Q762> <http://schema.org/title> "Leonardo_da_Vinci" .
+@base <http://imlapps.github.io/anti-recommender/anti-recommendation/> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix schema: <http://schema.org/> .
+@prefix wd: <http://www.wikidata.org/entity/> .
+
+<Nikola_Tesla> rdf:type schema:Recommendation .
+
+<Nikola_Tesla> schema:itemReviewed wd:Q44666 .
+wd:Q44666 schema:url "http://www.wikidata.org/entity/Q44666" .
+wd:Q44666 rdf:type schema:WebPage .
+wd:Q44666 schema:title "Laplace's_demon" .
+
+<Nikola_Tesla> schema:itemReviewed wd:Q762 .
+wd:Q762 schema:url "http://www.wikidata.org/entity/Q762" .
+wd:Q762 rdf:type schema:WebPage .
+wd:Q762 schema:title "Leonardo_da_Vinci" .

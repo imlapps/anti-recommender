@@ -19,7 +19,7 @@ async def login(
 ) -> AuthToken:
     try:
         sign_in_result: AuthResponse = request.app.state.auth_service.sign_in(
-            Credentials(
+            authentication_credentials=Credentials(
                 email=form_data.username, password=SecretStr(form_data.password)
             )
         )
@@ -30,7 +30,7 @@ async def login(
 
     request.app.state.anti_recommendation_engine = AntiRecommendationEngine(
         user=request.app.state.user_service.create_user_from_token(
-            sign_in_result.authentication_token
+            authentication_token=sign_in_result.authentication_token
         ),
         settings=request.app.state.settings,
     )
@@ -58,7 +58,7 @@ async def sign_up(
 ) -> AuthToken:
     try:
         sign_up_result: AuthResponse = request.app.state.auth_service.sign_up(
-            Credentials(
+            authentication_credentials=Credentials(
                 email=form_data.username, password=SecretStr(form_data.password)
             )
         )
@@ -69,7 +69,7 @@ async def sign_up(
 
     request.app.state.anti_recommendation_engine = AntiRecommendationEngine(
         user=request.app.state.user_service.create_user_from_token(
-            sign_up_result.authentication_token
+            authentication_token=sign_up_result.authentication_token
         ),
         settings=request.app.state.settings,
     )
