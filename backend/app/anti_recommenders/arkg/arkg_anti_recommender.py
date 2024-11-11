@@ -4,6 +4,7 @@ from typing import override
 
 import pyoxigraph as ox
 from pydantic import AnyUrl
+from pydantic_extra_types.language_code import LanguageAlpha2
 
 from app.anti_recommenders import AntiRecommender
 from app.constants import WIKIPEDIA_BASE_URL
@@ -46,19 +47,20 @@ class ArkgAntiRecommender(AntiRecommender):
         return store
 
     def __retrieve_anti_recommendations_from_store(
-        self, record_key: RecordKey
+        self, *, record_key: RecordKey, language: LanguageAlpha2
     ) -> tuple[RecordKey, ...]:
         """Return a tuple of anti-recommendations that have been retrieved from an ARKG Store."""
 
         return tuple(
-            binding["name"].value
+            str(binding["name"].value).replace("@" + language, "")
             for binding in self.__store.query(  # type: ignore[union-attr]
-                query=f'SELECT ?name WHERE {{ {{ ?uuid <{SCHEMA.ABOUT.value}> ?entity {{?entity <{SCHEMA.NAME.value}> "{record_key}"}} . ?uuid <{SCHEMA.ITEM_REVIEWED.value}> ?anti_recommendation {{?anti_recommendation <{SCHEMA.NAME.value}> ?name}} }} }}'
+                query=f'SELECT ?name WHERE {{ {{ ?uuid <{SCHEMA.ABOUT.value}> ?entity {{ ?entity_article <{SCHEMA.ABOUT.value}> ?entity {{?entity_article <{SCHEMA.NAME.value}> "{record_key}"@{language} }} }} . \
+                                                 ?uuid <{SCHEMA.ITEM_REVIEWED.value}> ?anti_recommendation {{?anti_recommendation_article <{SCHEMA.ABOUT.value}> ?anti_recommendation {{?anti_recommendation_article <{SCHEMA.NAME.value}> ?name}} }} }} }}'
             )
         )
 
     def __select_primary_anti_recommendation_key(
-        self, anti_recommendation_keys: tuple[RecordKey, ...]
+        self, *, anti_recommendation_keys: tuple[RecordKey, ...]
     ) -> RecordKey:
         """
         Select and return a primary anti-recommendation key.
@@ -101,11 +103,13 @@ class ArkgAntiRecommender(AntiRecommender):
         """
 
         anti_recommendation_keys = list(
-            self.__retrieve_anti_recommendations_from_store(record_key)
+            self.__retrieve_anti_recommendations_from_store(
+                record_key=record_key, language=LanguageAlpha2("en")
+            )
         )
 
         primary_anti_recommendation_key = self.__select_primary_anti_recommendation_key(
-            tuple(anti_recommendation_keys)
+            anti_recommendation_keys=tuple(anti_recommendation_keys)
         )
 
         if primary_anti_recommendation_key:

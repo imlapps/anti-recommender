@@ -19,6 +19,8 @@ pyoxigraph = "0.3.22"
 supabase = "^2.8.1"
 pyjwt = "^2.9.0"
 python-multipart = "^0.0.12"
+pydantic-extra-types = "^2.10.0"
+pycountry = "^24.6.1"
 
 
 [tool.poetry.group.dev.dependencies]
