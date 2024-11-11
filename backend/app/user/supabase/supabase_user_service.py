@@ -4,7 +4,7 @@ import supabase
 from postgrest import APIError, APIResponse
 from supabase import Client
 
-from app.auth import AuthException, AuthService
+from app.auth import AuthException, AuthService, UserNotFoundAuthException
 from app.constants import ARKG_ANTI_RECOMMENDER_USER_STATE_TABLE_NAME
 from app.models import AntiRecommendationsSelector, AuthToken, Settings
 from app.models.types import RecordKey, UserId
@@ -35,6 +35,16 @@ class SupabaseUserService(UserService):
 
         msg = "Cannot use Supabase Database without Supabase URL and Supabase key."
         raise UserServiceException(msg)
+
+    def __create_anonymous_user(self) -> User:
+        """Return a new User with an anonymous Supabase user ID."""
+
+        try:
+            return self.create_user_from_id(
+                user_id=self.__auth_service.sign_in_anonymously().user_id
+            )
+        except AuthException as exception:
+            raise UserServiceException from exception
 
     def __fetch_from_database(
         self, *, table_name: str, columns: str, eq: dict
@@ -74,9 +84,7 @@ class SupabaseUserService(UserService):
         return User(id=user_id, _service=self)
 
     def create_user_from_token(self, *, authentication_token: AuthToken) -> User:
-        """
-        Retrieve a user ID from __auth_service, and return a new User with a matching ID.
-        """
+        """Return a new User with an ID retrieved from a Supabase AuthService."""
 
         try:
             return self.create_user_from_id(
@@ -84,15 +92,10 @@ class SupabaseUserService(UserService):
                     authentication_token=authentication_token
                 ).user_id
             )
-        except AuthException:
-            try:
-                return self.create_user_from_id(
-                    user_id=self.__auth_service.get_user(
-                        authentication_token=authentication_token
-                    ).user_id
-                )
-            except AuthException as exception:
-                raise UserServiceException from exception
+        except UserNotFoundAuthException:
+            return self.__create_anonymous_user()
+        except AuthException as exception:
+            raise UserServiceException from exception
 
     @override
     def add_to_user_anti_recommendations_history(

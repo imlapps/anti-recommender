@@ -3,7 +3,7 @@ from typing import override
 import supabase
 from supabase import AuthError, AuthInvalidCredentialsError, SupabaseAuthClient
 
-from app.auth import AuthException, AuthService
+from app.auth import AuthException, AuthService, UserNotFoundAuthException
 from app.auth.supabase import SupabaseAuthResponse, SupabaseUserResponse
 from app.models import AuthToken, Credentials, Settings
 
@@ -44,7 +44,7 @@ class SupabaseAuthService(AuthService):
             raise AuthException from exception
 
         if not supabase_user_result:
-            raise AuthException
+            raise UserNotFoundAuthException
 
         return SupabaseUserResponse(supabase_user_result)
 
