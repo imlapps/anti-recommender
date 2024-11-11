@@ -6,8 +6,11 @@ class SCHEMA:
 
     BASE_IRI = NamedNode("http://schema.org/")
 
-    TITLE = NamedNode(BASE_IRI.value + "title")
-    URL = NamedNode(BASE_IRI.value + "url")
-    RECOMMENDATION = NamedNode(BASE_IRI.value + "Recommendation")
+    ABOUT = NamedNode(BASE_IRI.value + "about")
     ITEM_REVIEWED = NamedNode(BASE_IRI.value + "itemReviewed")
-    WEB_PAGE = NamedNode(BASE_IRI.value + "WebPage")
+    NAME = NamedNode(BASE_IRI.value + "name")
+    RECOMMENDATION = NamedNode(BASE_IRI.value + "Recommendation")
+    SAME_AS = NamedNode(BASE_IRI.value + "sameAs")
+    TEXT_OBJECT = NamedNode(BASE_IRI.value + "TextObject")
+    THING = NamedNode(BASE_IRI.value + "Thing")
+    URL = NamedNode(BASE_IRI.value + "url")

@@ -23,30 +23,25 @@ class ArkgAntiRecommender(AntiRecommender):
     def __init__(
         self,
         *,
-        base_iri: ox.NamedNode,
         file_path: Path,
         mime_type: RdfMimeType,
         record_keys: tuple[RecordKey, ...],
         user: User,
     ) -> None:
-        self.__base_iri = base_iri
         self.__record_keys: tuple[RecordKey, ...] = record_keys
         self.__store: ox.Store = self.__load_store(
-            base_iri=base_iri, file_path=file_path, mime_type=mime_type
+            file_path=file_path, mime_type=mime_type
         )
         self.__user = user
 
     @staticmethod
-    def __load_store(
-        *, base_iri: ox.NamedNode, file_path: Path, mime_type: RdfMimeType
-    ) -> ox.Store:
+    def __load_store(*, file_path: Path, mime_type: RdfMimeType) -> ox.Store:
         """Load an ARKG serialization into an RDF Store."""
 
         store = ox.Store()
         store.load(
             input=file_path,
             mime_type=mime_type.value,
-            base_iri=base_iri.value,
         )
         return store
 
@@ -56,10 +51,9 @@ class ArkgAntiRecommender(AntiRecommender):
         """Return a tuple of anti-recommendations that have been retrieved from an ARKG Store."""
 
         return tuple(
-            binding["title"].value
+            binding["name"].value
             for binding in self.__store.query(  # type: ignore[union-attr]
-                query=f"SELECT ?title WHERE {{ <{record_key}> <{SCHEMA.ITEM_REVIEWED.value}> ?resource {{?resource <{SCHEMA.TITLE.value}> ?title}} }}",
-                base_iri=self.__base_iri.value,
+                query=f'SELECT ?name WHERE {{ {{ ?uuid <{SCHEMA.ABOUT.value}> ?entity {{?entity <{SCHEMA.NAME.value}> "{record_key}"}} . ?uuid <{SCHEMA.ITEM_REVIEWED.value}> ?anti_recommendation {{?anti_recommendation <{SCHEMA.NAME.value}> ?name}} }} }}'
             )
         )
 

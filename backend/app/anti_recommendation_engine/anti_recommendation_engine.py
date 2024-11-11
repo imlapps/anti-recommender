@@ -52,7 +52,6 @@ class AntiRecommendationEngine:
             return NormalOpenaiAntiRecommender()
 
         return ArkgAntiRecommender(
-            base_iri=settings.arkg_base_iri,
             file_path=settings.arkg_file_path,
             mime_type=settings.arkg_mime_type,
             record_keys=tuple(sorted(self.__records_by_key.keys())),

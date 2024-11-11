@@ -15,7 +15,6 @@ from fastapi import FastAPI, HTTPException, status
 from fastapi.security import OAuth2PasswordRequestForm
 from postgrest import APIResponse, SyncQueryRequestBuilder, SyncSelectRequestBuilder
 from pydantic import AnyUrl
-from pyoxigraph import NamedNode
 from pytest_mock import MockFixture
 from supabase import SupabaseAuthClient
 
@@ -280,13 +279,6 @@ def mime_type() -> RdfMimeType:
 
 
 @pytest.fixture(scope="session")
-def base_iri() -> NamedNode:
-    """Return the base IRI of a Wikipedia ARKG."""
-
-    return NamedNode("http://imlapps.github.io/anti-recommender/anti-recommendation/")
-
-
-@pytest.fixture(scope="session")
 def supabase_auth_service(
     settings: Settings,
     supabase_parameters: None,  # noqa: ARG001
@@ -354,9 +346,8 @@ def mock_database_upsert(session_mocker: MockFixture) -> None:
 
 
 @pytest.fixture(scope="session")
-def arkg_anti_recommender(  # noqa: PLR0913
+def arkg_anti_recommender(
     arkg_file_path: Path,
-    base_iri: NamedNode,
     mime_type: RdfMimeType,
     mock_database_fetch: None,  # noqa: ARG001
     records_by_key: dict[RecordKey, Record],
@@ -365,7 +356,6 @@ def arkg_anti_recommender(  # noqa: PLR0913
     """Return an ArkgAntiRecommender."""
 
     return ArkgAntiRecommender(
-        base_iri=base_iri,
         file_path=arkg_file_path,
         mime_type=mime_type,
         record_keys=tuple(records_by_key.keys()),
