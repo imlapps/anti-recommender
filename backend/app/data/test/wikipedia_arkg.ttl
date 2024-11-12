@@ -1,0 +1,36 @@
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix schema: <http://schema.org/> .
+@prefix urn: <http://imlapps.github.io/anti-recommender/anti-recommendation/> .
+@prefix wd: <http://www.wikidata.org/entity/> .
+@prefix wikibase: <http://wikiba.se/ontology#> .
+
+urn:uuid:edf5a5c1-014e-4dfa-a503-8cbf1672aac8 rdf:type schema:Recommendation .
+urn:uuid:edf5a5c1-014e-4dfa-a503-8cbf1672aac8 schema:about wd:Q9036 .
+urn:uuid:edf5a5c1-014e-4dfa-a503-8cbf1672aac8 schema:itemReviewed wd:Q762 .
+urn:uuid:edf5a5c1-014e-4dfa-a503-8cbf1672aac8 schema:itemReviewed wd:Q44666 .
+
+wd:Q762 rdf:type schema:Thing .
+wd:Q9036 rdf:type schema:Thing .
+wd:Q44666 rdf:type schema:Thing .
+
+wd:Q762 a wikibase:Item . 
+wd:Q9036 a wikibase:Item .
+wd:Q44666 a wikibase:Item .
+
+<https://en.wikipedia.org/wiki/Leonardo_da_Vinci> a schema:Article ;
+	schema:about wd:Q762 ;
+	schema:inLanguage "en" ;
+	schema:isPartOf <https://en.wikipedia.org/> ;
+	schema:name "Leonardo_da_Vinci"@en .
+
+<https://en.wikipedia.org/wiki/Nikola_Tesla> a schema:Article ;
+	schema:about wd:Q9036 ;
+	schema:inLanguage "en" ;
+	schema:isPartOf <https://en.wikipedia.org/> ;
+	schema:name "Nikola_Tesla"@en .
+
+<https://en.wikipedia.org/wiki/Laplace%27s_demon> a schema:Article ;
+	schema:about wd:Q44666 ;
+	schema:inLanguage "en" ;
+	schema:isPartOf <https://en.wikipedia.org/> ;
+	schema:name "Laplace's_demon"@en .

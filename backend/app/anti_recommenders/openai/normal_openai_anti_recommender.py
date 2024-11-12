@@ -1,21 +1,24 @@
+import typing
 from collections.abc import Iterable
 
 from langchain.prompts import PromptTemplate
 from langchain.schema import StrOutputParser
 from langchain.schema.runnable import RunnablePassthrough, RunnableSerializable
 from langchain_openai import OpenAI
+from pydantic import AnyUrl
 
-from app.anti_recommenders.open_ai.open_ai_anti_recommender import OpenAiAntiRecommender
-from app.models.anti_recommendation import AntiRecommendation
-from app.models.types import ModelQuery, ModelResponse, RecordKey, RecordType
+from app.anti_recommenders.openai import OpenaiAntiRecommender
+from app.models import AntiRecommendation
+from app.models.types import NonBlankString as ModelQuery
+from app.models.types import NonBlankString as ModelResponse
+from app.models.types import RecordKey, RecordType
 
 
-class NormalOpenAiAntiRecommender(OpenAiAntiRecommender):
+class NormalOpenaiAntiRecommender(OpenaiAntiRecommender):
     """
-    A subclass of OpenAiAntiRecommender that relies solely on
-    the large language model's parametric knowledge to generate AntiRecommendations.
+    A subclass of OpenaiAntiRecommender.
 
-    record_type is the type of AntiRecommendations generated from the large language model.
+    A NormalOpenaiAntiRecommender relies solely on the large language model's parametric knowledge to generate anti-recommendations.
     """
 
     def _build_chain(self) -> RunnableSerializable:
@@ -32,12 +35,12 @@ class NormalOpenAiAntiRecommender(OpenAiAntiRecommender):
     ) -> ModelResponse:
         """Invoke the OpenAI large language model and generate a response."""
 
-        return open_ai_chain.invoke(open_ai_query)
+        return str(open_ai_chain.invoke(open_ai_query))
 
     def _parse_llm_response(
         self, open_ai_llm_response: ModelResponse
     ) -> Iterable[AntiRecommendation]:
-        """Extract anti-recommendations from the response and yield AntiRecommendations."""
+        """Extract anti-recommendations from open_ai_llm_response, and yield anti-recommendations."""
 
         model_response_length = 3
 
@@ -55,16 +58,16 @@ class NormalOpenAiAntiRecommender(OpenAiAntiRecommender):
             if RecordType.WIKIPEDIA in line_chunk[2]:
                 url = line_chunk[2].strip()
 
-            yield AntiRecommendation(key=title, url=url)
+            yield AntiRecommendation(key=title, url=AnyUrl(url))
 
+    @typing.override
     def generate_anti_recommendations(
-        self, *, record_key: RecordKey, record_type: RecordType
+        self, *, record_key: RecordKey
     ) -> Iterable[AntiRecommendation]:
-        """Yield AntiRecommendations of a given record key, and of type record_type."""
+        """Yield anti-recommendations of a given record_key."""
 
         yield from self._generate_anti_recommendendations(
             record_key=record_key,
-            record_type=record_type,
             build_chain=self._build_chain,
             create_query=self._create_query,
             generate_llm_response=self._generate_llm_response,

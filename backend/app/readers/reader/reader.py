@@ -1,7 +1,7 @@
 from abc import ABC, abstractmethod
 from collections.abc import Iterable
 
-from app.models.record import Record
+from app.models import Record
 
 
 class Reader(ABC):

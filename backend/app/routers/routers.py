@@ -1,48 +1,125 @@
 from typing import Annotated
 
-from fastapi import APIRouter, Depends, Request
+from fastapi import APIRouter, Depends, HTTPException, Request, status
+from fastapi.security import OAuth2PasswordRequestForm
+from pydantic import SecretStr
 
-from app.models.query_params import CommonQueryParams, NextRecordsQueryParams
-from app.models.record import Record
+from app.anti_recommendation_engine import AntiRecommendationEngine
+from app.auth import AuthException, AuthResponse
+from app.dependencies import check_user_authentication
+from app.models import AuthToken, Credentials, Record
+from app.models.types import RecordKey
 
 router = APIRouter(prefix="/api/v1", tags=["/api/v1"])
 
 
-@router.get("/next_records")
+@router.post("/login")
+async def login(
+    form_data: Annotated[OAuth2PasswordRequestForm, Depends()], request: Request
+) -> AuthToken:
+    try:
+        sign_in_result: AuthResponse = request.app.state.auth_service.sign_in(
+            authentication_credentials=Credentials(
+                email=form_data.username, password=SecretStr(form_data.password)
+            )
+        )
+    except AuthException as exception:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+        ) from exception
+
+    request.app.state.anti_recommendation_engine = AntiRecommendationEngine(
+        user=request.app.state.user_service.create_user_from_token(
+            authentication_token=sign_in_result.authentication_token
+        ),
+        settings=request.app.state.settings,
+    )
+
+    return sign_in_result.authentication_token
+
+
+@router.get("/sign_in_anonymously")
+async def sign_in_anonymously(request: Request) -> AuthToken:
+    try:
+        sign_in_anonymously_result: AuthResponse = (
+            request.app.state.auth_service.sign_in_anonymously()
+        )
+    except AuthException as exception:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+        ) from exception
+
+    return sign_in_anonymously_result.authentication_token
+
+
+@router.post("/sign_up")
+async def sign_up(
+    form_data: Annotated[OAuth2PasswordRequestForm, Depends()], request: Request
+) -> AuthToken:
+    try:
+        sign_up_result: AuthResponse = request.app.state.auth_service.sign_up(
+            authentication_credentials=Credentials(
+                email=form_data.username, password=SecretStr(form_data.password)
+            )
+        )
+    except AuthException as exception:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+        ) from exception
+
+    request.app.state.anti_recommendation_engine = AntiRecommendationEngine(
+        user=request.app.state.user_service.create_user_from_token(
+            authentication_token=sign_up_result.authentication_token
+        ),
+        settings=request.app.state.settings,
+    )
+
+    return sign_up_result.authentication_token
+
+
+@router.get("/sign_out")
+async def sign_out(request: Request) -> None:
+    try:
+        request.app.state.auth_service.sign_out()
+    except AuthException as exception:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST) from exception
+
+
+@router.get(
+    "/next_records/{record_key}", dependencies=[Depends(check_user_authentication)]
+)
 async def next_records(
-    next_params: Annotated[NextRecordsQueryParams, Depends(NextRecordsQueryParams)],
+    record_key: RecordKey,
     request: Request,
 ) -> tuple[Record, ...]:
     """
-    This is the path operation function of the /next_records endpoint.
+    The path operation function of the /next_records endpoint.
+
     Returns a tuple of Records from the AntiRecommendationEngine.
     """
 
-    return request.app.state.anti_recommendation_engine.get_next_records(
-        record_key=next_params.record_key, record_type=next_params.record_type
+    return request.app.state.anti_recommendation_engine.next_records(  # type: ignore[no-any-return]
+        record_key=record_key
     )
 
 
-@router.get("/previous_records")
+@router.get("/previous_records", dependencies=[Depends(check_user_authentication)])
 async def previous_records(request: Request) -> tuple[Record | None, ...]:
     """
     The path operation function of the /previous_records endpoint.
+
     Returns a tuple of previous Records stored in the AntiRecommendationEngine.
     """
 
-    return request.app.state.anti_recommendation_engine.get_previous_records()
+    return request.app.state.anti_recommendation_engine.previous_records()  # type: ignore[no-any-return]
 
 
-@router.get("/initial_records")
-async def initial_records(
-    initial_records_params: Annotated[CommonQueryParams, Depends(CommonQueryParams)],
-    request: Request,
-) -> tuple[Record, ...]:
+@router.get("/initial_records", dependencies=[Depends(check_user_authentication)])
+async def initial_records(request: Request) -> tuple[Record, ...]:
     """
-    A path operation function of the /initial_records endpoint.
+    The path operation function of the /initial_records endpoint.
+
     Returns the intial tuple of Records from the AntiRecommendationEngine.
     """
 
-    return request.app.state.anti_recommendation_engine.get_initial_records(
-        record_type=initial_records_params.record_type
-    )
+    return request.app.state.anti_recommendation_engine.initial_records()  # type: ignore[no-any-return]

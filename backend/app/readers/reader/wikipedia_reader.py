@@ -5,7 +5,7 @@ from pathlib import Path
 from unidecode import unidecode
 
 from app.models import wikipedia
-from app.readers.reader.reader import Reader
+from app.readers.reader import Reader
 
 
 class WikipediaReader(Reader):
@@ -14,14 +14,13 @@ class WikipediaReader(Reader):
     Read in Wikipedia output data and yield them as Articles.
     """
 
-    def __init__(self, file_path: Path) -> None:
+    def __init__(self, *, file_path: Path) -> None:
         self.__file_path = file_path
 
     def read(self) -> Iterable[wikipedia.Article]:
         """Read in Wikipedia output data and yield Records."""
 
         with self.__file_path.open(encoding="utf-8") as json_file:
-
             for json_line in json_file:
                 record_json = json.loads(json_line)
 

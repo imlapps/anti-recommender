@@ -1,27 +1,35 @@
 from pathlib import Path
 
-from pydantic import Field, field_validator
+from pydantic import AnyUrl, Field, FilePath, SecretStr, field_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
+from pyoxigraph import NamedNode
 
-from app.models.types import AntiRecommenderType, ApiKey, RecordType
+from app.models.types import AntiRecommenderType, RdfMimeType
 
-CONFIG_FILE_PATH = Path(__file__).parent.parent.parent.absolute()
+CONFIG_DIRECTORY_PATH = Path(__file__).parent.parent.parent.absolute()
+DATA_DIRECTORY_PATH = Path(__file__).parent.parent.absolute() / "data"
 
 
 class Settings(BaseSettings):
-    """A Pydantic BaseSetting to hold environment variables."""
+    """Pydantic BaseSettings to hold environment variables."""
 
-    record_types: frozenset[RecordType] = frozenset()
+    arkg_base_iri: NamedNode = NamedNode(
+        "http://imlapps.github.io/anti-recommender/anti-recommendation/"
+    )
+    arkg_file_path: FilePath = DATA_DIRECTORY_PATH / "wikipedia_arkg_file.ttl"
+    arkg_mime_type: RdfMimeType = RdfMimeType.TURTLE
+
+    anti_recommender_type: AntiRecommenderType = AntiRecommenderType.ARKG
+    openai_api_key: SecretStr | None = None
     output_file_paths: frozenset[Path] = Field(
         default=frozenset(), validation_alias="output_file_names"
     )
-    anti_recommender_type: AntiRecommenderType = AntiRecommenderType.OPEN_AI
-    openai_api_key: ApiKey | None = None
-
+    supabase_url: AnyUrl | None = None
+    supabase_key: SecretStr | None = None
     model_config = SettingsConfigDict(
         env_file=(
-            CONFIG_FILE_PATH / ".env.local",
-            CONFIG_FILE_PATH / ".env.secret",
+            CONFIG_DIRECTORY_PATH / ".env.local",
+            CONFIG_DIRECTORY_PATH / ".env.secret",
         ),
         extra="ignore",
         env_file_encoding="utf-8",
@@ -33,13 +41,15 @@ class Settings(BaseSettings):
     def convert_to_list_of_file_paths(
         cls, output_file_names: frozenset[str]
     ) -> frozenset[Path]:
-        """Convert the list of file names in the environment variables into a list of Path objects."""
+        """Convert the list of file names in the environment variables into a list of Paths."""
+
         return frozenset(
-            [
-                Path(__file__).parent.parent.absolute() / "data" / file_name
-                for file_name in output_file_names
-            ]
+            [DATA_DIRECTORY_PATH / file_name for file_name in output_file_names]
         )
 
+    @field_validator("arkg_file_path", mode="before")
+    @classmethod
+    def convert_to_file_path(cls, arkg_file_name: str) -> Path:
+        """Convert the file name of an ARKG into a Path."""
 
-settings = Settings()
+        return DATA_DIRECTORY_PATH / arkg_file_name
