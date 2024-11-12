@@ -52,7 +52,7 @@ class ArkgAntiRecommender(AntiRecommender):
         """Return a tuple of anti-recommendations that have been retrieved from an ARKG Store."""
 
         return tuple(
-            str(binding["name"].value).replace("@" + language, "")
+            binding["name"].value
             for binding in self.__store.query(  # type: ignore[union-attr]
                 query=f'SELECT ?name WHERE {{ {{ ?uuid <{SCHEMA.ABOUT.value}> ?entity {{ ?entity_article <{SCHEMA.ABOUT.value}> ?entity {{?entity_article <{SCHEMA.NAME.value}> "{record_key}"@{language} }} }} . \
                                                  ?uuid <{SCHEMA.ITEM_REVIEWED.value}> ?anti_recommendation {{?anti_recommendation_article <{SCHEMA.ABOUT.value}> ?anti_recommendation {{?anti_recommendation_article <{SCHEMA.NAME.value}> ?name}} }} }} }}'
